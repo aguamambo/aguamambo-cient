@@ -1,0 +1,66 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-200 p-4 select-none">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+
+        <div class="flex justify-center ">
+            <img src="../../../assets/img/EAgua_1.png" alt="Sistema de Gestão de Água" class="h-16">
+        </div>
+
+        <div class="flex justify-center my-6 font-bold text-gray-700">
+            Iniciar Sessão
+        </div>
+        <form [formGroup]="loginForm">
+            <div class="mb-4">
+                <label for="userName" class="block text-gray-700 text-sm font-bold mb-2">
+                    Utilizador
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                            fill="#21B4FD">
+                            <path
+                                d="M480-504.62q-49.5 0-84.75-35.25T360-624.62q0-49.5 35.25-84.75T480-744.62q49.5 0 84.75 35.25T600-624.62q0 49.5-35.25 84.75T480-504.62ZM200-215.38v-65.85q0-24.77 14.42-46.35 14.43-21.57 38.81-33.5 56.62-27.15 113.31-40.73 56.69-13.57 113.46-13.57 56.77 0 113.46 13.57 56.69 13.58 113.31 40.73 24.38 11.93 38.81 33.5Q760-306 760-281.23v65.85H200Zm40-40h480v-25.85q0-13.31-8.58-25-8.57-11.69-23.73-19.77-49.38-23.92-101.83-36.65-52.45-12.73-105.86-12.73t-105.86 12.73Q321.69-349.92 272.31-326q-15.16 8.08-23.73 19.77-8.58 11.69-8.58 25v25.85Zm240-289.24q33 0 56.5-23.5t23.5-56.5q0-33-23.5-56.5t-56.5-23.5q-33 0-56.5 23.5t-23.5 56.5q0 33 23.5 56.5t56.5 23.5Zm0-80Zm0 369.24Z" />
+                        </svg>
+                    </span>
+                    <input type="text" id="userName" formControlName="username"
+                        class="block w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        placeholder="Insira ID do utilizador" />
+                </div>
+
+            </div>
+
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
+                    Senha
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                            fill="#21B4FD">
+                            <path
+                                d="M280-430.77q-20.69 0-34.96-14.27T230.77-480q0-20.69 14.27-34.96T280-529.23q20.69 0 34.96 14.27T329.23-480q0 20.69-14.27 34.96T280-430.77ZM280-280q-83.08 0-141.54-58.46Q80-396.92 80-480q0-83.08 58.46-141.54Q196.92-680 280-680q61.62 0 111.12 33.38 49.5 33.39 72.26 86.62h368.16l80 80-127.69 126.15-68.47-51.53-72.3 53.07L571.92-400H463.38q-22.76 52.46-72.26 86.23T280-280Zm0-40q59.08 0 100.81-35.54 41.73-35.54 53.42-84.46h150.39l57.23 38.69 74.3-53.31L781-405.77 855.23-480l-40-40h-381q-11.69-48.92-53.42-84.46Q339.08-640 280-640q-66 0-113 47t-47 113q0 66 47 113t113 47Z" />
+                        </svg>
+                    </span>
+                    <input type="password" id="password" formControlName="password"
+                        class="block w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        placeholder="Insira a senha" />
+                </div>
+            </div>
+             
+             
+
+            @if (isLoading$ | async) {
+                <div class="flex justify-center my-4">
+                    <app-loading-spinner></app-loading-spinner>
+                </div>
+            }
+
+            <!-- Login Button -->
+            <div class="flex items-center justify-between">
+                <button (click)="login()"
+                    class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Entrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

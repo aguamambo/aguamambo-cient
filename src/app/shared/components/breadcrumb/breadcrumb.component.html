@@ -1,0 +1,9 @@
+<div class="flex justify-between text-xs sm:text-sm md:text-xl items-center p-4  w-full h-16 rounded-md ">
+    <span class="font-semibold">{{ title }}</span>
+    <span class="text-gray-500">
+        <ng-container *ngFor="let item of breadcrumbItems; let last = last">
+            <span class="hover:underline cursor-pointer ">{{ item }}</span>
+            <span *ngIf="!last" class="mx-2">/</span>
+        </ng-container>
+    </span>
+</div>

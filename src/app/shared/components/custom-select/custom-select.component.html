@@ -1,0 +1,27 @@
+<div class="w-full">
+  <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">{{ label }}</label>
+
+  <div class="relative">
+    <button
+      class="block appearance-none w-full bg-light-mode dark:bg-slate-500  border text-start border-gray-300 text-gray-700 dark:text-light-mode py-3 px-3 rounded-xl shadow-sm leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+      (click)="toggleDropdown()">
+      {{ selectedLabel }}
+    </button>
+
+    <div *ngIf="isDropdownOpen" class="absolute mt-1 w-full rounded-xl bg-light-mode dark:bg-slate-500  z-10 shadow-lg">
+      <ul class="max-h-60 overflow-auto rounded-xl">
+        <li *ngFor="let option of options"
+          class="cursor-pointer text-dark-light  dark:text-light-mode  py-2 px-3 hover:bg-color-primary hover:text-light-mode hover:bg-deep-dark"
+          (click)="selectOption(option)">
+          {{ option.label }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-light-mode">
+      <svg class="fill-current h-8 w-8 rounded-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+        <path d="M5.2 7.2L10 12l4.8-4.8H5.2z" />
+      </svg>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="fixed bottom-5 right-5 z-50" *ngIf="toastMessage">
+    <div  class="text-white  max-w-xs p-4 rounded-lg shadow-lg flex gap-4 items-center" [class]="{
+        'bg-red-700': toastMessage.type === 'error',
+        'bg-green-700': toastMessage.type === 'success',
+        'bg-blue-700': toastMessage.type === 'info',
+       'bg-yellow-700': toastMessage.type === 'warning'
+     }">
+
+
+        <span>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                fill="currentColor">
+                <path [attr.d]="toastMessage.icon" />
+            </svg>
+        </span>
+        <span>{{ toastMessage.message }}</span>
+    </div>
+</div>

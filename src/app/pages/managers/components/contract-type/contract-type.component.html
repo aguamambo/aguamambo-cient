@@ -1,0 +1,56 @@
+<div class="mx-auto p-4 space-y-6">
+  <ng-container *ngIf="(isContractTypesLoading$ | async) || (isContractTypeSaving$ | async)">
+    <div class="flex flex-col justify-center my-4 gap-1">
+      <app-loading-spinner></app-loading-spinner>
+      <span class="flex justify-center text-sm">
+        <ng-container *ngIf="(isContractTypeSaving$ | async); else loadingData">
+          Salvando a leitura
+        </ng-container>
+        <ng-template #loadingData>
+          Carregando dados
+        </ng-template>
+      </span>
+    </div>
+  </ng-container>
+    <div class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-lg font-semibold mb-4">{{ isEditing ? 'Editar Tipo de Contracto' : 'Adicionar Novo Tipo de Contracto' }}</h2>
+      <form [formGroup]="contractTypeForm" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+           
+          <div>
+            <label class="block text-deep-dark dark:text-light-mode text-sm font-bold mb-2">Designação</label>
+            <input type="text" formControlName="designation" class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
+          </div>
+          <div>
+            <label class="block text-deep-dark dark:text-light-mode text-sm font-bold mb-2">Valor mínimo de consumo</label>
+            <input type="text" formControlName="minimumConsumptionValue" class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
+          </div>
+          <div>
+            <label class="block text-deep-dark dark:text-light-mode text-sm font-bold mb-2">Preço por unidade de consumo</label>
+            <input type="text" formControlName="pricePerConsumptionUnit" #pricePerConsumptionUnit
+            (input)="onNumberInputChange(pricePerConsumptionUnit)"
+            class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
+          </div>
+          <div>
+            <label class="block text-deep-dark dark:text-light-mode text-sm font-bold mb-2">Taxa de religação</label>
+            <input type="text" formControlName="reconnectionFee" class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
+          </div>
+        </div>
+      </form>
+      <button (click)="submitForm()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        {{ isEditing ? 'Actualizar Dados' : 'Adicionar Tipo de Contracto' }}
+      </button>
+    </div>
+  
+    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
+      <h2 class="text-lg font-semibold mb-4">Lista de Empresas</h2>
+      <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
+        <div *ngIf="contractTypes.length > 0">
+          <app-table [data]="contractTypes" [columns]="contractTypesColumns" [totalCount]="contractTypes.length"
+            (rowClick)="editContractType($event)">
+          </app-table>
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -3,8 +3,44 @@ module.exports = {
   content: [
     "./src/**/*.{html,ts}",
   ],
+  darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'deep-dark': '#1f2937',
+        'medium-dark': '#152026',
+        'light-mode': '#FFFFFF',
+        'primary-dark-text': '#F0F0F0',
+        'primary-light-text': '#333333',
+        'scrollbar-thumb': '#21B4FD',
+        'scrollbar-track': '#21B4FD'
+      },
+    },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          'scrollbar-width': 'none',  
+          '&::-webkit-scrollbar': {
+            display: 'none',  
+          },
+        },
+        '.scrollbar-custom': {
+          'scrollbar-width': 'thin',  
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: '#21B4FD', 
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#21B4FD',
+            borderRadius: '9999px',
+          },
+        },
+      });
+    },
+  ],
 }

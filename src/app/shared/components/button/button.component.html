@@ -1,0 +1,7 @@
+<button (click)="handleClick()"
+        class="flex justify-center items-center w-full rounded-3xl sm:rounded-lg p-2 bg-blue-700 cursor-pointer transition duration-300 shadow-md dark:shadow-slate-800 mt-5">
+        <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="currentColor">
+            <path [attr.d]="iconPath"/>
+        </svg>
+  <span class="text-xs font-semibold md:text-md">{{ buttonText }}</span>
+</button>

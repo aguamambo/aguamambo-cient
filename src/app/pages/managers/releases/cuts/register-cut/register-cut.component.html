@@ -1,0 +1,66 @@
+<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
+    <app-breadcrumb title="Registar Novo Corte" [breadcrumbItems]="['Dashboard', 'Registar Corte']"></app-breadcrumb>
+
+    <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[40vh] h-full rounded-lg shadow-md p-4">
+        <ng-container *ngIf="(isClientsLoading$ | async) || (isCutSaving$ | async)">
+            <div class="flex flex-col justify-center my-4 gap-1">
+                <app-loading-spinner></app-loading-spinner>
+                <span class="flex justify-center text-sm">
+                    <ng-container *ngIf="(isCutSaving$ | async); else loadingData">
+                        Salvando a dados de Corte
+                    </ng-container>
+                    <ng-template #loadingData>
+                        Carregando dados
+                    </ng-template>
+                </span>
+            </div>
+        </ng-container>
+
+        <form [formGroup]="registCutForm" class=" py-4 dark:bg-deep-dark ">
+
+            <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
+                <div class="w-full">
+                    <app-custom-select formControlName="empresa" label="Empresa" [options]="enterpriseData"
+                        (selectedValueChange)="onValueSelected($event)">
+                    </app-custom-select>
+                </div>
+
+                <div class="w-full">
+                    <app-custom-select formControlName="zona" label="Zona" [options]="zoneData"
+                        (selectedValueChange)="onEnterpriseSelect($event)">
+                    </app-custom-select>
+                </div>
+                <div class="w-full">
+                    <app-custom-select formControlName="clienteId" label="Cliente" [options]="clientData">
+                    </app-custom-select>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
+
+                <div class="w-full">
+                    <app-custom-drop-down formControlName="mesInicio" label="Mês de Início" [options]="monthsData"
+                        (selectionChange)="onStartMonthSelect($event)">
+                    </app-custom-drop-down>
+                </div>
+                <div class="w-full">
+                    <app-custom-drop-down formControlName="mesTermino" label="Mês de Término" [options]="monthsData"
+                        (selectionChange)="onEndMonthSelect($event)">
+                    </app-custom-drop-down>
+                </div>
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano
+                        Económico</label>
+                    <span
+                        class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{year}}
+                    </span>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="w-full flex items-center justify-end p-4">
+            <button (click)="saveCut()"
+                class="w-full md:w-1/4 bg-blue-600 py-2 text-light-mode rounded-full sm:rounded-lg">Submeter</button>
+        </div>
+    </div>
+</div>

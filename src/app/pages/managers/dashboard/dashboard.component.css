@@ -1,0 +1,44 @@
+/* Estilos gerais */
+.container {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    background-color: var(--medium-dark);
+    color: var(--primary-dark-text);
+    transition: background-color 0.3s;
+    overflow: auto;
+}
+
+.stats-grid {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+}
+
+/* 1 coluna: para telas menores que 429px */
+@media (max-width: 428px) {
+    .stats-grid {
+        grid-template-columns: 1fr; /* 1 coluna */
+    }
+}
+
+/* 2 colunas: entre 429px e 1206px */
+@media (min-width: 640px) and (max-width: 767px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr; 
+    }
+}
+
+/* 2 colunas: entre 429px e 1206px */
+@media (min-width: 429px) and (max-width: 1206px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr; /* 2 colunas */
+    }
+}
+
+/* 4 colunas: para telas maiores que 1206px */
+@media (min-width: 1207px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 colunas */
+    }
+}

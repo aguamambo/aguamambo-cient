@@ -1,0 +1,71 @@
+<nav
+    class="bg-white dark:bg-deep-dark text-gray-900 dark:text-light-mode px-4 py-1 flex justify-between items-center transition duration-300 shadow-b-md  dark:shadow-b-md dark:shadow-black">
+    <button (click)="toggleSidebar()" class="p-2 rounded-full shadow-md md:hidden">
+        <svg *ngIf="!isSidebarOpen" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+            width="24px" fill="currentColor">
+            <path d="M160-269.23v-40h640v40H160ZM160-460v-40h640v40H160Zm0-190.77v-40h640v40H160Z" />
+        </svg>
+        <svg *ngIf="isSidebarOpen" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+            width="24px" fill="currentColor">
+            <path
+                d="M256-227.69 227.69-256l224-224-224-224L256-732.31l224 224 224-224L732.31-704l-224 224 224 224L704-227.69l-224-224-224 224Z" />
+        </svg>
+    </button>
+    <div class="relative flex gap-4 md:justify-between md:w-full">
+        <button (click)="toggleTheme()" class="p-2 hidden sm:block">
+            <div *ngIf="!isDarkMode"
+                class="flex justify-between px-1 w-16 rounded-2xl border border-white bg-gray-300 transition duration-300">
+                <div class="bg-white rounded-full p-0.5 shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="currentColor">
+                        <path
+                            d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 40q-66.85 0-113.42-46.58Q320-413.15 320-480t46.58-113.42Q413.15-640 480-640t113.42 46.58Q640-546.85 640-480t-46.58 113.42Q546.85-320 480-320ZM200-460H60v-40h140v40Zm700 0H760v-40h140v40ZM460-760v-140h40v140h-40Zm0 700v-140h40v140h-40ZM269.85-663.85l-86.39-83.92 27.77-29.77 84.46 85.39-25.84 28.3Zm478.92 481.39-84.69-85.62 26.07-28.07 86.39 83.92-27.77 29.77Zm-84.92-507.69 83.92-86.39 29.77 27.77-85.39 84.46-28.3-25.84ZM182.46-211.23l85.62-84.69 26.54 26.07-83.16 87.16-29-28.54ZM480-480Z" />
+                    </svg>
+                </div>
+                <span></span>
+            </div>
+            <div *ngIf="isDarkMode"
+                class="flex justify-between px-1 w-16 rounded-2xl  border border-blue-800 bg-blue-800 transition duration-300">
+                <span></span>
+                <div class="bg-white rounded-full p-0.5 shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#4e4e4e">
+                        <path
+                            d="M482.31-160q-133.34 0-226.67-93.33-93.33-93.34-93.33-226.67 0-121.54 79.23-210.77t196.15-105.38q3.23 0 6.35.23 3.11.23 6.11.69-20.23 28.23-32.03 62.81-11.81 34.57-11.81 72.42 0 106.67 74.66 181.33Q555.64-404 662.31-404q38.07 0 72.54-11.81 34.46-11.81 61.92-32.04.46 3 .69 6.12.23 3.11.23 6.35-15.38 116.92-104.61 196.15T482.31-160Zm0-40q88 0 158-48.5t102-126.5q-20 5-40 8t-40 3q-123 0-209.5-86.5T366.31-660q0-20 3-40t8-40q-78 32-126.5 102t-48.5 158q0 116 82 198t198 82Zm-10-270Z" />
+                    </svg>
+                </div>
+            </div>
+        </button>
+        <button (click)="toggleProfileMenu()" class="flex items-center space-x-2 p-2 focus:outline-none">
+            <div class="text-left text-sm">
+                <div>{{userName}}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">{{userRole}}</div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+        <div *ngIf="isProfileMenuOpen"
+            class="absolute right-0 top-full w-48 p-4 bg-light-mode dark:bg-gray-800 rounded-lg border shadow-lg">
+            <a (click)="settings()"
+                class="flex items-center hover:cursor-pointer gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="currentColor">
+                    <path
+                        d="M363.07-71.87 346.59-202.5q-11.09-4.28-21.04-10.33-9.94-6.04-19.51-12.84l-121.39 51.19L67.48-377.39l104.91-79.44q-.76-6.04-.76-11.58v-23.18q0-5.54.76-11.58L67.48-582.61l117.17-202.43 121.87 50.95q9.57-6.8 19.65-12.73 10.09-5.92 20.42-10.2l16.48-131.11h233.86l16.48 131.11q11.09 4.28 21.04 10.2 9.94 5.93 19.51 12.73l121.39-50.95 117.17 202.43-105.15 79.44q.76 6.04.76 11.58V-480q0 6.04-.12 11.59-.12 5.54-1.64 11.58l105.15 79.44-117.41 202.91-120.63-51.19q-9.57 6.8-19.65 12.84-10.09 6.05-20.42 10.33L596.93-71.87H363.07Zm79.56-91h73.5l14.24-105.52q31.24-8 58.34-23.62 27.09-15.62 49.09-38.58l98.77 41 36.13-63.69-85.29-64.52q5-14.48 7.24-30.22 2.24-15.74 2.24-31.98 0-16.24-2.24-31.98-2.24-15.74-7.24-30.22l85.76-64.52-36.6-63.69-98.53 42q-22-23.72-49.09-39.58-27.1-15.86-58.58-23.62l-13-105.52h-73.98l-13.52 105.28q-31.72 7.76-58.94 23.62-27.21 15.86-49.45 38.82l-98.28-41-36.37 63.69 85.04 63.29q-5 15.47-7.24 30.83-2.24 15.36-2.24 32.6 0 16.24 2.24 31.72t7.24 30.95l-85.04 64.05 36.37 63.69 98.28-41.76q22.24 23.48 49.57 39.34 27.34 15.86 58.82 23.86l12.76 105.28ZM481.28-340q58 0 99-41t41-99q0-58-41-99t-99-41q-58.76 0-99.38 41t-40.62 99q0 58 40.62 99t99.38 41ZM480-480Z" />
+                </svg>
+                <span>Configurações</span>
+            </a> 
+            <a (click)="signout()"
+                class="flex hover:cursor-pointer items-center gap-2 border-t px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="currentColor">
+                    <path
+                        d="M202.87-111.87q-37.78 0-64.39-26.61t-26.61-64.39v-554.26q0-37.78 26.61-64.39t64.39-26.61h279.04v91H202.87v554.26h279.04v91H202.87Zm434.02-156.65L574-333.93 674.56-434.5H358.09v-91h316.47L574-626.07l62.89-65.41L848.13-480 636.89-268.52Z" />
+                </svg>
+                <span>Sair</span>
+            </a>
+        </div>
+    </div>
+</nav>

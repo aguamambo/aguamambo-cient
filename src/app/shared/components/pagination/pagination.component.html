@@ -1,0 +1,52 @@
+<div class="mt-4 flex justify-center items-center">
+  
+  
+  <button
+    (click)="changePage(1)"
+    [disabled]="currentPage === 1"
+    class="p-2 rounded disabled:text-gray-300 disabled:cursor-not-allowed relative group text-blue-600"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+      <path d="M440-240 200-480l240-240 56 56-183 184 183 184-56 56Zm264 0L464-480l240-240 56 56-183 184 183 184-56 56Z"/>
+    </svg>  
+    </button>
+
+  
+  <button
+    (click)="changePage(currentPage - 1)"
+    [disabled]="currentPage === 1"
+    class="p-2 rounded disabled:text-gray-300 disabled:cursor-not-allowed relative group text-blue-600"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+      <path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/>
+    </svg> 
+  </button>
+
+
+  <span class="mx-4">{{ (currentPage - 1) * pageSize + 1 }} - 
+    {{ currentPage * pageSize > totalCount ? totalCount : currentPage * pageSize }} 
+    de {{ totalCount }}
+  </span>
+  
+ 
+  <button
+    (click)="goToNextPage()"
+    [disabled]="!hasNext"
+    class="p-2 rounded disabled:text-gray-300 disabled:cursor-not-allowed relative group text-blue-600"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+      <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/>
+    </svg> 
+  </button>
+
+  
+  <button
+    (click)="changePage(totalPages)"
+    [disabled]="currentPage >= totalPages"
+    class="p-2 rounded disabled:text-gray-300 disabled:cursor-not-allowed relative group text-blue-600"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+      <path d="M383-480 200-664l56-56 240 240-240 240-56-56 183-184Zm264 0L464-664l56-56 240 240-240 240-56-56 183-184Z"/>
+    </svg> 
+  </button>
+</div>

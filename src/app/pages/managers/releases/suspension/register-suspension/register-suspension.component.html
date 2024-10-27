@@ -1,0 +1,66 @@
+<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
+    <app-breadcrumb title="Registar Nova Suspensão"
+        [breadcrumbItems]="['Dashboard', 'Registar Suspensão']"></app-breadcrumb>
+
+    <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[40vh] h-full rounded-lg shadow-md p-4">
+        <ng-container *ngIf="(isCustomersLoading$ | async) || (isSuspensionSaving$ | async)">
+            <div class="flex flex-col justify-center my-4 gap-1">
+                <app-loading-spinner></app-loading-spinner>
+                <span class="flex justify-center text-sm">
+                    <ng-container *ngIf="(isSuspensionSaving$ | async); else loadingData">
+                        Salvando a Suspensão
+                    </ng-container>
+                    <ng-template #loadingData>
+                        Carregando dados
+                    </ng-template>
+                </span>
+            </div>
+        </ng-container>
+
+        <form [formGroup]="registSuspensionForm" class=" py-4 dark:bg-deep-dark ">
+
+            <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
+                <div class="w-full">
+                    <app-custom-select label="Empresa" [options]="enterpriseData"
+                        (selectedValueChange)="onValueSelected($event)">
+                    </app-custom-select>
+                </div>
+
+                <div class="w-full">
+                    <app-custom-select label="Zona" [options]="ZoneData"
+                        (selectedValueChange)="onEnterpriseSelect($event)">
+                    </app-custom-select>
+                </div>
+                <div class="w-full">
+                    <app-custom-select label="Cliente" [options]="clientsData">
+                    </app-custom-select>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
+
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data
+                        Início</label>
+                    <app-date-picker formControlName="startDate"></app-date-picker>
+                </div>
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data Fim</label>
+                    <app-date-picker formControlName="endDate"></app-date-picker>
+                </div>
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano
+                        Económico</label>
+                    <span
+                        class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{year}}
+                    </span>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="w-full flex items-center justify-end p-4">
+            <button (click)="saveSuspension()"
+                class="w-full md:w-1/4 bg-blue-600 py-2 text-light-mode rounded-full sm:rounded-lg">Submeter</button>
+        </div>
+    </div>
+</div>

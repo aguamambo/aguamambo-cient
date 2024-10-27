@@ -7,4 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'eagua-client';
+  constructor() {
+   localStorage.clear()
+  }
 }

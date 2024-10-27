@@ -1,0 +1,46 @@
+<div class="container mx-auto p-4">
+    <div class="flex flex-col gap-2 justify-between bg-white rounded-lg shadow-md p-6">
+        <div class="w-full flex gap-4">
+            <div
+                class="w-20 h-20 shadow-md flex items-center justify-center shadow-cyan-300 bg-cyan-400 rounded-md -translate-y-10 text-light-mode">
+                <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px"
+                    fill="currentColor">
+                    <path
+                        d="M80-120v-720h400v160h400v320h-80v-240H480v80h80v80h-80v80h80v80h-80v80h160v80H80Zm80-80h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80ZM800-40v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80ZM640-440v-80h80v80h-80Zm0 160v-80h80v80h-80Z" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold mb-4">Adicionar Zona</h2>
+            </div>
+        </div>
+        <div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Nome da Zona</label>
+                <input type="text"
+                    class="mt-1 block w-full border p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Descrição</label>
+                <textarea
+                    class="mt-1 block w-full rounded-md border p-1 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    rows="3"></textarea>
+            </div>
+
+            <div class="w-full">
+                <app-custom-select label="Empresa" [options]="enterpriseData"
+                    (selectedValueChange)="onValueSelected($event)">
+                </app-custom-select>
+            </div>
+        </div>
+        <div>
+            <div class="flex justify-between items-center mt-6">
+                <button
+                    class="w-full bg-cyan-400 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Salvar
+                    Zona
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

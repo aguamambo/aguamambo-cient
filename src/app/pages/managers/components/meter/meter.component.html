@@ -1,0 +1,54 @@
+<div class="max-w-3xl mx-auto p-4 space-y-6">
+    <!-- Meter Form Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-lg font-semibold mb-4">{{ isEditing ? 'Edit Meter' : 'Add New Meter' }}</h2>
+      <form [formGroup]="meterForm" (ngSubmit)="submitMeterForm()" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block font-medium">Marca</label>
+            <input type="text" formControlName="installationDate" class="w-full p-2 border rounded">
+        </div>
+        <div>
+            <label class="block font-medium">Metros cúbicos</label>
+            <input type="text" formControlName="installationDate" class="w-full p-2 border rounded">
+          </div>
+          <div>
+            <app-custom-select label="Cliente"></app-custom-select>
+
+              </div>
+        </div>
+        <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          {{ isEditing ? 'Update Meter' : 'Add Meter' }}
+        </button>
+      </form>
+    </div>
+  
+    <!-- Meter List Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-lg font-semibold mb-4">Meters List</h2>
+      <table class="min-w-full table-auto border">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700">
+            <th class="px-4 py-2">Meter ID</th>
+            <th class="px-4 py-2">Installation Date</th>
+            <th class="px-4 py-2">Status</th>
+            <th class="px-4 py-2">Location</th>
+            <th class="px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let meter of metersList; let i = index" class="border-b hover:bg-gray-100">
+            <td class="px-4 py-2">{{ meter.meterId }}</td>
+            <td class="px-4 py-2">{{ meter.installationDate }}</td>
+            <td class="px-4 py-2">{{ meter.status }}</td>
+            <td class="px-4 py-2">{{ meter.location }}</td>
+            <td class="px-4 py-2 space-x-2">
+              <button (click)="editMeter(i)" class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</button>
+              <button (click)="deleteMeter(i)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

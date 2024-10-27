@@ -5,7 +5,11 @@
   "projects": {
     "eagua-client": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "standalone": false
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -13,6 +17,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "crypto-js"
+            ],
             "outputPath": "dist/eagua-client",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -66,10 +73,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "eagua-client:build:production"
+              "buildTarget": "eagua-client:build:production"
             },
             "development": {
-              "browserTarget": "eagua-client:build:development"
+              "buildTarget": "eagua-client:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -77,7 +84,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "eagua-client:build"
+            "buildTarget": "eagua-client:build"
           }
         },
         "test": {

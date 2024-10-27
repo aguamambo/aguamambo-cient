@@ -1,0 +1,24 @@
+<div class="container mx-auto p-4 w-full">
+    <table class="table-auto w-full border-collapse rounded-lg">
+        <thead>
+            <tr class="bg-[#353B46] rounded-t-lg text-sm">
+                <th *ngFor="let column of columns" class="px-4 py-2 text-white text-start">
+                    {{ column.label }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of data" class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm"
+                (click)="onRowClick(row)">
+                <td *ngFor="let column of columns" class="px-4 py-2 text-start">
+                    {{ row[column.key] }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <app-pagination [currentPage]="currentPage" [pageSize]="pageSize" [totalPages]="totalPages" [hasNext]="hasNext"
+        [hasPrevious]="hasPrevious" [totalCount]="totalCount" [paginatedData]="data"
+        (pageChange)="changePage($event)"></app-pagination>
+</div>
