@@ -26,11 +26,11 @@ export class RegisterReadingComponent implements OnInit {
   registReadingForm!: FormGroup;
   lastReading: number = 0;
   counter: string = '';
-  ZoneData: IOption[] = [];
+  zoneData: IOption[] = [];
   enterpriseData: IOption[] = [];
   clientData: IOption[] = [];
   monthsData: IOption[] = [];
-  ZoneList: IZone[] = [];
+  zoneList: IZone[] = [];
   enterprisesList: IEnterprise[] = [];
   clientsList: IClient[] = [];
   readingsList: IReading[] = [];
@@ -66,6 +66,7 @@ export class RegisterReadingComponent implements OnInit {
     this.checkSession();
     this.initForm();
     this.loadData();
+    this.registReadingForm.controls['meterId'].disable();
   }
 
   initForm(): void {
@@ -73,12 +74,12 @@ export class RegisterReadingComponent implements OnInit {
       currentReading: new FormControl(null),
       readingMonth: new FormControl(null), 
       readingYear: new FormControl(this.getCurrentYear()),
-      meterId: new FormControl(this.counter)
+      meterId: new FormControl(null)
     });
   }
 
   enableFormControls(): void {
-    this.registReadingForm.get('meterId')?.enable();
+    this.registReadingForm.controls['meterId'].enable();;
   }
 
   loadData(): void {
@@ -105,8 +106,8 @@ export class RegisterReadingComponent implements OnInit {
       this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
       this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
         if (zones) {
-          this.ZoneList = zones;
-          this.ZoneData = [
+          this.zoneList = zones;
+          this.zoneData = [
             { label: 'Seleccione...', value: '' },
             ...zones.map(zone => ({
               label: zone.designation,
@@ -156,6 +157,9 @@ export class RegisterReadingComponent implements OnInit {
           this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((counter) => {
             if (counter)
               this.counter = counter.meterId
+              this.registReadingForm.patchValue({
+                meterId: this.counter
+              })
           })
         }
       }

@@ -27,7 +27,7 @@
         <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center ">
           <div class="w-full">
             <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Nome</label>
-            <input type="text" formControlName="nome"
+            <input type="text" formControlName="name"
               class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
           </div>
           <div class="w-full">
@@ -40,7 +40,7 @@
             <div class="w-full flex">
               <span
                 class="p-2.5 border border-gray-300 text-deep-dark dark:text-light-mode font-medium bg-light-mode dark:bg-slate-500 text-sm rounded-l-lg ">+258</span>
-              <input type="text" formControlName="telefone" #telefone (input)="onNumberInputChange(telefone)"
+              <input type="text" formControlName="phoneNumber" #telefone (input)="onNumberInputChange(telefone)"
                 class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
             </div>
           </div>
@@ -49,7 +49,7 @@
             <div class="w-full flex">
               <span
                 class="p-2.5 border border-gray-300 text-deep-dark dark:text-light-mode font-medium bg-light-mode dark:bg-slate-500 text-sm rounded-l-lg ">+258</span>
-              <input type="text" formControlName="telefone2" #telefone2 (input)="onNumberInputChange(telefone2)"
+              <input type="text" formControlName="alternativePhoneNumber" #telefone2 (input)="onNumberInputChange(telefone2)"
                 class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
             </div>
           </div>
@@ -57,17 +57,17 @@
         </div>
         <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center ">
           <div class="w-full">
-            <app-custom-select formControlName="zonaId" label="Zona" [options]="zoneData"
+            <app-custom-select formControlName="zoneId" label="Zona" [options]="zoneData"
               (selectedValueChange)="onEnterpriseSelect($event)">
             </app-custom-select>
           </div>
           <div class="w-full">
-            <app-custom-select formControlName="tipoContratoId" label="Tipo de Contrato" [options]="contractTypeData"
+            <app-custom-select formControlName="contractTypeId" label="Tipo de Contrato" [options]="contractTypeData"
               (selectedValueChange)="onEnterpriseSelect($event)">
             </app-custom-select>
           </div>
           <div class="w-full">
-            <app-custom-drop-down formControlName="mesInicial" label="Mês de Início" [options]="monthsData"
+            <app-custom-drop-down formControlName="startMonth" label="Mês de Início" [options]="monthsData"
               (selectionChange)="onMonthSelect($event)">
             </app-custom-drop-down>
           </div>
@@ -75,12 +75,12 @@
         <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center ">
           <div class="w-full">
             <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Endereço</label>
-            <input type="text" formControlName="endereco"
+            <input type="text" formControlName="address"
               class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
           </div>
           <div class="w-full">
             <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Observação</label>
-            <input type="text" formControlName="observacao"
+            <input type="text" formControlName="notes"
               class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
           </div>
 
@@ -128,15 +128,15 @@
         <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
           <div class="w-full">
 
-            <app-checkbox formControlName="isentoDeMultas" label="Isento de Multas" (checkedChange)="onCheckboxValueChange('isentoDeMultas', $event)"></app-checkbox>
+            <app-checkbox formControlName="exemptFromFines" label="Isento de Multas" (checkedChange)="onCheckboxValueChange('isentoDeMultas', $event)"></app-checkbox>
           </div>
           <div class="w-full">
 
-            <app-checkbox formControlName="receberRecibo" label="Receber Recibo" (checkedChange)="onCheckboxValueChange('receberRecibo', $event)"></app-checkbox>
+            <app-checkbox formControlName="receiveReceipt" label="Receber Recibo" (checkedChange)="onCheckboxValueChange('receberRecibo', $event)"></app-checkbox>
           </div>
           <div class="w-full">
 
-            <app-checkbox formControlName="receberFactura" label="Receber Factura" (checkedChange)="onCheckboxValueChange('receberFactura', $event)"></app-checkbox>
+            <app-checkbox formControlName="receiveInvoice" label="Receber Factura" (checkedChange)="onCheckboxValueChange('receberFactura', $event)"></app-checkbox>
           </div>
 
 

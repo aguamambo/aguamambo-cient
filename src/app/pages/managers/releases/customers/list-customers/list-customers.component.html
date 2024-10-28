@@ -4,8 +4,36 @@
     [breadcrumbItems]="['Dashboard', 'Listar Clientes']">
     </app-breadcrumb>
 
-    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-       
-          
+    <ng-container *ngIf="(isClientLoading$ | async) || (isClientSaving$ | async)">
+        <div class="flex flex-col justify-center my-4 gap-1">
+          <app-loading-spinner></app-loading-spinner>
+          <span class="flex justify-center text-sm">
+            <ng-container *ngIf="(isClientSaving$ | async); else loadingData">
+              Salvando a leitura
+            </ng-container>
+            <ng-template #loadingData>
+              Carregando dados
+            </ng-template>
+          </span>
+        </div>
+      </ng-container>
+
+     
+ 
+     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
+        <h2 class="text-lg font-semibold mb-4">Lista de Clientes</h2>
+        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
+            <ng-container *ngIf="clientsList.length > 0; else noData">
+                <app-table
+                    [data]="clientsList"
+                    [columns]="clientColumns"
+                    [totalCount]="clientsList.length"
+                    (rowClick)="editClient($event)">
+                </app-table>
+            </ng-container>
+            <ng-template #noData>
+                <div class="text-center p-4">Nenhum cliente disponível</div>
+            </ng-template>
+        </div>
     </div>
 </div>

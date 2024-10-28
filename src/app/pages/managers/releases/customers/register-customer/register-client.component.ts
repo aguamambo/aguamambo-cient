@@ -42,20 +42,18 @@ export class RegisterClientComponent implements OnInit {
     this.year = this.generic.getCurrentYear()
 
     this.clientForm = this.fb.group({
-      endereco: new FormControl(),
-      nome: new FormControl(),
-      nuit: new FormControl(),
-      telefone: new FormControl(),
-      telefone2: new FormControl(),
-      tipoContratoId: new FormControl(),
-      utilizadorCriacao: new FormControl(this.user),
-      mesInicial: new FormControl(),
-      anoEconomicoInicial: new FormControl(this.year),
-      zonaId: new FormControl(),
-      observacao: new FormControl(),
-      isentoDeMultas: new FormControl(false),
-      receberRecibo: new FormControl(false),
-      receberFactura: new FormControl(false),
+      name: new FormControl(null),
+      phoneNumber: new FormControl(null),
+      address: new FormControl(null),
+      nuit: new FormControl(null),
+      zoneId: new FormControl(null),
+      contractTypeId: new FormControl(null),
+      alternativePhoneNumber: new FormControl(),
+      startMonth: new FormControl(),
+      notes: new FormControl(),
+      exemptFromFines: new FormControl(false),
+      receiveReceipt: new FormControl(false),
+      receiveInvoice: new FormControl(false),
     });
 
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
@@ -101,7 +99,7 @@ export class RegisterClientComponent implements OnInit {
   }
 
   onMonthSelect(selectedOption: { value: string; label: string }) {
-    this.clientForm.get('mesInicial')?.setValue(selectedOption.value)
+    this.clientForm.get('startMonth')?.setValue(selectedOption.value)
   }
   saveClient(): void {
     if (this.clientForm.valid) {
@@ -113,7 +111,7 @@ export class RegisterClientComponent implements OnInit {
 
   onNumberInputChange(inputElement: HTMLInputElement): void {
     inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
-  } 
+  }
 
   onCheckboxValueChange(controlName: string, isChecked: boolean) {
     this.clientForm.get(controlName)?.setValue(isChecked);

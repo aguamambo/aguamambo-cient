@@ -26,7 +26,7 @@
         </div>
 
         <div class="w-full">
-          <app-custom-select label="Zona" [options]="ZoneData"
+          <app-custom-select label="Zona" [options]="zoneData"
             (selectedValueChange)="onEnterpriseSelect($event)">
           </app-custom-select>
         </div>
@@ -49,11 +49,9 @@
           </span>
         </div>
 
-        <div class="w-full" *ngIf="counter">
+        <div class="w-full">
           <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-          <span
-            class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{counter}}
-          </span>
+          <input formControlName="counter" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
         </div>
 
         <div class="w-full">

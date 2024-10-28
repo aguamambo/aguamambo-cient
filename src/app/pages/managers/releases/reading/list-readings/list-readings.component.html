@@ -1,12 +1,86 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 h-full">
-    <app-breadcrumb 
-    title="Lista de Leituras" 
-    [breadcrumbItems]="['Dashboard', 'Listar Leituras']">
-    </app-breadcrumb>
+<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
+    <app-breadcrumb title="Lista de Leituras" [breadcrumbItems]="['Dashboard', 'Listar Leituras']"></app-breadcrumb>
+     
+    <ng-container *ngIf="(isReadingsLoading$ | async) || (isReadingSaving$ | async)">
+        <div class="flex flex-col justify-center my-4 gap-1">
+          <app-loading-spinner></app-loading-spinner>
+          <span class="flex justify-center text-sm">
+            <ng-container *ngIf="(isReadingSaving$ | async); else loadingData">
+              Salvando a leitura
+            </ng-container>
+            <ng-template #loadingData>
+              Carregando dados
+            </ng-template>
+          </span>
+        </div>
+      </ng-container>
 
-    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-        <div *ngIf="readingsData.length > 0">
-            <app-table [data]="readingsData" [columns]="readingColumns" [totalCount]="readingsList.length"></app-table>
+    <div *ngIf="isEditing" class="py-4 dark:bg-deep-dark w-full mt-4">
+        <form [formGroup]="readingForm" class="p-4">
+             
+            <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
+                    <input formControlName="readingYear" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+                </div>
+
+                <div class="w-full" >
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
+                    <input formControlName="counter" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+                </div>
+
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>
+                    <input formControlName="lastReading" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+               </div>
+            </div>
+
+            <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
+                <div class="w-full">
+                    <app-custom-drop-down
+                        formControlName="readingMonth"
+                        label="Mês"
+                        [options]="monthsData"
+                        (selectionChange)="onMonthSelect($event)">
+                    </app-custom-drop-down>
+                </div>
+
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Actual</label>
+                    <input
+                        type="text"
+                        formControlName="currentReading"
+                        #currentReading
+                        (input)="onNumberInputChange(currentReading)"
+                        class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
+                </div>
+            </div>
+
+        </form>
+        <div class="flex mt-4 p-6">
+            <button
+                type="button"
+                (click)="submitForm()" 
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer">
+                Atualizar Leitura
+            </button>
+        </div>
+    </div>
+ 
+     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
+        <h2 class="text-lg font-semibold mb-4">Lista de Leituras</h2>
+        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
+            <ng-container *ngIf="readingsList.length > 0; else noData">
+                <app-table
+                    [data]="readingsData"
+                    [columns]="readingColumns"
+                    [totalCount]="readingsList.length"
+                    (rowClick)="editReading($event)">
+                </app-table>
+            </ng-container>
+            <ng-template #noData>
+                <div class="text-center p-4">Nenhuma leitura disponível</div>
+            </ng-template>
         </div>
     </div>
 </div>

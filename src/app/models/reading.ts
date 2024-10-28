@@ -2,14 +2,14 @@ export interface IReading {
   readingId: string;
   active: boolean;
   consumption: number;
-  dateChange: string;
-  dateCreated: string;
+  updatedAt: string;
+  createdAt: string;
   currentReading: number;
-  lastReading: number;
+  previousReading: number;
   readingMonth: number;
   readingYear: number;
   state: string;
   meterId: string;
-  userChange: string;
+  userChanged: string;
   userCreated: string; 
 }
