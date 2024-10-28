@@ -17,7 +17,8 @@ export class DatePickerComponent implements ControlValueAccessor {
   showCalendar = false;
   isYearDropdownOpen = false;
   isMonthDropdownOpen = false;
-  selectedDate: string | null = null;
+  selectedDate: string | null = null;  // Date value in ISO format
+  displayDate: string | null = null;    // Displayed in dd-MM-yyyy format
   days: number[] = [];
   months: string[] = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -34,31 +35,25 @@ export class DatePickerComponent implements ControlValueAccessor {
   }
 
   generateDays(year: number, month: number): void { 
-    if (!isNaN(month) && month >= 0 && month <= 11) { 
-      const start = new Date(year, month, 1);
-      const end = new Date(year, month + 1, 0);
-      this.days = [];
-      
-      if (start && end) {   
-        for (let i = start.getDate(); i <= end.getDate(); i++) {
-          this.days.push(i);
-        }
-      }
+    const start = new Date(year, month, 1);
+    const end = new Date(year, month + 1, 0);
+    this.days = [];
+
+    for (let i = start.getDate(); i <= end.getDate(); i++) {
+      this.days.push(i);
     }
   }
-  
 
   generateYears() {
-    if (this.currentYear) {
-      for (let i = this.currentYear; i >= 2000; i--) {
-        this.years.push(i);
-      }
+    for (let i = this.currentYear; i >= 2000; i--) {
+      this.years.push(i);
     }
   }
 
   selectDate(day: number) {
     const date = new Date(this.selectedYear, this.selectedMonth, day);
-    this.selectedDate = this.formatDate(date);
+    this.selectedDate = date.toISOString(); // ISO format for sent value
+    this.displayDate = this.formatDisplayDate(date); // dd-MM-yyyy format for display
     this.showCalendar = false;
     this.onChange(this.selectedDate);
     this.onTouched();
@@ -66,20 +61,17 @@ export class DatePickerComponent implements ControlValueAccessor {
   }
 
   selectMonth(month: number) {
-    if (month >= 0 && month <= 11) {  
-      this.selectedMonth = month;
-      this.generateDays(this.selectedYear, this.selectedMonth);
-      this.isMonthDropdownOpen = false;
-    }
+    this.selectedMonth = month;
+    this.generateDays(this.selectedYear, this.selectedMonth);
+    this.isMonthDropdownOpen = false;
   }
 
   selectYear(year: number) {
-    if (year) {   
-      this.selectedYear = year;
-      this.generateDays(this.selectedYear, this.selectedMonth);
-      this.isYearDropdownOpen = false;
-    }
+    this.selectedYear = year;
+    this.generateDays(this.selectedYear, this.selectedMonth);
+    this.isYearDropdownOpen = false;
   }
+
   toggleYearDropdown() {
     this.isYearDropdownOpen = !this.isYearDropdownOpen;
     this.isMonthDropdownOpen = false;   
@@ -94,18 +86,25 @@ export class DatePickerComponent implements ControlValueAccessor {
     this.showCalendar = !this.showCalendar;
   }
 
-  formatDate(date: Date): string {
+  formatDisplayDate(date: Date): string {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    return `${year}-${month}-${day}`;
+    return `${day}-${month}-${year}`;
   }
 
   onChange = (value: any) => {};
   onTouched = () => {};
 
   writeValue(value: any): void {
-    this.selectedDate = value;
+    if (value) {
+      const date = new Date(value);
+      this.selectedDate = value;
+      this.displayDate = this.formatDisplayDate(date); // Display as dd-MM-yyyy
+    } else {
+      this.selectedDate = null;
+      this.displayDate = null;
+    }
     this.cdr.detectChanges(); 
   }
 

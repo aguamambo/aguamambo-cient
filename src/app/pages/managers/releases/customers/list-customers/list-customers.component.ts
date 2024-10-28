@@ -78,7 +78,7 @@ constructor(private fb: FormBuilder, private store: Store, private generic: Gene
   }
 
   getData() {
-    // Dispatch actions to fetch data
+     
     this.store.dispatch(listAllClients());
     this.store.dispatch(listAllZones());
     this.store.dispatch(listAllContractTypes());

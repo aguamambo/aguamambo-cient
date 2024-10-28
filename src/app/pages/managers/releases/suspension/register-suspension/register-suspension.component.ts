@@ -9,8 +9,9 @@ import { IEnterprise } from "src/app/models/enterprise";
 import { IOption } from "src/app/models/option";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from "src/app/services/auth.service";
-import { IAppState, createSuspension, getClientByZoneId, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
+import { IAppState, createSuspension, getClientByZoneId, getClientMeter, getClientMeterByClientId, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
+import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
 import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
 
@@ -28,13 +29,15 @@ export class RegisterSuspensionComponent  implements OnInit {
   clientsList: IClient[] = []; 
   ZoneList: IZone[] = [];
   enterprisesList: IEnterprise[] = [];
+  clientMeter: string = ''
  
   isCustomersLoading$: Observable<boolean>;
   isSuspensionSaving$: Observable<boolean>;
 
   getZonesByCompanyId$ = this.store.pipe(select(selectSelectedZones));
   getEnterprise$ = this.store.pipe(select(selectSelectedEnterprises));
-  getClients$ = this.store.pipe(select(selectSelectedClients));  
+  getClients$ = this.store.pipe(select(selectSelectedClients));
+  getMeterByClientId$  = this.store.pipe(select(selectSelectedClientMeter));
   private destroy$ = new Subject<void>();
   user: string = '';
   year: number = 0;
@@ -89,7 +92,7 @@ export class RegisterSuspensionComponent  implements OnInit {
           this.ZoneData = [
             { label: 'Seleccione...', value: '' },
             ...response.map(area => ({
-              label: area.description,
+              label: area.designation,
               value: area.zoneId
             }))
           ];
@@ -117,18 +120,40 @@ export class RegisterSuspensionComponent  implements OnInit {
     }
   }
 
+  
+onClientSelect(event: { value: string; label: string }): void {
+  const clientId = event.value; 
+
+  if (clientId) { 
+    this.store.dispatch(getClientMeterByClientId({ clientId: clientId }));
+ 
+    this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((counter) => {
+      if (counter) {
+        this.clientMeter = counter.meterId;
+        this.registSuspensionForm.patchValue({
+          meterId: this.clientMeter
+        });
+      }
+    });
+  } else {
+    this.clientMeter = '';
+    this.registSuspensionForm.patchValue({ meterId: '' });
+  }
+}
+
+
   getClients(){
     this.store.dispatch(listAllClients());
     this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
       if (clients) {
-        this.clientsList = clients;
+        this.clientsList = clients; 
         this.clientsData = [
           { label: 'Seleccione...', value: '' },
           ...clients.map(client => ({
             label: client.name,
             value: client.clientId
           }))
-        ];
+        ]; 
       }
     });
   }
