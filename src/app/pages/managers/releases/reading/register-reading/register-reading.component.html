@@ -32,7 +32,7 @@
         </div>
         <div class="w-full">
           <app-custom-select label="Cliente" [options]="clientData"
-            (selectedValueChange)="onCustomerSelect($event)">
+            (selectedValueChange)="onClientSelect($event)">
           </app-custom-select>
         </div>
       </div>
@@ -51,8 +51,11 @@
 
         <div class="w-full">
           <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-          <input formControlName="counter" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-        </div>
+          <app-custom-drop-down
+              [options]="clientMetersData"
+          (selectionChange)="onMeterSeclected($event)"> 
+          </app-custom-drop-down>
+      </div>
 
         <div class="w-full">
           <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>

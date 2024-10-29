@@ -13,7 +13,7 @@ import { IZone } from "src/app/models/zone";
 import { AuthService } from 'src/app/services/auth.service';
 import { IAppState, createReading, getClientMeter, getLastReadingByClient, listAllEnterprises } from 'src/app/store';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
-import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
+import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
 import {  selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
@@ -27,6 +27,7 @@ export class RegisterReadingComponent implements OnInit {
   lastReading: number = 0;
   counter: string | null = '';
   zoneData: IOption[] = [];
+  clientMetersData: IOption[] = [];
   enterpriseData: IOption[] = [];
   clientData: IOption[] = [];
   monthsData: IOption[] = [];
@@ -46,8 +47,8 @@ export class RegisterReadingComponent implements OnInit {
   getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
-  getReadingsByCustomerId$ = this.store.pipe(select(selectSelectedReading));
-  getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeter));
+  getReadingsByClientId$ = this.store.pipe(select(selectSelectedReading));
+  getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
   private destroy$ = new Subject<void>();
   user: string = '';
 
@@ -137,32 +138,43 @@ export class RegisterReadingComponent implements OnInit {
     }
   }
 
-  onCustomerSelect(selectedCustomer: { label: string, value: string }): void {
-    this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe((customers) => {
-      if (customers) {
+  onClientSelect(selectedClient: { label: string, value: string }): void {
+    this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
+      if (clients) {
 
-        const customerDetails = customers.find(customer => customer.clientId === selectedCustomer.value);
-        if (customerDetails) {
-          this.store.dispatch(getLastReadingByClient({ clientId: customerDetails.clientId }));
-          this.store.dispatch(getClientMeter({ meterId: customerDetails.clientId }))
+        const clientDetails = clients.find(client => client.clientId === selectedClient.value);
+        if (clientDetails) {
+          this.store.dispatch(getLastReadingByClient({ clientId: clientDetails.clientId }));
+          this.store.dispatch(getClientMeter({ meterId: clientDetails.clientId }))
 
-          this.getReadingsByCustomerId$.pipe(takeUntil(this.destroy$)).subscribe((readings) => {
+          this.getReadingsByClientId$.pipe(takeUntil(this.destroy$)).subscribe((readings) => {
             if (readings) { 
               this.lastReading = readings.currentReading;
               this.enableFormControls();
             }
           });
 
-          this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((counter) => {
-            if (counter)
-              this.counter = counter.meterId
-              this.registReadingForm.patchValue({
-                meterId: this.counter
-              })
+          this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
+            if (meters) {
+              this.clientMetersData = [
+                { label: 'Seleccione...', value: '' },
+                ...meters.map(meter => ({
+                  label: meter.meterId || '',
+                  value: meter.meterId || ''
+                }))
+              ];
+              
+            }
           })
         }
       }
     });
+  }
+
+  onMeterSeclected(option: IOption) {
+    if (option && option.value) {
+      this.registReadingForm.get('meterId')?.setValue(option.value)
+    }
   }
 
   getCurrentYear(): number {
