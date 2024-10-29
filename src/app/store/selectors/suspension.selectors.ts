@@ -13,22 +13,22 @@ export const selectSelectedSuspension = createSelector(
   (state) => state.selectedSuspension
 );
 
-export const selectuspensionIsLoading = createSelector(
+export const selectSuspensionIsLoading = createSelector(
   selectSuspensionState,
   (state) => state.isLoading
 );
 
-export const selectuspensionIsSaving = createSelector(
+export const selectSuspensionIsSaving = createSelector(
   selectSuspensionState,
   (state) => state.isSaving
 );
 
-export const selectuspensionErrorMessage = createSelector(
+export const selectSuspensionErrorMessage = createSelector(
   selectSuspensionState,
   (state) => state.errorMessage
 );
 
-export const selectuspensionSuccessMessage = createSelector(
+export const selectSuspensionSuccessMessage = createSelector(
   selectSuspensionState,
   (state) => state.successMessage
 );

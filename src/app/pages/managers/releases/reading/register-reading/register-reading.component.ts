@@ -62,8 +62,7 @@ export class RegisterReadingComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-    this.checkSession();
+    this.user = this.auth.checkSession();
     this.initForm();
     this.loadData();
     this.registReadingForm.controls['meterId'].disable();

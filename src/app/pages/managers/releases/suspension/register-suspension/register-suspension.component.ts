@@ -1,4 +1,3 @@
-import { selectuspensionIsSaving } from './../../../../../store/selectors/suspension.selectors';
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
@@ -13,6 +12,7 @@ import { IAppState, createSuspension, getClientByZoneId, getClientMeter, getClie
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
 import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
+import { selectSuspensionIsSaving } from "src/app/store/selectors/suspension.selectors";
 import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
 
 @Component({
@@ -45,7 +45,7 @@ export class RegisterSuspensionComponent  implements OnInit {
 
   constructor(private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
     this.isCustomersLoading$ = this.store.select(selectClientIsLoading);
-    this.isSuspensionSaving$ = this.store.select(selectuspensionIsSaving);
+    this.isSuspensionSaving$ = this.store.select(selectSuspensionIsSaving);
     this.year = this.generic.getCurrentYear()
 
   }
