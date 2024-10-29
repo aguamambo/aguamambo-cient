@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { delay, first, Observable, Subject, takeUntil } from 'rxjs';
 import { GenericConfig } from 'src/app/core/config/generic.config';
+import { IClientMeter } from 'src/app/models/clientMeter';
 import { IContractType } from 'src/app/models/contractType';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
-import { createClient, listAllContractTypes, listAllZones } from 'src/app/store';
-import { selectClientErrorMessage, selectClientIsSaving, selectClientSuccessMessage } from 'src/app/store/selectors/client.selectors';
+import { createClient, createClientMeter, listAllContractTypes, listAllZones } from 'src/app/store';
+import { selectClientErrorMessage, selectClientIsSaving, selectClientSuccessMessage, selectSelectedClient } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedZones, selectZoneIsLoading } from 'src/app/store/selectors/zone.selectors';
 
@@ -19,6 +20,7 @@ import { selectSelectedZones, selectZoneIsLoading } from 'src/app/store/selector
 })
 export class RegisterClientComponent implements OnInit {
   clientForm!: FormGroup;
+  meterForm!: FormGroup;
   destroy$ = new Subject<void>();
   zoneData: IOption[] = [];
   contractTypeData: IOption[] = [];
@@ -31,15 +33,22 @@ export class RegisterClientComponent implements OnInit {
 
   getZonesByEnterpriseId$ = this.store.pipe(select(selectSelectedZones));
   getContactTypes$ = this.store.pipe(select(selectSelectedContractTypes));
+  getClient$ = this.store.pipe(select(selectSelectedClient));
   year: number = 0
   monthsData: IOption[] = [];
   user: string = '';
   isAccordionOpen = false;
+  
+
   constructor(private fb: FormBuilder, private store: Store, private generic: GenericConfig, private auth: AuthService) { }
 
   ngOnInit(): void {
-    // this.user = this.auth.checkSession();
+      this.checkSession();
     this.year = this.generic.getCurrentYear()
+
+     
+      
+    
 
     this.clientForm = this.fb.group({
       name: new FormControl(null),
@@ -54,6 +63,8 @@ export class RegisterClientComponent implements OnInit {
       exemptFromFines: new FormControl(false),
       receiveReceipt: new FormControl(false),
       receiveInvoice: new FormControl(false),
+      brand:  new FormControl(''),
+      cubicMeters: new FormControl('') 
     });
 
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
@@ -103,9 +114,30 @@ export class RegisterClientComponent implements OnInit {
   }
   saveClient(): void {
     if (this.clientForm.valid) {
-      const payload = this.clientForm.value;
 
-      this.store.dispatch(createClient({ client: payload }));
+      const clientData = this.payload_Client;
+      const meterData = this.payload_Meter; 
+ 
+      this.store.dispatch(createClient({ client: clientData }));
+
+
+      delay(5000)
+
+      this.getClient$.pipe(
+        first(client => !!client)   
+      ).subscribe(client => {
+        if (client) {
+          const payload: IClientMeter = {
+            meterId: '',
+            ...meterData,
+            clientId: client.clientId
+          };
+          
+          console.log(payload);
+          
+          this.store.dispatch(createClientMeter({clientMeter: payload}))
+        }
+      })
     }
   }
 
@@ -121,8 +153,24 @@ export class RegisterClientComponent implements OnInit {
     this.isAccordionOpen = !this.isAccordionOpen;
   }
 
+  get payload_Client() {
+    const { brand, cubicMeters, ...clientData } = this.clientForm.value;
+    return clientData;
+  }
+
+  get payload_Meter() {
+    const { brand, cubicMeters } = this.clientForm.value;
+    return { brand, cubicMeters };
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  checkSession() {
+    if (!this.auth.authenticated()){
+      this.auth.logout()
+    }
   }
 }

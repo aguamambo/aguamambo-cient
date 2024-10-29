@@ -10,6 +10,7 @@ import { IZone } from "src/app/models/zone";
 import { AuthService } from "src/app/services/auth.service";
 import { IAppState, createCut, getClientByZoneId, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
+import { selectSelectedClientMeter, selectSelectedClientMeters } from "src/app/store/selectors/clientMeter.selectors";
 import { selectCutIsSaving } from "src/app/store/selectors/cut.selectors";
 import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
 import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
@@ -20,8 +21,10 @@ import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
   styleUrl: './register-cut.component.css'
 })
 export class RegisterCutComponent  implements OnInit {
+
   registCutForm!: FormGroup;   
   clientData: IOption[] = [];
+  clientMetersData: IOption[] = [];
   enterpriseData: IOption[] = [];
   monthsData: IOption[] = []; 
   zoneData: IOption[] = []; 
@@ -35,15 +38,16 @@ export class RegisterCutComponent  implements OnInit {
   getZonesByEnterpriseId$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClients$ = this.store.pipe(select(selectSelectedClients));  
+  getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
   private destroy$ = new Subject<void>();
   user: string = '';
   year: number = 0;
+  meter: string | null = '';
 
   constructor(private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
     this.isClientsLoading$ = this.store.select(selectClientIsLoading);
     this.isCutSaving$ = this.store.select(selectCutIsSaving);
     this.year = this.generic.getCurrentYear()
-
   }
 
   ngOnInit(): void {
@@ -55,8 +59,9 @@ export class RegisterCutComponent  implements OnInit {
   initForm(): void {
     
     this.registCutForm = new FormGroup({  
-        mesInicio: new FormControl(null),
-        mesTermino: new FormControl(null), 
+        startDate: new FormControl(null),
+        endDate: new FormControl(null), 
+        meterId: new FormControl(null)
     });
 
   }
@@ -106,14 +111,35 @@ export class RegisterCutComponent  implements OnInit {
           this.clientsList = clients;
           this.clientData = [
             { label: 'Seleccione...', value: '' },
-            ...clients.map(customer => ({
-              label: customer.name,
-              value: customer.clientId
+            ...clients.map(client => ({
+              label: client.name,
+              value: client.clientId
             }))
           ];
         }
       });
     }
+  }
+
+  onMeterSeclected(option: IOption) {
+    if (option && option.value) {
+      this.registCutForm.get('meterId')?.setValue(option.value)
+    }
+  }
+
+   onClientSelect(selectedClient: { label: string, value: string }): void {
+    this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
+      if (meters) {
+        this.clientMetersData = [
+          { label: 'Seleccione...', value: '' },
+          ...meters.map(meter => ({
+            label: meter.meterId || '',
+            value: meter.meterId || ''
+          }))
+        ];
+        
+      }
+    })
   }
 
   getClients(){
@@ -123,9 +149,9 @@ export class RegisterCutComponent  implements OnInit {
         this.clientsList = clients;
         this.clientData = [
           { label: 'Seleccione...', value: '' },
-          ...clients.map(customer => ({
-            label: customer.name,
-            value: customer.clientId
+          ...clients.map(client => ({
+            label: client.name,
+            value: client.clientId
           }))
         ];
       }

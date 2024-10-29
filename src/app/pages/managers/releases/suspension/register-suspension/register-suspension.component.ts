@@ -11,7 +11,7 @@ import { IZone } from "src/app/models/zone";
 import { AuthService } from "src/app/services/auth.service";
 import { IAppState, createSuspension, getClientByZoneId, getClientMeter, getClientMeterByClientId, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
-import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
+import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
 import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
 
@@ -23,13 +23,14 @@ import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
 export class RegisterSuspensionComponent  implements OnInit {
   registSuspensionForm!: FormGroup;   
   clientsData: IOption[] = [];
+  clientMetersData: IOption[] = [];
   enterpriseData: IOption[] = [];
   monthsData: IOption[] = []; 
   ZoneData: IOption[] = []; 
   clientsList: IClient[] = []; 
   ZoneList: IZone[] = [];
   enterprisesList: IEnterprise[] = [];
-  clientMeter: string = ''
+  clientMeter!: string | null
  
   isCustomersLoading$: Observable<boolean>;
   isSuspensionSaving$: Observable<boolean>;
@@ -37,7 +38,7 @@ export class RegisterSuspensionComponent  implements OnInit {
   getZonesByCompanyId$ = this.store.pipe(select(selectSelectedZones));
   getEnterprise$ = this.store.pipe(select(selectSelectedEnterprises));
   getClients$ = this.store.pipe(select(selectSelectedClients));
-  getMeterByClientId$  = this.store.pipe(select(selectSelectedClientMeter));
+  getMeterByClientId$  = this.store.pipe(select(selectSelectedClientMeters));
   private destroy$ = new Subject<void>();
   user: string = '';
   year: number = 0;
@@ -127,20 +128,28 @@ onClientSelect(event: { value: string; label: string }): void {
   if (clientId) { 
     this.store.dispatch(getClientMeterByClientId({ clientId: clientId }));
  
-    this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((counter) => {
-      if (counter) {
-        this.clientMeter = counter.meterId;
-        this.registSuspensionForm.patchValue({
-          meterId: this.clientMeter
-        });
+    this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
+      if (meters) {
+        this.clientMetersData = [
+          { label: 'Seleccione...', value: '' },
+          ...meters.map(meter => ({
+            label: meter.meterId || '',
+            value: meter.meterId || ''
+          }))
+        ];
+        
       }
-    });
-  } else {
-    this.clientMeter = '';
-    this.registSuspensionForm.patchValue({ meterId: '' });
+    })
+  }  
+}
+
+onMeterSeclected(option: IOption) {
+  if (option && option.value) {
+    this.registSuspensionForm.get('meterId')?.setValue(option.value)
   }
 }
 
+ 
 
   getClients(){
     this.store.dispatch(listAllClients());

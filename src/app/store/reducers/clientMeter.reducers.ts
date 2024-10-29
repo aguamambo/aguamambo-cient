@@ -103,9 +103,8 @@ const reducer = createReducer(
   // Update clientMeter
   on(updateClientMeter, (state) => ({ ...state, isSaving: true })),
   on(updateClientMeterSuccess, (state, { clientMeter }) =>
-    adapter.updateOne(
-      { id: clientMeter.meterId, changes: clientMeter },
-      { ...state, isSaving: false, successMessage: 'ClientMeter updated successfully!' }
+    (
+      { ...state, isSaving: false, selectedClientMeter: clientMeter, successMessage: 'ClientMeter updated successfully!' }
     )
   ),
   on(updateClientMeterFailure, (state, { error }) => ({

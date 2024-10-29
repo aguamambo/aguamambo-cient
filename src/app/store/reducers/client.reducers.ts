@@ -108,7 +108,7 @@ const reducer = createReducer(
   // Create client
   on(createClient, (state) => ({ ...state, isSaving: true })),
   on(createClientSuccess, (state, { client }) =>
-    adapter.addOne(client, { ...state, isSaving: false, successMessage: 'Client created successfully!' })
+    ({ ...state, isSaving: false, selectedClient: client, successMessage: 'Client created successfully!' })
   ),
   on(createClientFailure, (state, { error }) => ({
     ...state,

@@ -20,39 +20,37 @@
 
             <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
                 <div class="w-full">
-                    <app-custom-select formControlName="empresa" label="Empresa" [options]="enterpriseData"
+                    <app-custom-select   label="Empresa" [options]="enterpriseData"
                         (selectedValueChange)="onValueSelected($event)">
                     </app-custom-select>
                 </div>
 
                 <div class="w-full">
-                    <app-custom-select formControlName="zona" label="Zona" [options]="zoneData"
+                    <app-custom-select label="Zona" [options]="zoneData"
                         (selectedValueChange)="onEnterpriseSelect($event)">
                     </app-custom-select>
                 </div>
                 <div class="w-full">
-                    <app-custom-select formControlName="clienteId" label="Cliente" [options]="clientData">
+                    <app-custom-select   label="Cliente" [options]="clientData" (selectedValueChange)="onClientSelect($event)">
                     </app-custom-select>
                 </div>
             </div>
             <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
 
                 <div class="w-full">
-                    <app-custom-drop-down formControlName="mesInicio" label="Mês de Início" [options]="monthsData"
-                        (selectionChange)="onStartMonthSelect($event)">
-                    </app-custom-drop-down>
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data Início</label>
+                    <app-date-picker formControlName="startDate"></app-date-picker>
                 </div>
                 <div class="w-full">
-                    <app-custom-drop-down formControlName="mesTermino" label="Mês de Término" [options]="monthsData"
-                        (selectionChange)="onEndMonthSelect($event)">
-                    </app-custom-drop-down>
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data Fim</label>
+                    <app-date-picker formControlName="endDate"></app-date-picker>
                 </div>
                 <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano
-                        Económico</label>
-                    <span
-                        class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{year}}
-                    </span>
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
+                    <app-custom-drop-down
+                        [options]="clientMetersData"
+                    (selectionChange)="onMeterSeclected($event)"> 
+                    </app-custom-drop-down>
                 </div>
             </div>
 

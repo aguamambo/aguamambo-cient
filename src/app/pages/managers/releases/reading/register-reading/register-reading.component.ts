@@ -25,7 +25,7 @@ import {  selectSelectedZones, selectZoneIsLoading } from "src/app/store/selecto
 export class RegisterReadingComponent implements OnInit {
   registReadingForm!: FormGroup;
   lastReading: number = 0;
-  counter: string = '';
+  counter: string | null = '';
   zoneData: IOption[] = [];
   enterpriseData: IOption[] = [];
   clientData: IOption[] = [];

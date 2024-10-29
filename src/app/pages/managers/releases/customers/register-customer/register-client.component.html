@@ -44,15 +44,7 @@
                 class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
             </div>
           </div>
-          <div class="w-full">
-            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contacto Alternativo</label>
-            <div class="w-full flex">
-              <span
-                class="p-2.5 border border-gray-300 text-deep-dark dark:text-light-mode font-medium bg-light-mode dark:bg-slate-500 text-sm rounded-l-lg ">+258</span>
-              <input type="text" formControlName="alternativePhoneNumber" #telefone2 (input)="onNumberInputChange(telefone2)"
-                class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-            </div>
-          </div>
+
 
         </div>
         <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center ">
@@ -83,14 +75,19 @@
             <input type="text" formControlName="notes"
               class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
           </div>
+          <div class="w-full">
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Marca do Contador</label>
+            <input type="text" formControlName="brand"
+              class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
+          </div>
 
           <div class="w-full">
-            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano
-              Económico</label>
-            <span
-              class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{year}}
-            </span>
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Metros Cúbicos</label>
+            <input type="text" formControlName="cubicMeters" #cubicMeters (input)="onNumberInputChange(cubicMeters)"
+              class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
           </div>
+
+
         </div>
         <div class="p-4">
           <button (click)="toggleAccordion()"
@@ -105,10 +102,11 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 15l-7-7-7 7" />
             </svg>
           </button>
- 
+
           <div *ngIf="isAccordionOpen" class="p-4">
             <p class="mb-4 text-blue-700">
-              Leia atentamente cada uma das opções abaixo para entender como elas podem impactar a experiência do cliente com o
+              Leia atentamente cada uma das opções abaixo para entender como elas podem impactar a experiência do
+              cliente com o
               serviço.
             </p>
 
@@ -128,15 +126,18 @@
         <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
           <div class="w-full">
 
-            <app-checkbox formControlName="exemptFromFines" label="Isento de Multas" (checkedChange)="onCheckboxValueChange('isentoDeMultas', $event)"></app-checkbox>
+            <app-checkbox formControlName="exemptFromFines" label="Isento de Multas"
+              (checkedChange)="onCheckboxValueChange('isentoDeMultas', $event)"></app-checkbox>
           </div>
           <div class="w-full">
 
-            <app-checkbox formControlName="receiveReceipt" label="Receber Recibo" (checkedChange)="onCheckboxValueChange('receberRecibo', $event)"></app-checkbox>
+            <app-checkbox formControlName="receiveReceipt" label="Receber Recibo"
+              (checkedChange)="onCheckboxValueChange('receberRecibo', $event)"></app-checkbox>
           </div>
           <div class="w-full">
 
-            <app-checkbox formControlName="receiveInvoice" label="Receber Factura" (checkedChange)="onCheckboxValueChange('receberFactura', $event)"></app-checkbox>
+            <app-checkbox formControlName="receiveInvoice" label="Receber Factura"
+              (checkedChange)="onCheckboxValueChange('receberFactura', $event)"></app-checkbox>
           </div>
 
 

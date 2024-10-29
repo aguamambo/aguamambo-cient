@@ -1,6 +1,6 @@
 export interface IClientMeter {
-    meterId: string;
-    brand: string;
-    cubicMeters: number;
-    clientId: string
+    meterId: string | null;
+    brand: string | null;
+    cubicMeters: number | null;
+    clientId: string | null
 }
