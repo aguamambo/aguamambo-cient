@@ -35,7 +35,7 @@ export class ListCutsComponent implements OnInit, OnDestroy {
     this.isCutSaving$ = this.store.select(selectCutIsSaving);
 
     this.cutColumns = [
-      { key: 'cutsId', label: 'Código de Corte' },
+      { key: 'cutId', label: 'Código de Corte' },
       { key: 'startDate', label: 'Data de Início' },
       { key: 'endDate', label: 'Data de Fim' },
       { key: 'clientId', label: 'ID do Cliente' }
@@ -64,7 +64,7 @@ export class ListCutsComponent implements OnInit, OnDestroy {
     this.isEditing = true;
     this.selectedCut = cut;
     this.cutForm.patchValue({
-      cutsId: cut.cutsId,
+      cutsId: cut.cutId,
       startDate: cut.startDate,
       endDate: cut.endDate,
       clientId: cut.clientId
@@ -74,7 +74,7 @@ export class ListCutsComponent implements OnInit, OnDestroy {
   submitForm(): void {
     if (this.cutForm.valid && this.isEditing) {
       const payload = this.cutForm.value;
-      this.store.dispatch(updateCut({ cutId: this.selectedCut.cutsId, cut: payload }));
+      this.store.dispatch(updateCut({ cutId: this.selectedCut.cutId, cut: payload }));
       this.isEditing = false;
       this.cutForm.reset();
     }

@@ -40,6 +40,7 @@ export interface IReadingState extends EntityState<IReading> {
   isSaving: boolean;
   errorMessage: string;
   successMessage: string;
+  statusCode: number;
   error: any;
   selectedReading: IReading | null;
   selectedReadings: IReading[];  // New selectedReadings property
@@ -53,6 +54,7 @@ export const initialState: IReadingState = adapter.getInitialState({
   isLoading: false,
   isSaving: false,
   errorMessage: '',
+  statusCode: 0,
   successMessage: '',
   error: null,
   selectedReading: null,
@@ -117,12 +119,17 @@ const reducer = createReducer(
 
   // Create reading
   on(createReading, (state) => ({ ...state, isSaving: true })),
-  on(createReadingSuccess, (state, { reading }) =>
-    adapter.addOne(reading, { ...state, isSaving: false, successMessage: 'Reading created successfully!' })
-  ),
-  on(createReadingFailure, (state, { error }) => ({
+  on(createReadingSuccess, (state, { reading, statusCode }) => ({
     ...state,
     isSaving: false,
+    selectedReading: reading,
+    statusCode: statusCode,   
+    successMessage: 'Reading created successfully!'
+  })),
+  on(createReadingFailure, (state, { error, statusCode }) => ({
+    ...state,
+    isSaving: false,
+    statusCode: statusCode,
     errorMessage: error,
   })),
 

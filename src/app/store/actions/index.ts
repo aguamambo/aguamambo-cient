@@ -8,6 +8,7 @@ export * from './invoice.actions';
 export * from './fineConfiguration.actions';
 export * from './enterprise.actions';
 export * from './cut.actions';
+export * from './contract.actions';
 export * from './contractType.actions';
 export * from './client.actions';
 export * from './clientMeter.actions';

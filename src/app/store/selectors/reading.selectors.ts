@@ -18,6 +18,11 @@ export const selectReadingIsLoading = createSelector(
   (state) => state.isLoading
 );
 
+export const selectReadingStatusCode = createSelector(
+  selectReadingState,
+  (state) => state.statusCode
+);
+
 export const selectReadingIsSaving = createSelector(
   selectReadingState,
   (state) => state.isSaving

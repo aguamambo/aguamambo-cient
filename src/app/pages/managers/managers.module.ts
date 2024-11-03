@@ -18,7 +18,8 @@ import { MeterComponent } from './components/meter/meter.component';
 import { RubricComponent } from './components/rubric/rubric.component';
 import { UserComponent } from './components/user/user.component';
 import { ZoneComponent } from './components/zone/zone.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms'; 
+import { ContractsModule } from './contracts/contracts.module';
 
 
 
@@ -36,7 +37,7 @@ import { ReactiveFormsModule } from '@angular/forms';
      RubricComponent,
      UserComponent,
      FineComponent,
-     InvoicePaymentComponent
+     InvoicePaymentComponent 
     ],
   imports: [
     CommonModule,
@@ -45,7 +46,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     ReactiveFormsModule,
     ParameterisationModule,
     TreasuryModule,
-    ReleasesModule
+    ReleasesModule,
+    ContractsModule
 ],
   exports: [
     DashboardComponent, 
@@ -59,7 +61,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     RubricComponent,
     UserComponent,
     FineComponent,
-    InvoicePaymentComponent
+    InvoicePaymentComponent 
   ]
 })
 export class ManagersModule { }

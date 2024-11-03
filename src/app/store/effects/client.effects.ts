@@ -79,11 +79,11 @@ export class ClientEffects {
         this.actions$.pipe(
             ofType(createClient),
             exhaustMap(action =>
-                this.apiService.post<IClient>('/client', action.client).pipe(
-                    map(client => createClientSuccess({ client })),
+                this.apiService.post<{ client: IClient; statusCode: number }>('/client', action.client).pipe(
+                    map(response => createClientSuccess({ client: response.client, statusCode: response.statusCode })),
                     catchError(error => {
                         this.errorMessage.getErrorMessage(error.status);
-                        return of(createClientFailure({ error }));
+                        return of(createClientFailure({ error: error, statusCode: error.status }));
                     })
                 )
             )

@@ -81,7 +81,7 @@ const reducer = createReducer(
   // List all clientMeters
   on(listAllClientMeters, (state) => ({ ...state, isLoading: true })),
   on(listAllClientMetersSuccess, (state, { clientMeters }) =>
-    adapter.setAll(clientMeters, { ...state, isLoading: false })
+    ({ ...state, isLoading: false, selectedClientMeters: clientMeters })
   ),
   on(listAllClientMetersFailure, (state, { error }) => ({
     ...state,

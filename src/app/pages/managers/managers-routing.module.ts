@@ -14,6 +14,7 @@ const routes: Routes = [
   { path: 'settings', component: SettingsComponent },
   { path: 'backups', component: BackupComponent },
   {path: 'releases', loadChildren: () => import('./releases/releases.module').then(m => m.ReleasesModule)},
+  {path: 'contracts', loadChildren: () => import('./contracts/contracts.module').then(m => m.ContractsModule)},
   {path: 'treasuries', loadChildren: () => import('./treasury/treasury.module').then(m => m.TreasuryModule)},
   {path: 'parameterisations', loadChildren: () => import('./parameterisation/parameterisation.module').then(m => m.ParameterisationModule)}
 ];

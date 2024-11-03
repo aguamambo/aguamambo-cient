@@ -1,10 +1,10 @@
 import { getClientByZoneId } from './../../../../../store/actions/client.actions';
 import { getZoneByEnterpriseId } from './../../../../../store/actions/zone.actions';
-import { selectReadingErrorMessage, selectReadingIsSaving, selectReadingSuccessMessage, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
+import { selectReadingErrorMessage, selectReadingIsSaving, selectReadingStatusCode, selectReadingSuccessMessage, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { Observable, Subject, take, takeUntil } from "rxjs";
 import { IClient } from "src/app/models/client";
 import { IEnterprise } from "src/app/models/enterprise";
 import { IOption } from "src/app/models/option";
@@ -42,13 +42,14 @@ export class RegisterReadingComponent implements OnInit {
   isClientLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
   errorMessage$: Observable<string>;
-  successMessage$: Observable<string>;
+  successMessage$: Observable<string>; 
   
   getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
   getReadingsByClientId$ = this.store.pipe(select(selectSelectedReading));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
+  statusCode$ = this.store.select(selectReadingStatusCode); 
   private destroy$ = new Subject<void>();
   user: string = '';
 
@@ -59,6 +60,7 @@ export class RegisterReadingComponent implements OnInit {
     this.isReadingSaving$ = this.store.select(selectReadingIsSaving);
     this.errorMessage$ = this.store.select(selectReadingErrorMessage);
     this.successMessage$ = this.store.select(selectReadingSuccessMessage);
+    
 
   }
 
@@ -192,7 +194,16 @@ export class RegisterReadingComponent implements OnInit {
       const formData = this.registReadingForm.value;
 
       this.store.dispatch(createReading({reading: formData}))
-
+      this.store.select(selectReadingStatusCode);
+      this.statusCode$.pipe(take(1)).subscribe(status => {
+        console.log('Status Code:', status);
+        
+        if (status === 200) {
+          console.log('Reading created successfully!');
+        } else {
+          console.error('Failed to create reading with status code:', status);
+        }
+      });
     } else {
       
     }

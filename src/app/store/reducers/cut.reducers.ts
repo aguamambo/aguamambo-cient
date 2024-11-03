@@ -105,7 +105,7 @@ const reducer = createReducer(
   on(updateCut, (state) => ({ ...state, isSaving: true })),
   on(updateCutSuccess, (state, { cut }) =>
     adapter.updateOne(
-      { id: cut.cutsId, changes: cut },
+      { id: cut.cutId, changes: cut },
       { ...state, isSaving: false, successMessage: 'Cut updated successfully!' }
     )
   ),

@@ -14,6 +14,7 @@ import { contractTypeReducer, IContractTypeState } from "./contractType.reducers
 import { clientMeterReducer, IClientMeterState } from "./clientMeter.reducers";
 import { clientReducer, IClientState } from "./client.reducers";
 import { IRubricState, rubricReducer } from "./rubric.reducers";
+import { contractReducer, IContractState } from "./contract.reducers";
 
 
 export interface IAppState {
@@ -29,6 +30,7 @@ export interface IAppState {
     enterprise?: IEnterpriseState,
     cut?: ICutState,
     contractType?: IContractTypeState,
+    contract?: IContractState,
     client?: IClientState,
     clientMeter?: IClientMeterState,
 
@@ -47,6 +49,7 @@ export const reducers: ActionReducerMap<IAppState> = {
     enterprise: enterpriseReducer,
     cut: cutReducer,
     contractType: contractTypeReducer,
+    contract: contractReducer,
     client: clientReducer,
     clientMeter: clientMeterReducer,
 };

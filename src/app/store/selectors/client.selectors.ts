@@ -18,6 +18,11 @@ export const selectClientErrorMessage = createSelector(
   (state) => state.errorMessage
 );
 
+export const selectClientStatusCode = createSelector(
+  selectClientState,
+  (state) => state.statusCode
+);
+
 export const selectClientSuccessMessage = createSelector(
   selectClientState,
   (state) => state.successMessage

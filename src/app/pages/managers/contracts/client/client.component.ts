@@ -1,24 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { delay, first, Observable, Subject, takeUntil } from 'rxjs';
+import { Subject, Observable, takeUntil, filter } from 'rxjs';
 import { GenericConfig } from 'src/app/core/config/generic.config';
-import { IClientMeter } from 'src/app/models/clientMeter';
+import { IClient } from 'src/app/models/client';
 import { IContractType } from 'src/app/models/contractType';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
-import { createClient, createClientMeter, listAllContractTypes, listAllZones } from 'src/app/store';
-import { selectClientErrorMessage, selectClientIsSaving, selectClientSuccessMessage, selectSelectedClient } from 'src/app/store/selectors/client.selectors';
+import { listAllZones, listAllContractTypes, createClient} from 'src/app/store';
+import { selectSelectedClient, selectClientIsSaving, selectClientErrorMessage, selectClientSuccessMessage, selectClientStatusCode } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedZones, selectZoneIsLoading } from 'src/app/store/selectors/zone.selectors';
 
 @Component({
-  selector: 'app-register-client',
-  templateUrl: './register-client.component.html',
-  styleUrl: './register-client.component.css'
+  selector: 'app-client',
+  templateUrl: './client.component.html',
+  styleUrl: './client.component.css'
 })
-export class RegisterClientComponent implements OnInit {
+export class ClientComponent implements OnInit {
+  @Output() clientSaved = new EventEmitter<any>();
+
   clientForm!: FormGroup;
   meterForm!: FormGroup;
   destroy$ = new Subject<void>();
@@ -30,15 +32,15 @@ export class RegisterClientComponent implements OnInit {
   isZonesLoading$!: Observable<boolean>;
   errorMessage$!: Observable<string | null>;
   successMessage$!: Observable<string | null>;
+  selectStatusCode$!: Observable<number | null>; 
 
   getZonesByEnterpriseId$ = this.store.pipe(select(selectSelectedZones));
-  getContactTypes$ = this.store.pipe(select(selectSelectedContractTypes));
-  getClient$ = this.store.pipe(select(selectSelectedClient));
+  getContactTypes$ = this.store.pipe(select(selectSelectedContractTypes)); 
+  getClient$ = this.store.pipe(select(selectSelectedClient)); 
   year: number = 0
   monthsData: IOption[] = [];
   user: string = '';
   isAccordionOpen = false;
-  
 
   constructor(private fb: FormBuilder, private store: Store, private generic: GenericConfig, private auth: AuthService) { }
 
@@ -46,31 +48,24 @@ export class RegisterClientComponent implements OnInit {
       this.checkSession();
     this.year = this.generic.getCurrentYear()
 
-     
-      
-    
-
     this.clientForm = this.fb.group({
       name: new FormControl(null),
       phoneNumber: new FormControl(null),
       address: new FormControl(null),
       nuit: new FormControl(null),
       zoneId: new FormControl(null),
-      contractTypeId: new FormControl(null),
-      alternativePhoneNumber: new FormControl(),
-      startMonth: new FormControl(),
-      notes: new FormControl(),
+      alternativeNumber: new FormControl(),
+      observation: new FormControl(),
       exemptFromFines: new FormControl(false),
-      receiveReceipt: new FormControl(false),
-      receiveInvoice: new FormControl(false),
-      brand:  new FormControl(''),
-      cubicMeters: new FormControl('') 
+      wantsReceiptSMS: new FormControl(true),
+      wantsInvoiceSMS: new FormControl(true)
     });
 
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
     this.isClientSaving$ = this.store.select(selectClientIsSaving);
     this.errorMessage$ = this.store.select(selectClientErrorMessage);
     this.successMessage$ = this.store.select(selectClientSuccessMessage);
+    this.selectStatusCode$ = this.store.select(selectClientStatusCode)
     this.loadData()
   }
 
@@ -112,33 +107,29 @@ export class RegisterClientComponent implements OnInit {
   onMonthSelect(selectedOption: { value: string; label: string }) {
     this.clientForm.get('startMonth')?.setValue(selectedOption.value)
   }
+
   saveClient(): void {
-    if (this.clientForm.valid) {
-
-      const clientData = this.payload_Client;
-      const meterData = this.payload_Meter; 
- 
+    const clientData = this.clientForm.value;
+    if ((this.checkIsNotNull(clientData.name)) && (this.checkIsNotNull(clientData.phoneNumber)) && (this.checkIsNotNull(clientData.address)) && (this.checkIsNotNull(clientData.zoneId))) {  
       this.store.dispatch(createClient({ client: clientData }));
-
-
-      delay(5000)
-
-      this.getClient$.pipe(
-        first(client => !!client)   
-      ).subscribe(client => {
+      this.getClient$.pipe( 
+        filter(client => !!client), 
+        takeUntil(this.destroy$)
+      )
+      .subscribe(client => {
         if (client) {
-          const payload: IClientMeter = {
-            meterId: '',
-            ...meterData,
-            clientId: client.clientId
-          };
           
-          console.log(payload);
-          
-          // this.store.dispatch(createClientMeter({clientMeter: payload}))
+          this.clientSaved.emit(client.clientId);
+          this.clientForm.reset();
         }
-      })
+      });
+    } else {
+      this.clientSaved.emit();  
     }
+  }
+
+  checkIsNotNull(field: string) : boolean{
+    return field !== null
   }
 
   onNumberInputChange(inputElement: HTMLInputElement): void {

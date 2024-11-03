@@ -33,6 +33,7 @@ export interface IClientState extends EntityState<IClient> {
   isLoading: boolean;
   isSaving: boolean;
   errorMessage: string;
+  statusCode: number;
   successMessage: string;
   error: any;
   selectedClient: IClient | null;
@@ -46,6 +47,7 @@ export const initialState: IClientState = adapter.getInitialState({
   isSaving: false,
   errorMessage: '',
   successMessage: '',
+  statusCode: 0,
   error: null,
   selectedClient: null,
   selectedClients: null,
@@ -107,12 +109,17 @@ const reducer = createReducer(
 
   // Create client
   on(createClient, (state) => ({ ...state, isSaving: true })),
-  on(createClientSuccess, (state, { client }) =>
-    ({ ...state, isSaving: false, selectedClient: client, successMessage: 'Client created successfully!' })
+  on(createClientSuccess, (state, { client, statusCode }) =>
+    ({ ...state, 
+      isSaving: false, 
+      selectedClient: client, 
+      statusCode: statusCode,
+      successMessage: 'Client created successfully!' })
   ),
-  on(createClientFailure, (state, { error }) => ({
+  on(createClientFailure, (state, { error, statusCode }) => ({
     ...state,
     isSaving: false,
+    statusCode: statusCode,
     errorMessage: error,
   })),
 

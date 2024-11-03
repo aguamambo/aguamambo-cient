@@ -73,12 +73,12 @@ export const createClient = createAction(
 
 export const createClientSuccess = createAction(
   '[Client] Create Client Success',
-  props<{ client: IClient }>()
+  props<{ client: IClient , statusCode: number}>()
 );
 
 export const createClientFailure = createAction(
   '[Client] Create Client Failure',
-  props<{ error: any }>()
+  props<{ error: any , statusCode: number }>()
 );
 
 // PUT clients/{id}

@@ -1,21 +1,20 @@
-import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
-import { NgModule, isDevMode } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { SharedModule } from './shared/shared.module';
-import { AuthModule } from './pages/auth/auth.module';
-import { ManagerLayoutComponent } from './layouts/manager-layout/manager-layout.component';
-import { ManagersModule } from './pages/managers/managers.module';
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { effects, reducers } from './store';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { httpInterceptorProviders } from './core/interceptors';
-import { JwtInterceptor, JwtModule } from '@auth0/angular-jwt';
-import { tokenGetter } from './core/utils';
+import { HttpClientModule } from "@angular/common/http";
+import { isDevMode, NgModule } from "@angular/core";
+import { BrowserModule } from "@angular/platform-browser";
+import { JwtModule } from "@auth0/angular-jwt";
+import { EffectsModule } from "@ngrx/effects";
+import { StoreModule } from "@ngrx/store";
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+import { AppRoutingModule } from "./app-routing.module";
+import { AppComponent } from "./app.component";
+import { httpInterceptorProviders } from "./core/interceptors";
+import { tokenGetter } from "./core/utils";
+import { AuthLayoutComponent } from "./layouts/auth-layout/auth-layout.component";
+import { ManagerLayoutComponent } from "./layouts/manager-layout/manager-layout.component";
+import { AuthModule } from "./pages/auth/auth.module";
+import { ManagersModule } from "./pages/managers/managers.module";
+import { SharedModule } from "./shared/shared.module";
+import { reducers, effects } from "./store";
 
 @NgModule({
   declarations: [

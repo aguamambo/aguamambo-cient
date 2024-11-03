@@ -73,12 +73,12 @@ export const createReading = createAction(
 
 export const createReadingSuccess = createAction(
   '[Reading] Create Reading Success',
-  props<{ reading: IReading }>()
+  props<{ reading: IReading; statusCode: number }>()
 );
 
 export const createReadingFailure = createAction(
   '[Reading] Create Reading Failure',
-  props<{ error: any }>()
+  props<{ error: any ; statusCode: number }>()
 );
 
 // PUT readings/{id}

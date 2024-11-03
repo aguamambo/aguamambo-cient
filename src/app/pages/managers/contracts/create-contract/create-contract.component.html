@@ -1,0 +1,67 @@
+<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 ">
+
+    <app-breadcrumb title="Celebração do Contrato" [breadcrumbItems]="['Dashboard', 'Contratos']">
+    </app-breadcrumb>
+    <div class="flex items-center justify-between w-full">
+        <div class="flex items-center justify-center space-x-8 w-full">
+
+            <div class="flex gap-4 relative">
+                <div class="w-8 h-8 flex items-center justify-center rounded-full font-semibold text-white" [ngClass]="{
+              'bg-blue-700': currentStep === 1,
+              'bg-gray-300 text-gray-700': currentStep !== 1
+            }">
+                    1
+                </div>
+                <p class="mt-2 text-center text-gray-700">Cliente</p>
+            </div>
+
+            <div [ngClass]="{'bg-blue-700': currentStep > 1, 'bg-gray-300': currentStep <= 1}" class="h-1 w-20"></div>
+
+            <div class="flex gap-4 relative">
+                <div class="w-8 h-8 flex items-center justify-center rounded-full font-semibold text-white"
+                    [ngClass]="{'bg-blue-700': currentStep === 2, 'bg-gray-300 text-gray-700': currentStep !== 2}">
+                    2
+                </div>
+                <p class="mt-2 text-center text-gray-700">Contador</p>
+            </div>
+
+            <div [ngClass]="{'bg-blue-700': currentStep > 2, 'bg-gray-300': currentStep <= 2}" class="h-1 w-20"></div>
+
+            <div class="flex gap-4 relative">
+                <div class="w-8 h-8 flex items-center justify-center rounded-full font-semibold text-white"
+                    [ngClass]="{'bg-blue-700': currentStep === 3,'bg-gray-300 text-gray-700': currentStep !== 3}">
+                    3
+                </div>
+                <p class="mt-2 text-center text-gray-700">Celebração do Contrato</p>
+            </div>
+        </div>
+    </div>
+
+    @if (currentStep === 1) {
+        <ng-container>
+            <app-client (clientSaved)="onClientSaved($event)"></app-client>
+        </ng-container>
+    }
+    @if (currentStep === 2) {
+        <ng-container>
+            <app-meter (meterSaved)="onMeterSaved()"></app-meter>
+        </ng-container>
+    }
+    @if (currentStep === 3) {
+        <ng-container>
+            <app-contract (contractSaved)="onContractSaved()"></app-contract>
+        </ng-container>
+    }
+
+    <div class="flex justify-between px-4">
+        <button (click)="previousStep()" class="px-4 py-2 rounded-md"
+            [disabled]="currentStep === 1"
+            [ngClass]="{'border border-blue-800 text-blue-800': currentStep > 1, 'bg-gray-300 text-gray-700 ': currentStep === 1}">
+            Voltar
+        </button>
+        <button (click)="nextStep()" class="px-4 py-2 bg-blue-700 text-white rounded-md">
+          {{currentStep === 3 ? 'Submeter': 'Próximo' }}  
+        </button>
+
+    </div>
+</div>

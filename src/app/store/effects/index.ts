@@ -1,6 +1,7 @@
 import { AuthEffects } from "./auth.effects";
 import { ClientEffects } from "./client.effects";
 import { ClientMeterEffects } from "./clientMeter.effects";
+import { ContractEffects } from "./contract.effects";
 import { ContractTypeEffects } from "./contractType.effects";
 import { CutEffects } from "./cut.effects";
 import { EnterpriseEffects } from "./enterprise.effects";
@@ -18,6 +19,7 @@ export const effects = [
     ClientEffects,
     ClientMeterEffects,
     ContractTypeEffects,
+    ContractEffects,
     CutEffects,
     EnterpriseEffects,
     FineConfigurationEffects,

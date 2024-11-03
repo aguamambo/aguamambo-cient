@@ -79,11 +79,11 @@ export class ReadingEffects {
     this.actions$.pipe(
       ofType(createReading),
       exhaustMap(action =>
-        this.apiService.post<IReading>('/reading', action.reading).pipe(
-          map(reading => createReadingSuccess({ reading })),
+        this.apiService.post<{ reading: IReading; statusCode: number }>('/reading', action.reading).pipe(
+          map(response => createReadingSuccess({ reading: response.reading, statusCode: response.statusCode })),
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status);
-            return of(createReadingFailure({ error }));
+            return of(createReadingFailure({ error: error, statusCode: error.status }));
           })
         )
       )

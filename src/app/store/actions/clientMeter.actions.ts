@@ -52,7 +52,7 @@ export const listAllClientMetersFailure = createAction(
 // POST client-meters
 export const createClientMeter = createAction(
   '[ClientMeter] Create Client Meter',
-  props<{ clientMeter: IClientMeter }>()
+  props<{ clientMeter: { brand: string,  cubicMeters: number;} }>()
 );
 
 export const createClientMeterSuccess = createAction(

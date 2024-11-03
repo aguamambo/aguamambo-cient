@@ -1,5 +1,5 @@
 export interface ICut {
-    cutsId: string;
+    cutId: string;
     startDate: string;
     endDate: string;
     clientId: string;
