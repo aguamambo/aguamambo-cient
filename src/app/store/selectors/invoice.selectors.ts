@@ -5,7 +5,7 @@ export const selectInvoiceState = createFeatureSelector<IInvoiceState>('invoice'
 
 export const selectSelectedInvoices = createSelector(
   selectInvoiceState,
-  (state) => state.selectedInvoice
+  (state) => state.selectedInvoices
 );
 
 export const selectSelectedInvoice = createSelector(
@@ -26,6 +26,11 @@ export const selectInvoiceIsSaving = createSelector(
 export const selectInvoiceErrorMessage = createSelector(
   selectInvoiceState,
   (state) => state.errorMessage
+);
+
+export const selectSelectedWaterBill = createSelector(
+  selectInvoiceState,
+  (state) => state.selectedWaterBillFile
 );
 
 export const selectInvoiceSuccessMessage = createSelector(

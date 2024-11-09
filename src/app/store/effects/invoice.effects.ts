@@ -4,7 +4,7 @@ import { exhaustMap, map, catchError, of } from "rxjs";
 import { IInvoice } from "src/app/models/invoice";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getInvoice, getInvoiceSuccess, getInvoiceFailure, listAllInvoices, listAllInvoicesSuccess, listAllInvoicesFailure, createInvoice, createInvoiceSuccess, createInvoiceFailure, updateInvoice, updateInvoiceSuccess, updateInvoiceFailure, deleteInvoice, deleteInvoiceSuccess, deleteInvoiceFailure, loadInvoicesCount, loadInvoicesCountSuccess, loadInvoicesCountFailure, getInvoiceByReadingId, getInvoiceByReadingIdFailure, getInvoiceByReadingIdSuccess } from "../actions";
+import { getInvoice, getInvoiceSuccess, getInvoiceFailure, listAllInvoices, listAllInvoicesSuccess, listAllInvoicesFailure, createInvoice, createInvoiceSuccess, createInvoiceFailure, updateInvoice, updateInvoiceSuccess, updateInvoiceFailure, deleteInvoice, deleteInvoiceSuccess, deleteInvoiceFailure, loadInvoicesCount, loadInvoicesCountSuccess, loadInvoicesCountFailure, getInvoiceByReadingId, getInvoiceByReadingIdFailure, getInvoiceByReadingIdSuccess, getWaterBillByReadingId, getWaterBillByReadingIdFailure, getWaterBillByReadingIdSuccess } from "../actions";
 
 @Injectable()
 export class InvoiceEffects {
@@ -44,6 +44,25 @@ export class InvoiceEffects {
         )
     );
 
+
+    
+    getWaterBillByReadingId$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getWaterBillByReadingId),
+            exhaustMap(action =>
+                this.apiService.getFile<Blob>(`/invoice/waterBill/${action.readingId}`).pipe(
+                    map((fileBlob) => getWaterBillByReadingIdSuccess({ payload: fileBlob })),
+                    catchError(error => {
+                        this.errorMessage.getErrorMessage(error.status);
+                        return of(getWaterBillByReadingIdFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
+
+
+
     listAllInvoices$ = createEffect(() =>
         this.actions$.pipe(
             ofType(listAllInvoices),
@@ -63,7 +82,7 @@ export class InvoiceEffects {
         this.actions$.pipe(
             ofType(createInvoice),
             exhaustMap(action =>
-                this.apiService.post<IInvoice>('/invoice', action.invoice).pipe(
+                this.apiService.post<IInvoice>('/invoice', action.payload).pipe(
                     map(invoice => createInvoiceSuccess({ invoice })),
                     catchError(error => {
                         this.errorMessage.getErrorMessage(error.status);

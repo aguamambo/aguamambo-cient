@@ -23,7 +23,10 @@ import {
   loadInvoicesCountFailure,
   getInvoiceByReadingId,
   getInvoiceByReadingIdFailure,
-  getInvoiceByReadingIdSuccess
+  getInvoiceByReadingIdSuccess,
+  getWaterBillByReadingIdSuccess,
+  getWaterBillByReadingId,
+  getWaterBillByReadingIdFailure
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
 
@@ -34,6 +37,8 @@ export interface IInvoiceState extends EntityState<IInvoice> {
   successMessage: string;
   error: any;
   selectedInvoice: IInvoice | null;
+  selectedInvoices: IInvoice[] | null;
+  selectedWaterBillFile: Blob | null;
   invoiceCount: number;
 }
 
@@ -45,6 +50,8 @@ export const initialState: IInvoiceState = adapter.getInitialState({
   successMessage: '',
   error: null,
   selectedInvoice: null,
+  selectedInvoices: null,
+  selectedWaterBillFile: null,
   invoiceCount: 0,
 });
 
@@ -77,10 +84,29 @@ const reducer = createReducer(
     errorMessage: error,
   })),
 
+  on(getWaterBillByReadingId, (state) => ({ ...state, isLoading: true })),
+
+  on(getWaterBillByReadingIdSuccess, (state, { payload }) => {
+    return {
+      ...state,
+      selectedWaterBillFile: payload,
+      isLoading: false
+    };
+  }),
+  on(getWaterBillByReadingIdFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+
   // List all invoices
   on(listAllInvoices, (state) => ({ ...state, isLoading: true })),
   on(listAllInvoicesSuccess, (state, { invoices }) =>
-    adapter.setAll(invoices, { ...state, isLoading: false })
+  ({
+    ...state,
+    selectedInvoices: invoices,
+    isLoading: false
+  })
   ),
   on(listAllInvoicesFailure, (state, { error }) => ({
     ...state,
@@ -91,7 +117,7 @@ const reducer = createReducer(
   // Create invoice
   on(createInvoice, (state) => ({ ...state, isSaving: true })),
   on(createInvoiceSuccess, (state, { invoice }) =>
-    adapter.addOne(invoice, { ...state, isSaving: false, successMessage: 'Invoice created successfully!' })
+    ({ ...state, isSaving: false, selectedInvoice: invoice, successMessage: 'Invoice created successfully!' })
   ),
   on(createInvoiceFailure, (state, { error }) => ({
     ...state,
@@ -102,10 +128,9 @@ const reducer = createReducer(
   // Update invoice
   on(updateInvoice, (state) => ({ ...state, isSaving: true })),
   on(updateInvoiceSuccess, (state, { invoice }) =>
-    adapter.updateOne(
-      { id: invoice.invoiceId, changes: invoice },
-      { ...state, isSaving: false, successMessage: 'Invoice updated successfully!' }
-    )
+  (
+    { ...state, isSaving: false, selectedInvoice: invoice, successMessage: 'Invoice updated successfully!' }
+  )
   ),
   on(updateInvoiceFailure, (state, { error }) => ({
     ...state,
@@ -116,7 +141,7 @@ const reducer = createReducer(
   // Delete invoice
   on(deleteInvoice, (state) => ({ ...state, isLoading: true })),
   on(deleteInvoiceSuccess, (state, { invoiceId }) =>
-    adapter.removeOne(invoiceId, { ...state, isLoading: false, successMessage: 'Invoice deleted successfully!' })
+    ({ ...state, isLoading: false, successMessage: 'Invoice deleted successfully!' })
   ),
   on(deleteInvoiceFailure, (state, { error }) => ({
     ...state,
@@ -146,8 +171,5 @@ export function invoiceReducer(
 }
 
 export const {
-  selectAll: selectAllInvoices,
-  selectEntities: selectInvoiceEntities,
-  selectIds: selectInvoiceIds,
-  selectTotal: selectTotalInvoices,
+  selectAll
 } = adapter.getSelectors();

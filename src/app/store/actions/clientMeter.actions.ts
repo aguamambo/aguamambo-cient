@@ -19,17 +19,17 @@ export const getClientMeterFailure = createAction(
 );
 
 // GET client-meters/{clientId}
-export const getClientMeterByClientId = createAction(
+export const getClientMeterByClient = createAction(
   '[ClientMeter] Load Client Meter',
   props<{ clientId: string }>()
 );
 
-export const getClientMeterByClientIdSuccess = createAction(
+export const getClientMeterByClientSuccess = createAction(
   '[ClientMeter] Load Client Meter Success',
   props<{ clientMeters: IClientMeter[] }>()
 );
 
-export const getClientMeterByClientIdFailure = createAction(
+export const getClientMeterByClientFailure = createAction(
   '[ClientMeter] Load Client Meter Failure',
   props<{ error: any }>()
 );
@@ -45,6 +45,21 @@ export const listAllClientMetersSuccess = createAction(
 );
 
 export const listAllClientMetersFailure = createAction(
+  '[ClientMeter] Load Client Meters Failure',
+  props<{ error: any }>()
+);
+
+// GET client-meters
+export const listAllAvailableMeters = createAction(
+  '[ClientMeter] Load Client Meters'
+);
+
+export const listAllAvailableMetersSuccess = createAction(
+  '[ClientMeter] Load Client Meters Success',
+  props<{ clientMeters: IClientMeter[] }>()
+);
+
+export const listAllAvailableMetersFailure = createAction(
   '[ClientMeter] Load Client Meters Failure',
   props<{ error: any }>()
 );

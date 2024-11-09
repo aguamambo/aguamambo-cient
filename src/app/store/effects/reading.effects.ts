@@ -1,16 +1,19 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { exhaustMap, map, catchError, of } from "rxjs";
+import { exhaustMap, map, catchError, of, tap } from "rxjs";
 import { IReading } from "src/app/models/reading";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
 import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess } from "../actions";
+import { Router } from "@angular/router";
+import { PdfService } from "src/app/services/pdf.service";
 
 @Injectable()
 export class ReadingEffects {
   constructor(
     private actions$: Actions,
     private apiService: ApiService,
+    private pdfFile: PdfService,
     private errorMessage: ErrorMessageService
   ) { }
 
@@ -79,8 +82,8 @@ export class ReadingEffects {
     this.actions$.pipe(
       ofType(createReading),
       exhaustMap(action =>
-        this.apiService.post<{ reading: IReading; statusCode: number }>('/reading', action.reading).pipe(
-          map(response => createReadingSuccess({ reading: response.reading, statusCode: response.statusCode })),
+        this.apiService.post<IReading>('/reading', action.reading).pipe(  
+          map(reading => createReadingSuccess({reading: reading})),
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status);
             return of(createReadingFailure({ error: error, statusCode: error.status }));
@@ -89,6 +92,19 @@ export class ReadingEffects {
       )
     )
   );
+
+//   createReadingSuccess$ = createEffect(
+//     () =>
+//         this.actions$.pipe(
+//             ofType(createReadingSuccess),
+//             map((action) => action.reading),
+//             tap((result) => { 
+//              this.apiService.get(`/invoice/waterBill/${result.readingId}`)  
+              
+//             })
+//         ),
+//     { dispatch: false }
+// );
 
   updateReading$ = createEffect(() =>
     this.actions$.pipe(

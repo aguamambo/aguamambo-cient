@@ -1,21 +1,23 @@
 import { getClientByZoneId } from './../../../../../store/actions/client.actions';
 import { getZoneByEnterpriseId } from './../../../../../store/actions/zone.actions';
-import { selectReadingErrorMessage, selectReadingIsSaving, selectReadingStatusCode, selectReadingSuccessMessage, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
+import { selectReadingErrorMessage, selectReadingId, selectReadingIsSaving, selectReadingStatusCode, selectReadingSuccessMessage, selectSelectedMeterReading, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { select, Store } from "@ngrx/store";
-import { Observable, Subject, take, takeUntil } from "rxjs";
+import { filter, first, Observable, skipWhile, Subject, take, takeUntil } from "rxjs";
 import { IClient } from "src/app/models/client";
 import { IEnterprise } from "src/app/models/enterprise";
 import { IOption } from "src/app/models/option";
 import { IReading } from "src/app/models/reading";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from 'src/app/services/auth.service';
-import { IAppState, createReading, getClientMeter, getLastReadingByClient, listAllEnterprises } from 'src/app/store';
+import { IAppState, createInvoice, createReading, getClientMeterByClient, getInvoiceByReadingId, getLastReadingByClient, getLastReadingByMeter, getWaterBillByReadingId, listAllEnterprises } from 'src/app/store';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
-import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
+import { selectClientMeterIsLoading, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
-import {  selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
+import { selectSelectedInvoice, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
+import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
 @Component({
   selector: 'app-register-reading',
@@ -26,6 +28,9 @@ export class RegisterReadingComponent implements OnInit {
   registReadingForm!: FormGroup;
   lastReading: number = 0;
   counter: string | null = '';
+  readingId: string | null = null;
+  fileUrl: SafeUrl | null = null;
+  clientId: string | null = null;
   zoneData: IOption[] = [];
   clientMetersData: IOption[] = [];
   enterpriseData: IOption[] = [];
@@ -40,27 +45,30 @@ export class RegisterReadingComponent implements OnInit {
   isZonesLoading$: Observable<boolean>;
   isEnterprisesLoading$: Observable<boolean>;
   isClientLoading$: Observable<boolean>;
+  isMeterLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
   errorMessage$: Observable<string>;
-  successMessage$: Observable<string>; 
-  
+  successMessage$: Observable<string>;
+
   getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
-  getReadingsByClientId$ = this.store.pipe(select(selectSelectedReading));
+  getReadingsByCMeterId$ = this.store.pipe(select(selectSelectedMeterReading));
+  getCreatedReading$ = this.store.pipe(select(selectSelectedReading));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
-  statusCode$ = this.store.select(selectReadingStatusCode); 
+  statusCode$ = this.store.select(selectReadingStatusCode);
   private destroy$ = new Subject<void>();
   user: string = '';
 
-  constructor(private store: Store<IAppState>, private auth: AuthService) {
+  constructor(private store: Store<IAppState>, private auth: AuthService,private sanitizer: DomSanitizer) {
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
     this.isEnterprisesLoading$ = this.store.select(selectEnterpriseIsLoading);
     this.isClientLoading$ = this.store.select(selectClientIsLoading);
+    this.isMeterLoading$ = this.store.select(selectClientMeterIsLoading);
     this.isReadingSaving$ = this.store.select(selectReadingIsSaving);
     this.errorMessage$ = this.store.select(selectReadingErrorMessage);
     this.successMessage$ = this.store.select(selectReadingSuccessMessage);
-    
+
 
   }
 
@@ -68,21 +76,17 @@ export class RegisterReadingComponent implements OnInit {
     this.user = this.auth.checkSession();
     this.initForm();
     this.loadData();
-    this.registReadingForm.controls['meterId'].disable();
   }
 
   initForm(): void {
     this.registReadingForm = new FormGroup({
       currentReading: new FormControl(null),
-      readingMonth: new FormControl(null), 
+      readingMonth: new FormControl(null),
       readingYear: new FormControl(this.getCurrentYear()),
       meterId: new FormControl(null)
     });
   }
 
-  enableFormControls(): void {
-    this.registReadingForm.controls['meterId'].enable();;
-  }
 
   loadData(): void {
     this.generateMonths();
@@ -141,20 +145,15 @@ export class RegisterReadingComponent implements OnInit {
   }
 
   onClientSelect(selectedClient: { label: string, value: string }): void {
+
     this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
       if (clients) {
 
         const clientDetails = clients.find(client => client.clientId === selectedClient.value);
         if (clientDetails) {
-          this.store.dispatch(getLastReadingByClient({ clientId: clientDetails.clientId }));
-          this.store.dispatch(getClientMeter({ meterId: clientDetails.clientId }))
+          this.clientId = clientDetails.clientId
 
-          this.getReadingsByClientId$.pipe(takeUntil(this.destroy$)).subscribe((readings) => {
-            if (readings) { 
-              this.lastReading = readings.currentReading;
-              this.enableFormControls();
-            }
-          });
+          this.store.dispatch(getClientMeterByClient({ clientId: this.clientId }))
 
           this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
             if (meters) {
@@ -165,7 +164,7 @@ export class RegisterReadingComponent implements OnInit {
                   value: meter.meterId || ''
                 }))
               ];
-              
+
             }
           })
         }
@@ -173,9 +172,23 @@ export class RegisterReadingComponent implements OnInit {
     });
   }
 
-  onMeterSeclected(option: IOption) {
+   onMeterSeclected(option: IOption) {
     if (option && option.value) {
-      this.registReadingForm.get('meterId')?.setValue(option.value)
+      this.lastReading = 0
+      this.counter = option.value
+      this.store.dispatch(getLastReadingByMeter({ meterId: this.counter }));
+
+      this.registReadingForm.get('meterId')?.setValue(this.counter)
+
+      this.getReadingsByCMeterId$.pipe(
+        skipWhile((readings) => !readings), 
+        first()  
+      ).subscribe((readings) => {
+        if (readings) { 
+          this.lastReading = readings.currentReading;
+          this.readingId = readings.readingId;
+        } 
+      });
     }
   }
 
@@ -187,31 +200,52 @@ export class RegisterReadingComponent implements OnInit {
     inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
   }
 
-  saveReading(): void {
-    if (this.registReadingForm.valid) { 
-      this.registReadingForm.get('meterId')?.setValue(this.counter)
+    saveReading(): void {
+      if (this.registReadingForm.valid) {
+          const formData = this.registReadingForm.value;
+          this.store.dispatch(createReading({ reading: formData }));
 
-      const formData = this.registReadingForm.value;
+          this.getCreatedReading$.pipe(
+              filter((reading) => !!reading),
+              first()
+          ).subscribe((reading) => { 
+            let count = 0
+              if (reading) {
+                if (count === 0) {
+                  const payload = {
+                    readingId: reading.readingId
+                  }
+                    this.store.dispatch(createInvoice({payload: payload}))
+                    this.store.pipe(
+                      select(selectSelectedInvoice),
+                      filter((invoice)=>!!invoice),
+                      first()
+                    ).subscribe((invoice) => {
+                      if (invoice) {
+                        this.store.dispatch(getWaterBillByReadingId({readingId: invoice.readingId}))
+                        this.store.pipe(
+                          select(selectSelectedWaterBill), 
+                          filter((file) => !!file),
+                          first()).subscribe((fileBlob) => {
+                          if (fileBlob) {
+                            const fileUrl = URL.createObjectURL(fileBlob);
+                            this.fileUrl = this.sanitizer.bypassSecurityTrustUrl(fileUrl);
+                          }
+                        });
+                      }
+                    })
 
-      this.store.dispatch(createReading({reading: formData}))
-      this.store.select(selectReadingStatusCode);
-      this.statusCode$.pipe(take(1)).subscribe(status => {
-        console.log('Status Code:', status);
-        
-        if (status === 200) {
-          console.log('Reading created successfully!');
-        } else {
-          console.error('Failed to create reading with status code:', status);
-        }
-      });
-    } else {
-      
-    }
+                    
+                }
+                count ++
+              }
+          });
+      }
   }
+
   onMonthSelect(selectedOption: { value: string; label: string }) {
     this.registReadingForm.get('readingMonth')?.setValue(selectedOption.value)
   }
-   
 
   ngOnDestroy(): void {
     this.destroy$.next();

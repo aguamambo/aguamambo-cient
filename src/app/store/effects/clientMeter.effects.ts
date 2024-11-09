@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { exhaustMap, map, catchError, of } from "rxjs";
+import { exhaustMap, map, catchError, of, tap } from "rxjs";
 import { IClientMeter } from "src/app/models/clientMeter";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getClientMeter, getClientMeterSuccess, getClientMeterFailure, listAllClientMeters, listAllClientMetersSuccess, listAllClientMetersFailure, createClientMeter, createClientMeterSuccess, createClientMeterFailure, updateClientMeter, updateClientMeterSuccess, updateClientMeterFailure, deleteClientMeter, deleteClientMeterSuccess, deleteClientMeterFailure, loadClientMetersCount, loadClientMetersCountSuccess, loadClientMetersCountFailure, getClientMeterByClientId, getClientMeterByClientIdFailure, getClientMeterByClientIdSuccess } from "../actions";
+import { getClientMeter, getClientMeterSuccess, getClientMeterFailure, listAllClientMeters, listAllClientMetersSuccess, listAllClientMetersFailure, createClientMeter, createClientMeterSuccess, createClientMeterFailure, updateClientMeter, updateClientMeterSuccess, updateClientMeterFailure, deleteClientMeter, deleteClientMeterSuccess, deleteClientMeterFailure, loadClientMetersCount, loadClientMetersCountSuccess, loadClientMetersCountFailure, getClientMeterByClient, getClientMeterByClientFailure, getClientMeterByClientSuccess, listAllAvailableMeters, listAllAvailableMetersFailure, listAllAvailableMetersSuccess } from "../actions";
 
 @Injectable()
 export class ClientMeterEffects {
@@ -14,45 +14,47 @@ export class ClientMeterEffects {
         private errorMessage: ErrorMessageService
     ) {}
 
-    getClientMeter$ = createEffect(() =>
+    getClientMeterByClientId$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(getClientMeter),
+            ofType(getClientMeterByClient),
             exhaustMap(action =>
-                this.apiService.get<IClientMeter>(`/client-meter/${action.meterId}`).pipe(
-                    map(clientMeter => getClientMeterSuccess({ clientMeter })),
+                this.apiService.get<IClientMeter[]>(`/client-meter/client/${action.clientId}`).pipe(
+                    map(clientMeters => getClientMeterByClientSuccess({ clientMeters:  clientMeters})),
                     catchError(error => {
                         this.errorMessage.getErrorMessage(error.status);
-                        return of(getClientMeterFailure({ error }));
+                        return of(getClientMeterByClientFailure({ error }));
                     })
                 )
             )
         )
     );
 
-    getClientMeterByClientId$ = createEffect(() =>
-        this.actions$.pipe(
-            ofType(getClientMeterByClientId),
-            exhaustMap(action =>
-                this.apiService.get<IClientMeter[]>(`/client-meter/client/${action.clientId}`).pipe(
-                    map(clientMeters => getClientMeterByClientIdSuccess({ clientMeters:  clientMeters})),
-                    catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
-                        return of(getClientMeterByClientIdFailure({ error }));
-                    })
-                )
-            )
-        )
-    );
+    
 
     listAllClientMeters$ = createEffect(() =>
         this.actions$.pipe(
             ofType(listAllClientMeters),
             exhaustMap(() =>
                 this.apiService.get<IClientMeter[]>('/client-meter').pipe(
-                    map(clientMeters => listAllClientMetersSuccess({ clientMeters })),
+                  map(clientMeters => listAllClientMetersSuccess({ clientMeters })),
                     catchError(error => {
                         this.errorMessage.getErrorMessage(error.status);
                         return of(listAllClientMetersFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
+
+    listAllAvailableMeters$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(listAllAvailableMeters),
+            exhaustMap(() =>
+                this.apiService.get<IClientMeter[]>('/client-meter/available').pipe(
+                    map(clientMeters => listAllAvailableMetersSuccess({ clientMeters })),
+                    catchError(error => {
+                        this.errorMessage.getErrorMessage(error.status);
+                        return of(listAllAvailableMetersFailure({ error }));
                     })
                 )
             )

@@ -10,13 +10,13 @@ import { IEnterprise } from 'src/app/models/enterprise';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
-import { listAllEnterprises, listAllContractTypes, getZoneByEnterpriseId, getClientByZoneId, createContract, listAllClientMeters } from 'src/app/store';
+import { listAllEnterprises, listAllContractTypes, getZoneByEnterpriseId, getClientByZoneId, createContract, listAllClientMeters, listAllAvailableMeters } from 'src/app/store';
 import { selectSelectedClients, selectClientErrorMessage, selectClientSuccessMessage } from 'src/app/store/selectors/client.selectors';
 import { selectContractIsSaving } from 'src/app/store/selectors/contract.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
 import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
-import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
+import { selectSelectedAvailableMeters, selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { IClientMeter } from 'src/app/models/clientMeter';
 
 @Component({
@@ -45,7 +45,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   getClients$ = this.store.pipe(select(selectSelectedClients));  
   getContractTypes$ = this.store.pipe(select(selectSelectedContractTypes));
   getZonesByEnterpriseId$ = this.store.pipe(select(selectSelectedZones));
-  getMeters$ = this.store.pipe(select(selectSelectedClientMeters));
+  getMeters$ = this.store.pipe(select(selectSelectedAvailableMeters));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
 
   constructor(
@@ -81,7 +81,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   loadData() {
     this.store.dispatch(listAllEnterprises());
     this.store.dispatch(listAllContractTypes());
-    this.store.dispatch(listAllClientMeters());
+    this.store.dispatch(listAllAvailableMeters());
 
     this.getContractTypes$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
         if (response) {
@@ -201,9 +201,7 @@ export class ContractComponent implements OnInit, OnDestroy {
  
   saveContract(): void {
     const contractData = this.contractForm.value;
-    
-    console.log(contractData);
-    
+        
     if (contractData) {
       this.store.dispatch(createContract({ contract: contractData }));
       this.contractSaved.emit();  

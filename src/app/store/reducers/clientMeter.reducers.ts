@@ -20,9 +20,12 @@ import {
   loadClientMetersCount,
   loadClientMetersCountSuccess,
   loadClientMetersCountFailure,
-  getClientMeterByClientId,
-  getClientMeterByClientIdFailure,
-  getClientMeterByClientIdSuccess
+  getClientMeterByClient,
+  getClientMeterByClientFailure,
+  getClientMeterByClientSuccess,
+  listAllAvailableMeters,
+  listAllAvailableMetersFailure,
+  listAllAvailableMetersSuccess
 } from "../actions/clientMeter.actions";
 import { Update } from "@ngrx/entity";
 
@@ -34,6 +37,7 @@ export interface IClientMeterState extends EntityState<IClientMeter> {
   error: any;
   selectedClientMeter: IClientMeter | null;
   selectedClientMeters: IClientMeter[] | null;
+  selectedAvailableMeters: IClientMeter[] | null;
   clientMeterCount: number;
 }
 
@@ -46,6 +50,7 @@ export const initialState: IClientMeterState = adapter.getInitialState({
   error: null,
   selectedClientMeter: null,
   selectedClientMeters: null,
+  selectedAvailableMeters: null,
   clientMeterCount: 0,
 });
 
@@ -66,13 +71,13 @@ const reducer = createReducer(
   })),
 
   // Get clientMeter by ID
-  on(getClientMeterByClientId, (state) => ({ ...state, isLoading: true })),
-  on(getClientMeterByClientIdSuccess, (state, { clientMeters }) => ({
+  on(getClientMeterByClient, (state) => ({ ...state, isLoading: true })),
+  on(getClientMeterByClientSuccess, (state, { clientMeters }) => ({
     ...state,
     selectedClientMeters: clientMeters,
     isLoading: false,
   })),
-  on(getClientMeterByClientIdFailure, (state, { error }) => ({
+  on(getClientMeterByClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error,
@@ -84,6 +89,17 @@ const reducer = createReducer(
     ({ ...state, isLoading: false, selectedClientMeters: clientMeters })
   ),
   on(listAllClientMetersFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+
+  // List all clientMeters
+  on(listAllAvailableMeters, (state) => ({ ...state, isLoading: true })),
+  on(listAllAvailableMetersSuccess, (state, { clientMeters }) =>
+    ({ ...state, isLoading: false, selectedAvailableMeters: clientMeters })
+  ),
+  on(listAllAvailableMetersFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error,
@@ -143,8 +159,5 @@ export function clientMeterReducer(state: IClientMeterState | undefined, action:
 }
 
 export const {
-  selectAll: selectAllClientMeters,
-  selectEntities: selectClientMeterEntities,
-  selectIds: selectClientMeterIds,
-  selectTotal: selectTotalClientMeters,
+  selectAll
 } = adapter.getSelectors();

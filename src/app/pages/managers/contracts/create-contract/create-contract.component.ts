@@ -30,12 +30,10 @@ export class CreateContractComponent{
       if (this.buttonDisabled) return;
 
       this.buttonDisabled = true;
-      console.log("Current step before:", this.currentStep);
 
       if (this.currentStep === 1) {
         this.clientComponent.saveClient();
       } else if (this.currentStep === 2) {
-        console.log('Client Id',  this.clientId);
         
         this.meterComponent.saveMeter(this.clientId);
       } else if (this.currentStep === 3) {
@@ -46,7 +44,6 @@ export class CreateContractComponent{
         this.currentStep++;
       }
 
-      console.log("Current step after:", this.currentStep);
   
       setTimeout(() => {
         this.buttonDisabled = false;
@@ -80,7 +77,6 @@ export class CreateContractComponent{
 
   onContractSaved() {
     this.successMessage = "Contrato salvo com sucesso!";
-    console.log("Contrato salvo com sucesso!");
     this.nextStep();
   }
  

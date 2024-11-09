@@ -16,6 +16,11 @@ export class ApiService {
         return this.http.get<T>(this.normalizeUrl(url));
     }
 
+    public getFile<T>(url: string) {
+        return this.http.get<T>(this.normalizeUrl(url), { responseType: 'blob' as 'json' });
+    }
+    
+
     public getById<T>(url: string, id: number) {
         return this.http.get<T>(this.normalizeUrl(`${url}/${id}`));
     }

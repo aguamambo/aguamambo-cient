@@ -8,7 +8,7 @@ import { IEnterprise } from "src/app/models/enterprise";
 import { IOption } from "src/app/models/option";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from "src/app/services/auth.service";
-import { IAppState, createSuspension, getClientByZoneId, getClientMeter, getClientMeterByClientId, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
+import { IAppState, createSuspension, getClientByZoneId, getClientMeter, getClientMeterByClient, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
 import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
@@ -126,7 +126,7 @@ onClientSelect(event: { value: string; label: string }): void {
   const clientId = event.value; 
 
   if (clientId) { 
-    this.store.dispatch(getClientMeterByClientId({ clientId: clientId }));
+    this.store.dispatch(getClientMeterByClient({ clientId: clientId }));
  
     this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
       if (meters) {

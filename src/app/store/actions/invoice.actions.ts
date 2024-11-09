@@ -34,6 +34,22 @@ export const getInvoiceByReadingIdFailure = createAction(
   props<{ error: any }>()
 );
 
+// GET invoices/{readingId}
+export const getWaterBillByReadingId = createAction(
+  '[Invoice] Load Invoice',
+  props<{ readingId: string }>()
+);
+
+export const getWaterBillByReadingIdSuccess = createAction(
+  '[Invoice] Load Invoice Success',
+  props<{ payload: Blob }>()  
+);
+
+export const getWaterBillByReadingIdFailure = createAction(
+  '[Invoice] Load Invoice Failure',
+  props<{ error: any }>()
+);
+
 // GET invoices
 export const listAllInvoices = createAction(
   '[Invoice] Load Invoices'
@@ -52,7 +68,7 @@ export const listAllInvoicesFailure = createAction(
 // POST invoices
 export const createInvoice = createAction(
   '[Invoice] Create Invoice',
-  props<{ invoice: IInvoice }>()
+  props<{ payload: any }>()
 );
 
 export const createInvoiceSuccess = createAction(

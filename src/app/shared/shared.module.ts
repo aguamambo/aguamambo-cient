@@ -19,6 +19,7 @@ import { DatePickerComponent } from './components/date-picker/date-picker.compon
 import { CardComponent } from './components/card/card.component';
 import { TabComponent } from './components/tab/tab.component';
 import { TabItemComponent } from './components/tab-item/tab-item.component';
+import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
 
 @NgModule({
   declarations: [ 
@@ -38,7 +39,7 @@ import { TabItemComponent } from './components/tab-item/tab-item.component';
     DatePickerComponent, 
     CardComponent, 
     TabComponent, 
-    TabItemComponent
+    TabItemComponent, PdfViewerComponent
   ],
   imports: [
     CommonModule,

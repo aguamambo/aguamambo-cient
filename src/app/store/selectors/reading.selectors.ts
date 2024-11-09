@@ -13,6 +13,11 @@ export const selectSelectedReading = createSelector(
   (state) => state.selectedReading
 );
 
+export const selectSelectedMeterReading = createSelector(
+  selectReadingState,
+  (state) => state.lastMeterReading
+);
+
 export const selectReadingIsLoading = createSelector(
   selectReadingState,
   (state) => state.isLoading
@@ -21,6 +26,11 @@ export const selectReadingIsLoading = createSelector(
 export const selectReadingStatusCode = createSelector(
   selectReadingState,
   (state) => state.statusCode
+);
+
+export const selectReadingId = createSelector(
+  selectReadingState,
+  (state) => state.readingId
 );
 
 export const selectReadingIsSaving = createSelector(

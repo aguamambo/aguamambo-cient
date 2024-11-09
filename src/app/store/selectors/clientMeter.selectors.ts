@@ -38,6 +38,11 @@ export const selectSelectedClientMeters = createSelector(
   (state) => state.selectedClientMeters
 );
 
+export const selectSelectedAvailableMeters = createSelector(
+  selectClientMeterState,
+  (state) => state.selectedAvailableMeters
+);
+
 export const selectClientMeterCount = createSelector(
   selectClientMeterState,
   (state) => state.clientMeterCount

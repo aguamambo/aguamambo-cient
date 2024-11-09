@@ -1,10 +1,32 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 h-full">
-    <app-breadcrumb 
-    title="Lista de Facturas" 
-    [breadcrumbItems]="['Dashboard', 'Listar Facturas']">
-    </app-breadcrumb>
-
-    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-
+<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
+    <app-breadcrumb title="Lista de Facturas" [breadcrumbItems]="['Dashboard', 'Listar Facturas']"></app-breadcrumb>
+     
+    <ng-container *ngIf="(isInvoicesLoading$ | async)">
+        <div class="flex flex-col justify-center my-4 gap-1">
+          <app-loading-spinner></app-loading-spinner>
+          <span class="flex justify-center text-sm">
+             
+              Carregando dados...
+             
+          </span>
+        </div>
+      </ng-container>
+ 
+ 
+     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
+        <h2 class="text-lg font-semibold mb-4">Lista de Facturas</h2>
+        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
+            <ng-container *ngIf="invoicesList.length > 0; else noData">
+                <app-table
+                    [data]="invoicesData"
+                    [columns]="invoiceColumns"
+                    [totalCount]="invoicesList.length"
+                    (rowClick)="editInvoice($event)">
+                </app-table>
+            </ng-container>
+            <ng-template #noData>
+                <div class="text-center p-4">Nenhuma factura disponível</div>
+            </ng-template>
+        </div>
     </div>
 </div>
