@@ -19,6 +19,21 @@ export const getReceiptFailure = createAction(
 );
 
 // GET receipts/{id}
+export const getReceiptPaymentMethods = createAction(
+  '[Receipt] Load Receipt Payment Methods' 
+);
+
+export const getReceiptPaymentMethodsSuccess = createAction(
+  '[Receipt] Load Receipt Payment Methods Success',
+  props<{ payload: string[] }>()
+);
+
+export const getReceiptPaymentMethodsFailure = createAction(
+  '[Receipt] Load Receipt Payment Methods Failure',
+  props<{ error: any }>()
+);
+
+// GET receipts/{id}
 export const getReceiptByClientId = createAction(
   '[Receipt] Load Receipt',
   props<{ clientId: string }>()
@@ -52,7 +67,7 @@ export const listAllReceiptsFailure = createAction(
 // POST /api/v1/receipts
 export const createReceipt = createAction(
   '[Receipt] Create Receipt',
-  props<{ receipt: IReceipt }>()
+  props<{ receipt: any }>()
 );
 
 export const createReceiptSuccess = createAction(

@@ -86,7 +86,6 @@ export class SideBarComponent {
         {
           label: 'Factura',
           subMenuOptions: [
-            { label: 'Nova Factura', url: 'treasuries/invoices/add' },
             { label: 'Listar Facturas', url: 'treasuries/invoices/list' }
           ],
           isOpen: false
@@ -94,8 +93,14 @@ export class SideBarComponent {
         {
           label: 'Recibo',
           subMenuOptions: [
-            { label: 'Novo Recibo', url: 'treasuries/receipts/add' },
             { label: 'Listar Recibos', url: 'treasuries/receipts/list' }
+          ],
+          isOpen: false
+        },
+        {
+          label: 'Pagamento',
+          subMenuOptions: [
+            { label: 'Pagar Factura', url: 'treasuries/payments/invoice-payment' }
           ],
           isOpen: false
         }

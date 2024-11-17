@@ -23,8 +23,10 @@ import {
   getReceiptByClientId,
   getReceiptByClientIdFailure,
   getReceiptByClientIdSuccess,
-} from '../actions/receipt.actions';
-import { Update } from '@ngrx/entity';
+  getReceiptPaymentMethods,
+  getReceiptPaymentMethodsFailure,
+  getReceiptPaymentMethodsSuccess,
+} from '../actions/receipt.actions'; 
 
 export interface IReceiptState extends EntityState<IReceipt> {
   isLoading: boolean;
@@ -34,6 +36,7 @@ export interface IReceiptState extends EntityState<IReceipt> {
   error: any;
   selectedReceipt: IReceipt | null;
   selectedReceipts: IReceipt[] | null;
+  selectedPaymentMethods: string[] | null;
   receiptCount: number;
 }
 
@@ -47,6 +50,7 @@ export const initialState: IReceiptState = adapter.getInitialState({
   error: null,
   selectedReceipt: null,
   selectedReceipts: null,
+  selectedPaymentMethods: null,
   receiptCount: 0,
 });
 
@@ -61,6 +65,19 @@ const reducer = createReducer(
     isLoading: false,
   })),
   on(getReceiptFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+
+  // Get receipt by ID
+  on(getReceiptPaymentMethods, (state) => ({ ...state, isLoading: true })),
+  on(getReceiptPaymentMethodsSuccess, (state, { payload }) => ({
+    ...state,
+    selectedPaymentMethods: payload,
+    isLoading: false,
+  })),
+  on(getReceiptPaymentMethodsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error,
@@ -95,7 +112,7 @@ const reducer = createReducer(
   // Create receipt
   on(createReceipt, (state) => ({ ...state, isSaving: true })),
   on(createReceiptSuccess, (state, { receipt }) =>
-    adapter.addOne(receipt, { ...state, isSaving: false, successMessage: 'Receipt created successfully!' })
+    ({ ...state, isSaving: false, selectedReceipt: receipt,  successMessage: 'Receipt created successfully!' })
   ),
   on(createReceiptFailure, (state, { error }) => ({
     ...state,
@@ -106,9 +123,8 @@ const reducer = createReducer(
   // Update receipt
   on(updateReceipt, (state) => ({ ...state, isSaving: true })),
   on(updateReceiptSuccess, (state, { receipt }) =>
-    adapter.updateOne(
-      { id: receipt.receiptID, changes: receipt },
-      { ...state, isSaving: false, successMessage: 'Receipt updated successfully!' }
+     ( 
+      { ...state, isSaving: false,selectedReceipt: receipt, successMessage: 'Receipt updated successfully!' }
     )
   ),
   on(updateReceiptFailure, (state, { error }) => ({
@@ -150,8 +166,5 @@ export function receiptReducer(
 }
 
 export const {
-  selectAll: selectAllReceipts,
-  selectEntities: selectReceiptEntities,
-  selectIds: selectReceiptIds,
-  selectTotal: selectTotalReceipts,
+  selectAll 
 } = adapter.getSelectors();

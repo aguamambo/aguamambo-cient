@@ -4,48 +4,48 @@ import { IClientMeter } from 'src/app/models/clientMeter';
 
 // GET client-meters/{id}
 export const getClientMeter = createAction(
-  '[ClientMeter] Load Client Meter',
+  '[ClientMeter] Get Client Meter',
   props<{ meterId: string }>()
 );
 
 export const getClientMeterSuccess = createAction(
-  '[ClientMeter] Load Client Meter Success',
+  '[ClientMeter] Get Client Meter Success',
   props<{ clientMeter: IClientMeter }>()
 );
 
 export const getClientMeterFailure = createAction(
-  '[ClientMeter] Load Client Meter Failure',
+  '[ClientMeter] Get Client Meter Failure',
   props<{ error: any }>()
 );
 
 // GET client-meters/{clientId}
 export const getClientMeterByClient = createAction(
-  '[ClientMeter] Load Client Meter',
+  '[ClientMeter] Get Meter By Client',
   props<{ clientId: string }>()
 );
 
 export const getClientMeterByClientSuccess = createAction(
-  '[ClientMeter] Load Client Meter Success',
+  '[ClientMeter] Get Meter By Client Success',
   props<{ clientMeters: IClientMeter[] }>()
 );
 
 export const getClientMeterByClientFailure = createAction(
-  '[ClientMeter] Load Client Meter Failure',
+  '[ClientMeter] Get Meter By Client Failure',
   props<{ error: any }>()
 );
 
 // GET client-meters
 export const listAllClientMeters = createAction(
-  '[ClientMeter] Load Client Meters'
+  '[ClientMeter] List All Meters'
 );
 
 export const listAllClientMetersSuccess = createAction(
-  '[ClientMeter] Load Client Meters Success',
+  '[ClientMeter] List All Meters Success',
   props<{ clientMeters: IClientMeter[] }>()
 );
 
 export const listAllClientMetersFailure = createAction(
-  '[ClientMeter] Load Client Meters Failure',
+  '[ClientMeter] List All Meters Failure',
   props<{ error: any }>()
 );
 

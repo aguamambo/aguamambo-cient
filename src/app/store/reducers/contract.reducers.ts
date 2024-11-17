@@ -82,7 +82,7 @@ const reducer = createReducer(
   // List all contracts
   on(listAllContracts, (state) => ({ ...state, isLoading: true })),
   on(listAllContractsSuccess, (state, { contracts }) =>
-    adapter.setAll(contracts, { ...state, isLoading: false })
+    ( { ...state, selectedContracts: contracts, isLoading: false })
   ),
   on(listAllContractsFailure, (state, { error }) => ({
     ...state,
@@ -104,9 +104,8 @@ const reducer = createReducer(
   // Update contract
   on(updateContract, (state) => ({ ...state, isSaving: true })),
   on(updateContractSuccess, (state, { contract }) =>
-    adapter.updateOne(
-      { id: contract.contractId, changes: contract },
-      { ...state, isSaving: false, successMessage: 'Contract updated successfully!' }
+    ( 
+      { ...state, isSaving: false,selectedContract : contract , successMessage: 'Contract updated successfully!' }
     )
   ),
   on(updateContractFailure, (state, { error }) => ({
@@ -145,8 +144,5 @@ export function contractReducer(state: IContractState | undefined, action: Actio
 }
 
 export const {
-  selectAll: selectAllContracts,
-  selectEntities: selectContractEntities,
-  selectIds: selectContractIds,
-  selectTotal: selectTotalContracts,
+  selectAll 
 } = adapter.getSelectors();

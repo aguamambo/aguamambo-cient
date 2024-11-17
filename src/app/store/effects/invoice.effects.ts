@@ -4,7 +4,7 @@ import { exhaustMap, map, catchError, of } from "rxjs";
 import { IInvoice } from "src/app/models/invoice";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getInvoice, getInvoiceSuccess, getInvoiceFailure, listAllInvoices, listAllInvoicesSuccess, listAllInvoicesFailure, createInvoice, createInvoiceSuccess, createInvoiceFailure, updateInvoice, updateInvoiceSuccess, updateInvoiceFailure, deleteInvoice, deleteInvoiceSuccess, deleteInvoiceFailure, loadInvoicesCount, loadInvoicesCountSuccess, loadInvoicesCountFailure, getInvoiceByReadingId, getInvoiceByReadingIdFailure, getInvoiceByReadingIdSuccess, getWaterBillByReadingId, getWaterBillByReadingIdFailure, getWaterBillByReadingIdSuccess } from "../actions";
+import { getInvoice, getInvoiceSuccess, getInvoiceFailure, listAllInvoices, listAllInvoicesSuccess, listAllInvoicesFailure, createInvoice, createInvoiceSuccess, createInvoiceFailure, updateInvoice, updateInvoiceSuccess, updateInvoiceFailure, deleteInvoice, deleteInvoiceSuccess, deleteInvoiceFailure, loadInvoicesCount, loadInvoicesCountSuccess, loadInvoicesCountFailure, getInvoiceByReadingId, getInvoiceByReadingIdFailure, getInvoiceByReadingIdSuccess, getWaterBillByReadingId, getWaterBillByReadingIdFailure, getWaterBillByReadingIdSuccess, getInvoiceByClientId, getInvoiceByClientIdFailure, getInvoiceByClientIdSuccess, getInvoiceByStatus, getInvoiceByStatusFailure, getInvoiceByStatusSuccess, getInvoiceByMeter, getInvoiceByMeterFailure, getInvoiceByMeterSuccess } from "../actions";
 
 @Injectable()
 export class InvoiceEffects {
@@ -38,6 +38,54 @@ export class InvoiceEffects {
                     catchError(error => {
                         this.errorMessage.getErrorMessage(error.status);
                         return of(getInvoiceByReadingIdFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
+
+
+    getInvoiceByClientId$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getInvoiceByClientId),
+            exhaustMap(action =>
+                this.apiService.get<IInvoice[]>(`/invoice/client/${action.clientId}`).pipe(
+                    map(invoice => getInvoiceByClientIdSuccess({ invoice })),
+                    catchError(error => {
+                        this.errorMessage.getErrorMessage(error.status);
+                        return of(getInvoiceByClientIdFailure({ error }));
+                    })
+                )
+            )
+        )
+    ); 
+    
+    getInvoiceByStatus$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getInvoiceByStatus),
+            exhaustMap(action =>
+                this.apiService.get<IInvoice[]>(`/invoice/client/by-status/${action.clientId}?paymentStatus=${action.status}`).pipe(
+                    map(invoice => getInvoiceByStatusSuccess({ invoice })),
+                    catchError(error => {
+                        this.errorMessage.getErrorMessage(error.status);
+                        return of(getInvoiceByStatusFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
+
+
+     
+    getInvoiceByMeter$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getInvoiceByMeter),
+            exhaustMap(action =>
+                this.apiService.get<IInvoice[]>(`/invoice/meter/${action.meterId}`).pipe(
+                    map(invoice => getInvoiceByMeterSuccess({ invoice })),
+                    catchError(error => {
+                        this.errorMessage.getErrorMessage(error.status);
+                        return of(getInvoiceByMeterFailure({ error }));
                     })
                 )
             )

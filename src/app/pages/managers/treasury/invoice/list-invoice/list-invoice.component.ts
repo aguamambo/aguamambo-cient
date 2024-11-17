@@ -55,8 +55,8 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
       { key: 'amount', label: 'Leitura Acutal' },
       { key: 'fineAmount', label: 'Leitura Anterior' },
       { key: 'totalAmount', label: 'Mês' },
-      { key: 'finePercentage', label: 'Ano Económico' },
-      { key: 'readingId', label: 'Estado' }
+      { key: 'finePercentage', label: 'Multa (%)' },
+      { key: 'readingId', label: 'Id da Leitura' }
     ];
   }
 

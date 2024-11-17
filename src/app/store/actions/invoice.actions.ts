@@ -4,64 +4,110 @@ import { IInvoice } from 'src/app/models/invoice';
 
 // GET invoices/{id}
 export const getInvoice = createAction(
-  '[Invoice] Load Invoice',
+  '[Invoice] Get Invoice',
   props<{ invoiceId: string }>()
 );
 
 export const getInvoiceSuccess = createAction(
-  '[Invoice] Load Invoice Success',
+  '[Invoice] Get Invoice Success',
   props<{ invoice: IInvoice }>()
 );
 
 export const getInvoiceFailure = createAction(
-  '[Invoice] Load Invoice Failure',
+  '[Invoice] Get Invoice Failure',
   props<{ error: any }>()
 );
 
 // GET invoices/{readingId}
 export const getInvoiceByReadingId = createAction(
-  '[Invoice] Load Invoice',
+  '[Invoice] Get Invoice By Reading',
   props<{ readingId: string }>()
 );
 
 export const getInvoiceByReadingIdSuccess = createAction(
-  '[Invoice] Load Invoice Success',
+  '[Invoice] Get Invoice By Reading Success',
   props<{ invoice: IInvoice }>()
 );
 
 export const getInvoiceByReadingIdFailure = createAction(
-  '[Invoice] Load Invoice Failure',
+  '[Invoice] Get Invoice By Reading Failure',
+  props<{ error: any }>()
+);
+
+// GET invoice/client/{clientId}
+export const getInvoiceByClientId = createAction(
+  '[Invoice] Get Invoice By Client',
+  props<{ clientId: string }>()
+);
+
+export const getInvoiceByClientIdSuccess = createAction(
+  '[Invoice] Get Invoice By Client Success',
+  props<{ invoice: IInvoice[] }>()
+);
+
+export const getInvoiceByClientIdFailure = createAction(
+  '[Invoice] Get Invoice By Client Failure',
+  props<{ error: any }>()
+);
+
+export const getInvoiceByStatus = createAction(
+  '[Invoice] Get Invoice By Status',
+  props<{ clientId: string, status: boolean }>()
+);
+
+export const getInvoiceByStatusSuccess = createAction(
+  '[Invoice] Get Invoice By Status Success',
+  props<{ invoice: IInvoice[] }>()
+);
+
+export const getInvoiceByStatusFailure = createAction(
+  '[Invoice] Get Invoice By Status Failure',
+  props<{ error: any }>()
+);
+
+export const getInvoiceByMeter = createAction(
+  '[Invoice] Get Invoice By Meter',
+  props<{ meterId: string}>()
+);
+
+export const getInvoiceByMeterSuccess = createAction(
+  '[Invoice] Get Invoice By Meter Success',
+  props<{ invoice: IInvoice[] }>()
+);
+
+export const getInvoiceByMeterFailure = createAction(
+  '[Invoice] Get Invoice By Meter Failure',
   props<{ error: any }>()
 );
 
 // GET invoices/{readingId}
 export const getWaterBillByReadingId = createAction(
-  '[Invoice] Load Invoice',
+  '[Invoice] Get WaterBil by Reading',
   props<{ readingId: string }>()
 );
 
 export const getWaterBillByReadingIdSuccess = createAction(
-  '[Invoice] Load Invoice Success',
+  '[Invoice] Get WaterBil by Reading Success',
   props<{ payload: Blob }>()  
 );
 
 export const getWaterBillByReadingIdFailure = createAction(
-  '[Invoice] Load Invoice Failure',
+  '[Invoice] Get WaterBil by Reading Failure',
   props<{ error: any }>()
 );
 
 // GET invoices
 export const listAllInvoices = createAction(
-  '[Invoice] Load Invoices'
+  '[Invoice] List All Invoices'
 );
 
 export const listAllInvoicesSuccess = createAction(
-  '[Invoice] Load Invoices Success',
+  '[Invoice] List All Invoices Success',
   props<{ invoices: IInvoice[] }>()
 );
 
 export const listAllInvoicesFailure = createAction(
-  '[Invoice] Load Invoices Failure',
+  '[Invoice] List All Invoices Failure',
   props<{ error: any }>()
 );
 

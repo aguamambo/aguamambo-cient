@@ -11,9 +11,9 @@ import { AuthService } from "src/app/services/auth.service";
 import { IAppState, createSuspension, getClientByZoneId, getClientMeter, getClientMeterByClient, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
 import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
-import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
+import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
 import { selectSuspensionIsSaving } from "src/app/store/selectors/suspension.selectors";
-import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
+import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
 @Component({
   selector: 'app-register-suspension',
@@ -34,6 +34,9 @@ export class RegisterSuspensionComponent  implements OnInit {
  
   isCustomersLoading$: Observable<boolean>;
   isSuspensionSaving$: Observable<boolean>;
+  isZonesLoading$: Observable<boolean>;
+  isEnterprisesLoading$: Observable<boolean>;
+  isClientLoading$: Observable<boolean>;
 
   getZonesByCompanyId$ = this.store.pipe(select(selectSelectedZones));
   getEnterprise$ = this.store.pipe(select(selectSelectedEnterprises));
@@ -46,6 +49,9 @@ export class RegisterSuspensionComponent  implements OnInit {
   constructor(private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
     this.isCustomersLoading$ = this.store.select(selectClientIsLoading);
     this.isSuspensionSaving$ = this.store.select(selectSuspensionIsSaving);
+    this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
+    this.isEnterprisesLoading$ = this.store.select(selectEnterpriseIsLoading);
+    this.isClientLoading$ = this.store.select(selectClientIsLoading);
     this.year = this.generic.getCurrentYear()
 
   }

@@ -36,16 +36,16 @@ export const getContractByClientIdFailure = createAction(
 
 // GET contracts
 export const listAllContracts = createAction(
-  '[Contract] Load Contracts'
+  '[Contract] List All Contracts'
 );
 
 export const listAllContractsSuccess = createAction(
-  '[Contract] Load Contracts Success',
+  '[Contract] List All Contracts Success',
   props<{ contracts: IContract[] }>()
 );
 
 export const listAllContractsFailure = createAction(
-  '[Contract] Load Contracts Failure',
+  '[Contract] List All Contracts Failure',
   props<{ error: any }>()
 );
 

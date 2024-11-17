@@ -2,37 +2,37 @@
     <app-breadcrumb title="Registar Novo Corte" [breadcrumbItems]="['Dashboard', 'Registar Corte']"></app-breadcrumb>
 
     <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[40vh] h-full rounded-lg shadow-md p-4">
-        <ng-container *ngIf="(isClientsLoading$ | async) || (isCutSaving$ | async)">
+        <ng-container *ngIf="(isZonesLoading$ | async) || (isEnterprisesLoading$ | async) || (isClientLoading$ | async) || (isCutSaving$ | async)  || (isMeterLoading$ | async)">
             <div class="flex flex-col justify-center my-4 gap-1">
-                <app-loading-spinner></app-loading-spinner>
-                <span class="flex justify-center text-sm">
-                    <ng-container *ngIf="(isCutSaving$ | async); else loadingData">
-                        Salvando a dados de Corte
-                    </ng-container>
-                    <ng-template #loadingData>
-                        Carregando dados
-                    </ng-template>
-                </span>
+              <app-loading-spinner></app-loading-spinner>
+              <span class="flex justify-center text-sm">
+                <ng-container *ngIf="(isCutSaving$ | async); else loadingData">
+                  Salvando a corte
+                </ng-container>
+                <ng-template #loadingData>
+                  Carregando dados
+                </ng-template>
+              </span>
             </div>
-        </ng-container>
+          </ng-container>
 
         <form [formGroup]="registCutForm" class=" py-4 dark:bg-deep-dark ">
 
             <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
                 <div class="w-full">
-                    <app-custom-select   label="Empresa" [options]="enterpriseData"
-                        (selectedValueChange)="onValueSelected($event)">
-                    </app-custom-select>
+                    <app-autocomplete-input label="Empresa" [dataSource]="enterpriseData"
+                        (valueSelected)="onValueSelected($event)">
+                    </app-autocomplete-input>
                 </div>
 
                 <div class="w-full">
-                    <app-custom-select label="Zona" [options]="zoneData"
-                        (selectedValueChange)="onEnterpriseSelect($event)">
-                    </app-custom-select>
+                    <app-autocomplete-input label="Zona" [dataSource]="zoneData"
+                        (valueSelected)="onEnterpriseSelect($event)">
+                    </app-autocomplete-input>
                 </div>
                 <div class="w-full">
-                    <app-custom-select   label="Cliente" [options]="clientData" (selectedValueChange)="onClientSelect($event)">
-                    </app-custom-select>
+                    <app-autocomplete-input label="Cliente" [dataSource]="clientData" (valueSelected)="onClientSelect($event)">
+                    </app-autocomplete-input>
                 </div>
             </div>
             <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">

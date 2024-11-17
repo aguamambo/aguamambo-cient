@@ -13,6 +13,11 @@ export const selectSelectedReceipt = createSelector(
   (state) => state.selectedReceipt
 );
 
+export const selectPaymentMethods = createSelector(
+  selectReceiptState,
+  (state) => state.selectedPaymentMethods
+);
+
 export const selectReceiptIsLoading = createSelector(
   selectReceiptState,
   (state) => state.isLoading

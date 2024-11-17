@@ -8,7 +8,7 @@ interface Option {
 @Component({
   selector: 'app-autocomplete-input',
   templateUrl: './autocomplete-input.component.html',
-  styleUrl: './autocomplete-input.component.css'
+  styleUrls: ['./autocomplete-input.component.css']
 })
 export class AutocompleteInputComponent {
   @Input() placeholder: string = 'Pesquisar';
@@ -17,22 +17,51 @@ export class AutocompleteInputComponent {
   @Output() valueSelected = new EventEmitter<Option>();
 
   filteredData: Option[] = [];
-  searchTerm: string = '';
-
+  displayLabel: string = '';
+  searchValue: string = '';
+  highlightedIndex: number = -1;
 
   onSearchInputChange() {
-  
-    if (this.searchTerm) {
-      this.filteredData = this.dataSource.filter(option => { 
-        return option.label && option.label.toLowerCase().includes(this.searchTerm.toLowerCase());
-      });
+    if (this.displayLabel) {
+      this.filteredData = this.dataSource.filter(option =>
+        option.label && option.label.toLowerCase().includes(this.displayLabel.toLowerCase())
+      );
+      this.highlightedIndex = -1;
     } else {
       this.filteredData = [];
     }
   }
+
+  onInputClick() { 
+    if (!this.displayLabel) {
+      this.filteredData = this.dataSource;
+    }
+  }
+  
+  clearInput(): void {
+    this.displayLabel = '';
+    this.filteredData = [];
+  }
+  
   onSelect(option: Option) {
-    this.searchTerm = option.label;  
-    this.valueSelected.emit(option); 
+    this.displayLabel = option.label; 
+    this.searchValue = option.value
     this.filteredData = []; 
+    this.highlightedIndex = -1;  
+    this.valueSelected.emit(option);   
+  }
+  
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'ArrowDown' && this.highlightedIndex < this.filteredData.length - 1) {
+      this.highlightedIndex++;
+      event.preventDefault();
+    } else if (event.key === 'ArrowUp' && this.highlightedIndex > 0) {
+      this.highlightedIndex--;
+      event.preventDefault();
+    } else if (event.key === 'Enter' && this.highlightedIndex >= 0) {
+      this.onSelect(this.filteredData[this.highlightedIndex]);
+      event.preventDefault();
+    }
   }
 }

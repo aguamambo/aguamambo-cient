@@ -26,7 +26,16 @@ import {
   getInvoiceByReadingIdSuccess,
   getWaterBillByReadingIdSuccess,
   getWaterBillByReadingId,
-  getWaterBillByReadingIdFailure
+  getWaterBillByReadingIdFailure,
+  getInvoiceByClientId,
+  getInvoiceByClientIdFailure,
+  getInvoiceByClientIdSuccess,
+  getInvoiceByStatus,
+  getInvoiceByStatusFailure,
+  getInvoiceByStatusSuccess,
+  getInvoiceByMeter,
+  getInvoiceByMeterFailure,
+  getInvoiceByMeterSuccess
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
 
@@ -79,6 +88,43 @@ const reducer = createReducer(
     isLoading: false,
   })),
   on(getInvoiceByReadingIdFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+
+  // Get invoice by ID
+  on(getInvoiceByClientId, (state) => ({ ...state, isLoading: true })),
+  on(getInvoiceByClientIdSuccess, (state, { invoice }) => ({
+    ...state,
+    selectedInvoices: invoice,
+    isLoading: false,
+  })),
+  on(getInvoiceByClientIdFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+
+  on(getInvoiceByStatus, (state) => ({ ...state, isLoading: true })),
+  on(getInvoiceByStatusSuccess, (state, { invoice }) => ({
+    ...state,
+    selectedInvoices: invoice,
+    isLoading: false,
+  })),
+  on(getInvoiceByStatusFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+
+  on(getInvoiceByMeter, (state) => ({ ...state, isLoading: true })),
+  on(getInvoiceByMeterSuccess, (state, { invoice }) => ({
+    ...state,
+    selectedInvoices: invoice,
+    isLoading: false,
+  })),
+  on(getInvoiceByMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error,

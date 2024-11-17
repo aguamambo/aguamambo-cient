@@ -52,16 +52,16 @@ export const getClientByContractTypeIdFailure = createAction(
 
 // GET clients
 export const listAllClients = createAction(
-  '[Client] List Clients'
+  '[Client] List All Clients'
 );
 
 export const listAllClientsSuccess = createAction(
-  '[Client] List Clients Success',
+  '[Client] List All Clients Success',
   props<{ clients: IClient[] }>()
 );
 
 export const listAllClientsFailure = createAction(
-  '[Client] List Clients Failure',
+  '[Client] List All Clients Failure',
   props<{ error: any }>()
 );
 

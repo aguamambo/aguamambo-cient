@@ -20,16 +20,16 @@ export const getContractTypeFailure = createAction(
 
 // GET contract-types
 export const listAllContractTypes = createAction(
-  '[ContractType] Load Contract Types'
+  '[ContractType] List A Contract Types'
 );
 
 export const listAllContractTypesSuccess = createAction(
-  '[ContractType] Load Contract Types Success',
+  '[ContractType] List A Contract Types Success',
   props<{ contractTypes: IContractType[] }>()
 );
 
 export const listAllContractTypesFailure = createAction(
-  '[ContractType] Load Contract Types Failure',
+  '[ContractType] List A Contract Types Failure',
   props<{ error: any }>()
 );
 

@@ -8,12 +8,12 @@ import { IEnterprise } from "src/app/models/enterprise";
 import { IOption } from "src/app/models/option";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from "src/app/services/auth.service";
-import { IAppState, createCut, getClientByZoneId, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
+import { IAppState, createCut, getClientByZoneId, getClientMeterByClient, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
-import { selectSelectedClientMeter, selectSelectedClientMeters } from "src/app/store/selectors/clientMeter.selectors";
+import { selectClientMeterIsLoading, selectSelectedClientMeter, selectSelectedClientMeters } from "src/app/store/selectors/clientMeter.selectors";
 import { selectCutIsSaving } from "src/app/store/selectors/cut.selectors";
-import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
-import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
+import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
+import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
 @Component({
   selector: 'app-register-cut',
@@ -34,19 +34,29 @@ export class RegisterCutComponent  implements OnInit {
  
   isClientsLoading$: Observable<boolean>;
   isCutSaving$: Observable<boolean>;
-
+  isZonesLoading$: Observable<boolean>;
+  isEnterprisesLoading$: Observable<boolean>;
+  isClientLoading$: Observable<boolean>;
+  isMeterLoading$: Observable<boolean>;
+  
   getZonesByEnterpriseId$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClients$ = this.store.pipe(select(selectSelectedClients));  
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
   private destroy$ = new Subject<void>();
   user: string = '';
+  clientId: string = '';
   year: number = 0;
   meter: string | null = '';
 
   constructor(private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
     this.isClientsLoading$ = this.store.select(selectClientIsLoading);
     this.isCutSaving$ = this.store.select(selectCutIsSaving);
+    this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
+    this.isEnterprisesLoading$ = this.store.select(selectEnterpriseIsLoading);
+    this.isClientLoading$ = this.store.select(selectClientIsLoading);
+    this.isMeterLoading$ = this.store.select(selectClientMeterIsLoading);
+    
     this.year = this.generic.getCurrentYear()
   }
 
@@ -128,20 +138,31 @@ export class RegisterCutComponent  implements OnInit {
   }
 
    onClientSelect(selectedClient: { label: string, value: string }): void {
-    this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
-      if (meters) {
-        this.clientMetersData = [
-          { label: 'Seleccione...', value: '' },
-          ...meters.map(meter => ({
-            label: meter.meterId || '',
-            value: meter.meterId || ''
-          }))
-        ];
-        
-      }
-    })
-  }
+    this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
+      if (clients) {
 
+        const clientDetails = clients.find(client => client.clientId === selectedClient.value);
+        if (clientDetails) {
+          this.clientId = clientDetails.clientId
+
+          this.store.dispatch(getClientMeterByClient({ clientId: this.clientId }))
+
+          this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
+            if (meters) {
+              this.clientMetersData = [
+                { label: 'Seleccione...', value: '' },
+                ...meters.map(meter => ({
+                  label: meter.meterId || '',
+                  value: meter.meterId || ''
+                }))
+              ];
+
+            }
+          })
+        }
+      }
+    });
+  }
   getClients(){
     this.store.dispatch(listAllClients());
     this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {

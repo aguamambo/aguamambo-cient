@@ -1,22 +1,41 @@
 <div class="relative w-full text-deep-dark">
-    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">{{ label }}</label>
-    
-    <input 
-      type="text" 
-      [(ngModel)]="searchTerm"
+  <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">{{ label }}</label>
+
+  <!-- Wrapper para o input e o botão -->
+  <div class="relative">
+    <input
+      type="text"
+      [(ngModel)]="displayLabel"
       (input)="onSearchInputChange()"
+      (click)="onInputClick()"
+      (keydown)="onKeyDown($event)"
       [placeholder]="placeholder"
-      class="w-full p-2 border text-deep-dark dark:text-light-mode dark:bg-slate-500 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full p-2 border text-deep-dark dark:text-light-mode dark:bg-slate-500 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
     />
-  
-    <ul *ngIf="filteredData.length > 0" class="absolute z-10 w-full mt-1  bg-light-mode dark:bg-slate-500  border border-gray-300 rounded-lg shadow-lg">
-      <li 
-        *ngFor="let option of filteredData" 
-        (click)="onSelect(option)"
-        class="p-2 hover:bg-blue-600 hover:rounded-lg  text-deep-dark cursor-pointer"
-      >
-      <span class="text-deep-dark dark:text-light-mode">{{ option.label }}</span>  
-      </li>
-    </ul>
+
+    <!-- Botão de limpar -->
+    <button
+      type="button"
+      *ngIf="displayLabel"
+      (click)="clearInput()"
+      class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 hover:text-gray-800"
+    >
+      ✖
+    </button>
   </div>
-  
+
+  <!-- Lista de opções -->
+  <ul
+    *ngIf="filteredData.length > 0"
+    class="absolute z-10 w-full mt-1 bg-light-mode dark:bg-slate-500 border border-gray-300 rounded-lg shadow-lg"
+  >
+    <li
+      *ngFor="let option of filteredData; let i = index"
+      (click)="onSelect(option)"
+      [class.bg-blue-600]="i === highlightedIndex"
+      class="p-2 hover:bg-blue-600 hover:rounded-lg text-deep-dark cursor-pointer"
+    >
+      <span class="text-deep-dark dark:text-light-mode">{{ option.label }}</span>
+    </li>
+  </ul>
+</div>

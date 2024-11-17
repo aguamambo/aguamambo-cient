@@ -3,6 +3,7 @@ export interface IInvoice {
     description: string;
     paymentMethod: string;
     limitDate: string;
+    paymentStatus: boolean;
     paymentDate: string;
     amount:number;
     fineAmount:number;

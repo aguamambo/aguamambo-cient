@@ -20,20 +20,23 @@
 
       <div class="flex flex-col sm:flex-row w-full p-4 gap-4 items-center ">
         <div class="w-full">
-          <app-custom-select  label="Empresa" [options]="enterpriseData"
-            (selectedValueChange)="onValueSelected($event)">
-          </app-custom-select>
+          <app-autocomplete-input
+            label="Empresa" 
+            [dataSource]="enterpriseData"
+            (valueSelected)="onValueSelected($event)">
+          </app-autocomplete-input>
         </div>
+        
 
         <div class="w-full">
-          <app-custom-select label="Zona" [options]="zoneData"
-            (selectedValueChange)="onEnterpriseSelect($event)">
-          </app-custom-select>
+          <app-autocomplete-input label="Zona" [dataSource]="zoneData"
+          (valueSelected)="onEnterpriseSelect($event)">
+          </app-autocomplete-input>
         </div>
         <div class="w-full">
-          <app-custom-select label="Cliente" [options]="clientData"
-            (selectedValueChange)="onClientSelect($event)">
-          </app-custom-select>
+          <app-autocomplete-input label="Cliente" [dataSource]="clientData"
+          (valueSelected)="onClientSelect($event)">
+          </app-autocomplete-input>
         </div>
       </div>
 
@@ -51,10 +54,10 @@
 
         <div class="w-full">
           <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-          <app-custom-drop-down
-              [options]="clientMetersData"
-          (selectionChange)="onMeterSeclected($event)"> 
-          </app-custom-drop-down>
+          <app-autocomplete-input
+              [dataSource]="clientMetersData"
+          (valueSelected)="onMeterSeclected($event)"> 
+          </app-autocomplete-input>
       </div>
 
         <div class="w-full">

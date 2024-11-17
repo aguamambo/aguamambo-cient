@@ -1,5 +1,5 @@
 import { HttpClientModule } from "@angular/common/http";
-import { isDevMode, NgModule } from "@angular/core";
+import { NgModule, isDevMode } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { JwtModule } from "@auth0/angular-jwt";
 import { EffectsModule } from "@ngrx/effects";
@@ -16,6 +16,7 @@ import { ManagersModule } from "./pages/managers/managers.module";
 import { SharedModule } from "./shared/shared.module";
 import { reducers, effects } from "./store";
 
+  
 @NgModule({
   declarations: [
     AppComponent,
