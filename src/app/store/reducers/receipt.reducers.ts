@@ -26,6 +26,9 @@ import {
   getReceiptPaymentMethods,
   getReceiptPaymentMethodsFailure,
   getReceiptPaymentMethodsSuccess,
+  getReceiptFile,
+  getReceiptFileFailure,
+  getReceiptFileSuccess,
 } from '../actions/receipt.actions'; 
 
 export interface IReceiptState extends EntityState<IReceipt> {
@@ -33,6 +36,7 @@ export interface IReceiptState extends EntityState<IReceipt> {
   isSaving: boolean;
   errorMessage: string;
   successMessage: string;
+  selectedFile: string;
   error: any;
   selectedReceipt: IReceipt | null;
   selectedReceipts: IReceipt[] | null;
@@ -47,6 +51,7 @@ export const initialState: IReceiptState = adapter.getInitialState({
   isSaving: false,
   errorMessage: '',
   successMessage: '',
+  selectedFile: '',
   error: null,
   selectedReceipt: null,
   selectedReceipts: null,
@@ -78,6 +83,18 @@ const reducer = createReducer(
     isLoading: false,
   })),
   on(getReceiptPaymentMethodsFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+ // Get receipt by ID
+  on(getReceiptFile, (state) => ({ ...state, isLoading: true })),
+  on(getReceiptFileSuccess, (state, { payload }) => ({
+    ...state,
+    selectedFile: payload,
+    isLoading: false,
+  })),
+  on(getReceiptFileFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error,

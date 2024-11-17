@@ -35,32 +35,48 @@ export const getReceiptPaymentMethodsFailure = createAction(
 
 // GET receipts/{id}
 export const getReceiptByClientId = createAction(
-  '[Receipt] Load Receipt',
+  '[Receipt] Get Receipt By Client Id',
   props<{ clientId: string }>()
 );
 
 export const getReceiptByClientIdSuccess = createAction(
-  '[Receipt] Load Receipt Success',
+  '[Receipt] Get Receipt By Client Id Success',
   props<{ receipts: IReceipt[] }>()
 );
 
 export const getReceiptByClientIdFailure = createAction(
-  '[Receipt] Load Receipt Failure',
+  '[Receipt] Get Receipt By Client Id Failure',
+  props<{ error: any }>()
+);
+
+// GET receipts/{id}
+export const getReceiptFile = createAction(
+  '[Receipt] Get Receipt File',
+  props<{ receiptId: string }>()
+);
+
+export const getReceiptFileSuccess = createAction(
+  '[Receipt] Get Receipt File Success',
+  props<{ payload: string }>()
+);
+
+export const getReceiptFileFailure = createAction(
+  '[Receipt] Get Receipt File Failure',
   props<{ error: any }>()
 );
 
 // GET /api/v1/receipts
 export const listAllReceipts = createAction(
-  '[Receipt] Load Receipts'
+  '[Receipt] List All Receipts'
 );
 
 export const listAllReceiptsSuccess = createAction(
-  '[Receipt] Load Receipts Success',
+  '[Receipt] List All Receipts Success',
   props<{ receipts: IReceipt[] }>()
 );
 
 export const listAllReceiptsFailure = createAction(
-  '[Receipt] Load Receipts Failure',
+  '[Receipt] List All Receipts Failure',
   props<{ error: any }>()
 );
 
