@@ -54,6 +54,15 @@
                         (input)="onNumberInputChange(currentReading)"
                         class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
                 </div>
+
+                <div class="w-full">
+                    <app-custom-drop-down
+                        formControlName="state"
+                        label="Estado"
+                        [options]="statusData"
+                        (selectionChange)=" onStatusSelect($event)">
+                    </app-custom-drop-down>
+                </div>
             </div>
 
         </form>

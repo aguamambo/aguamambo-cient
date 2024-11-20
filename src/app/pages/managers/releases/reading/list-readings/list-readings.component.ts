@@ -22,6 +22,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   readingsList: IReading[] = [];
   readingsData: IReading[] = [];
   monthsData: IOption[] = [];
+  statusData: IOption[] = [];
   counter: string = '';
   clientData: IOption[] = [];
   zoneData: IOption[] = [];
@@ -50,7 +51,8 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       enterprise: ['', Validators.required],
       zone: ['', Validators.required],
       client: ['', Validators.required],
-      readingYear:  ['']
+      readingYear: [''],
+      state: ['']
     });
 
     this.isReadingsLoading$ = this.store.select(selectReadingIsLoading);
@@ -85,6 +87,14 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   private loadData(): void {
     this.generateMonths()
+
+    this.statusData = [
+      { label: 'Seleccione...', value: '' },
+      { label: 'PENDENTE', value: 'PENDING' },
+      { label: 'APROVADO', value: 'APPROVED' },
+      { label: 'CANCELADO', value: 'CANCELED' },
+    ]
+
     this.store.dispatch(listAllReadings());
     this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe(readings => {
       if (readings) {
@@ -99,14 +109,17 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   }
 
   editReading(reading: IReading): void {
+
     this.isEditing = true;
     this.selectedReading = reading;
+
     this.readingForm.patchValue({
       readingMonth: reading.readingMonth,
       currentReading: reading.currentReading,
       counter: reading.meterId,
       lastReading: reading.previousReading,
-      readingYear: reading.readingYear
+      readingYear: reading.readingYear,
+      state: reading.state
     });
   }
 
@@ -114,7 +127,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.readingForm.controls['readingYear'].enable();
     console.log(this.readingForm.valid);
     console.log(this.isEditing);
-    
+
     if (this.readingForm.valid && this.isEditing) {
       const payload = this.readingForm.value;
       this.store.dispatch(updateReading({ readingId: this.selectedReading.readingId, reading: payload }));
@@ -149,6 +162,14 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  onStatusSelect(event: { value: string; label: string }): void {
+    if (event && event.value) {
+      const selectedValue = event.value;
+      this.readingForm.get('state')?.setValue(selectedValue)
+    }
+
   }
 
   onEnterpriseSelect(event: { value: string; label: string }): void {
