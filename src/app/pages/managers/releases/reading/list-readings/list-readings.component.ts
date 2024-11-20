@@ -124,10 +124,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   }
 
   submitForm(): void {
-    this.readingForm.controls['readingYear'].enable();
-    console.log(this.readingForm.valid);
-    console.log(this.isEditing);
-
+    this.readingForm.controls['readingYear'].enable(); 
     if (this.readingForm.valid && this.isEditing) {
       const payload = this.readingForm.value;
       this.store.dispatch(updateReading({ readingId: this.selectedReading.readingId, reading: payload }));
