@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, Subject, pipe } from 'rxjs';
+import { filter, first, takeUntil } from 'rxjs/operators';
 import { IOption } from 'src/app/models/option';
 import { IReading } from 'src/app/models/reading';
 import { IZone } from 'src/app/models/zone';
@@ -32,10 +32,12 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   readingColumns: { key: keyof IReading; label: string }[] = [];
   isEditing: boolean = false;
   selectedReading!: IReading;
+  selectedBulkStatus: any;
 
   isReadingsLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
   private destroy$ = new Subject<void>();
+
   getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
@@ -47,10 +49,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       readingMonth: ['', Validators.required],
       currentReading: ['', Validators.required],
       counter: [''],
-      lastReading: [''],
-      enterprise: ['', Validators.required],
-      zone: ['', Validators.required],
-      client: ['', Validators.required],
+      lastReading: [''],  
       readingYear: [''],
       state: ['']
     });
@@ -77,25 +76,21 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadData();
-    this.readingForm.controls['readingYear'].disable();
-    this.readingForm.controls['counter'].disable();
-    this.readingForm.controls['lastReading'].disable();
-    this.readingForm.controls['zone'].disable();
-    this.readingForm.controls['enterprise'].disable();
-    this.readingForm.controls['client'].disable();
+    this.setFormControlState(false);
   }
 
   private loadData(): void {
-    this.generateMonths()
+    this.generateMonths();
 
     this.statusData = [
       { label: 'Seleccione...', value: '' },
       { label: 'PENDENTE', value: 'PENDING' },
       { label: 'APROVADO', value: 'APPROVED' },
       { label: 'CANCELADO', value: 'CANCELED' },
-    ]
+    ];
 
     this.store.dispatch(listAllReadings());
+
     this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe(readings => {
       if (readings) {
         this.readingsList = readings;
@@ -108,8 +103,14 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     });
   }
 
-  editReading(reading: IReading): void {
+  private setFormControlState(isEnabled: boolean): void {
+    const method = isEnabled ? 'enable' : 'disable';
+    this.readingForm.controls['readingYear'][method]();
+    this.readingForm.controls['counter'][method]();
+    this.readingForm.controls['lastReading'][method]();  
+  }
 
+  editReading(reading: IReading): void {
     this.isEditing = true;
     this.selectedReading = reading;
 
@@ -121,17 +122,54 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       readingYear: reading.readingYear,
       state: reading.state
     });
+
+    this.setFormControlState(true);
   }
 
   submitForm(): void {
     this.readingForm.controls['readingYear'].enable(); 
+    
     if (this.readingForm.valid && this.isEditing) {
       const payload = this.readingForm.value;
       this.store.dispatch(updateReading({ readingId: this.selectedReading.readingId, reading: payload }));
       this.isEditing = false;
       this.readingForm.reset();
+      this.setFormControlState(false);
     }
   }
+
+  applyBulkStatusChange(): void {
+    if (this.selectedBulkStatus) { 
+      this.readingsList = this.readingsList.map((reading) => {  
+        return {
+          ...reading,
+          state: this.selectedBulkStatus
+        };
+      }); 
+     this.saveUpdatedReadings();
+    }
+  }
+  
+  
+  onBulkStatusChange(event: { value: string }): void {
+    const selectedStatus = event.value; 
+    if (selectedStatus) {
+      this.selectedBulkStatus = selectedStatus; 
+    }
+  }
+   
+  private saveUpdatedReadings(): void {
+    if (this.selectedBulkStatus) {
+      this.readingsList.forEach((reading) => { 
+        const updatedReading = { ...reading, state: this.selectedBulkStatus }; 
+        this.store.dispatch(updateReading({ 
+          readingId: updatedReading.readingId, 
+          reading: updatedReading 
+        })); 
+      });
+    }
+  }
+  
 
   loadEnterpriseData(): void {
     this.store.pipe(select(selectSelectedEnterprises), takeUntil(this.destroy$)).subscribe((enterprises) => {
@@ -145,7 +183,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   }
 
   onValueSelected(option: IOption): void {
-    if (option && option.value) {
+    if (option?.value) {
       this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
       this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
         if (zones) {
@@ -161,18 +199,15 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onStatusSelect(event: { value: string; label: string }): void {
-    if (event && event.value) {
-      const selectedValue = event.value;
-      this.readingForm.get('state')?.setValue(selectedValue)
+  onStatusSelect(event: { value: string }): void {
+    if (event?.value) {
+      this.readingForm.get('state')?.setValue(event.value);
     }
-
   }
 
-  onEnterpriseSelect(event: { value: string; label: string }): void {
-    if (event && event.value) {
-      const selectedValue = event.value;
-      this.store.dispatch(getClientByZoneId({ zoneId: selectedValue }));
+  onEnterpriseSelect(event: { value: string }): void {
+    if (event?.value) {
+      this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
       this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
         if (clients) {
           this.clientData = [
@@ -187,7 +222,6 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   getCurrentYear(): number {
     return new Date().getFullYear();
   }
@@ -196,12 +230,15 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
   onNumberInputChange(inputElement: HTMLInputElement): void {
     inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
   }
-  onMonthSelect(selectedOption: { value: string; label: string }) {
-    this.readingForm.get('readingMonth')?.setValue(selectedOption.value)
+
+  onMonthSelect(selectedOption: { value: string }): void {
+    this.readingForm.get('readingMonth')?.setValue(selectedOption.value);
   }
+
   generateMonths(): void {
     this.monthsData = [
       { value: '1', label: 'Janeiro' },
@@ -219,11 +256,8 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${day}-${month}-${year}`;
+  private formatDate(date: string): string {
+    const d = new Date(date);
+    return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
   }
 }

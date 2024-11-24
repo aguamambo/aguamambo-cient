@@ -1,6 +1,6 @@
 <div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
     <app-breadcrumb title="Lista de Leituras" [breadcrumbItems]="['Dashboard', 'Listar Leituras']"></app-breadcrumb>
-     
+    
     <ng-container *ngIf="(isReadingsLoading$ | async) || (isReadingSaving$ | async)">
         <div class="flex flex-col justify-center my-4 gap-1">
           <app-loading-spinner></app-loading-spinner>
@@ -13,18 +13,17 @@
             </ng-template>
           </span>
         </div>
-      </ng-container>
+    </ng-container>
 
     <div *ngIf="isEditing" class="py-4 dark:bg-deep-dark w-full mt-4">
         <form [formGroup]="readingForm" class="p-4">
-             
             <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
                 <div class="w-full">
                     <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
                     <input formControlName="readingYear" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
                 </div>
 
-                <div class="w-full" >
+                <div class="w-full">
                     <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
                     <input formControlName="counter" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
                 </div>
@@ -32,7 +31,7 @@
                 <div class="w-full">
                     <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>
                     <input formControlName="lastReading" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-               </div>
+                </div>
             </div>
 
             <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
@@ -64,8 +63,8 @@
                     </app-custom-drop-down>
                 </div>
             </div>
-
         </form>
+
         <div class="flex mt-4 p-6">
             <button
                 type="button"
@@ -75,9 +74,28 @@
             </button>
         </div>
     </div>
- 
-     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
+
+    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
         <h2 class="text-lg font-semibold mb-4">Lista de Leituras</h2>
+ 
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-2">
+                <label for="bulkStatusChange" class="text-sm font-medium">Alterar Status para Todos</label>
+                <app-custom-drop-down
+                    id="bulkStatusChange"
+                    [(ngModel)]="selectedBulkStatus"
+                    [options]="statusData"
+                    (selectionChange)="onBulkStatusChange($event)">
+                </app-custom-drop-down>
+            </div>
+            <button
+                *ngIf="selectedBulkStatus"
+                (click)="applyBulkStatusChange()"
+                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 cursor-pointer">
+                Atualizar Todos
+            </button>
+        </div>
+
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="readingsList.length > 0; else noData">
                 <app-table
