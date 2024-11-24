@@ -1,13 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
+interface RowData {
+  [key: string]: any;
+}
+
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrl: './table.component.css'
 })
 export class  TableComponent<T> {
-  @Input() data: T[] = [];
+  @Input() data: T[] = []; // Use T[] here, instead of RowData[]
   @Input() columns: { key: keyof T; label: string }[] = [];
   @Input() pageSize: number = 5;
 
@@ -27,7 +31,9 @@ export class  TableComponent<T> {
   @Output() pageSizeChange = new EventEmitter<number>();
   @Output() pageChange = new EventEmitter<number>();
   @Output() rowClick = new EventEmitter<T>();
-
+  sortColumn: keyof T | null = null;  
+  sortDirection: 'asc' | 'desc' = 'asc'; 
+  
   getPaginatedData(): T[] {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     return this.data.slice(startIndex, startIndex + this.pageSize);
@@ -38,6 +44,28 @@ export class  TableComponent<T> {
       this.currentPage = newPage;
       this.pageChange.emit(newPage);
     }
+  }
+
+  onSort(column: { label: string, key: keyof T }): void { // column.key is now keyof T
+    if (this.sortColumn === column.key) {
+      // Toggle sort direction if clicking the same column
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Set new column to sort by and default to ascending
+      this.sortColumn = column.key;
+      this.sortDirection = 'asc';
+    }
+    this.sortData();
+  }
+
+  // Sort the data array
+  sortData(): void {
+    const isAsc = this.sortDirection === 'asc';
+    this.data.sort((a: T, b: T) => {
+      if (a[this.sortColumn as keyof T] < b[this.sortColumn as keyof T]) return isAsc ? -1 : 1;
+      if (a[this.sortColumn as keyof T] > b[this.sortColumn as keyof T]) return isAsc ? 1 : -1;
+      return 0;
+    });
   }
 
   goToNextPage(): void {

@@ -2,21 +2,31 @@
     <table class="table-auto w-full border-collapse rounded-lg">
         <thead>
             <tr class="bg-[#353B46] rounded-t-lg text-xs overflow-x-auto">
-                <th *ngFor="let column of columns" class="px-4 py-2 text-white text-start">
-                    {{ column.label }}
+                <th *ngFor="let column of columns" class="px-4 py-2 text-white text-start cursor-pointer gap-1" (click)="onSort(column)">
+                    {{ column.label }} 
+                    <span *ngIf="sortColumn === column.key">
+                        <svg *ngIf="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" >
+                            <path d="M12 19l-7-7 7-7"></path>
+                        </svg>
+                        <svg *ngIf="sortDirection === 'desc'" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5l7 7-7 7"></path>
+                        </svg>
+                    </span>
                 </th>
+                
             </tr>
         </thead>
-        <tbody>
-            <tr *ngFor="let row of getPaginatedData()" 
-                class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm"
-                (click)="onRowClick(row)">
+        <tbody class="gap-1">
+            <tr *ngFor="let row of getPaginatedData()" class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm" (click)="onRowClick(row)">
                 <td *ngFor="let column of columns" class="px-4 py-2 text-start">
                     {{ row[column.key] }}
                 </td>
             </tr>
         </tbody>
     </table>
+    
+    
+    
 
     <app-pagination [currentPage]="currentPage"
                     [pageSize]="pageSize"
