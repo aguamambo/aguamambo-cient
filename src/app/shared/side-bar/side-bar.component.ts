@@ -55,7 +55,7 @@ export class SideBarComponent {
         {
           label: 'Clientes',
           subMenuOptions: [
-            { label: 'Registar Cliente', url: 'releases/customers/add', restrict: this.isMenuVisible },
+            
             { label: 'Listar Clientes', url: 'releases/customers/list' }
           ],
           isOpen: false

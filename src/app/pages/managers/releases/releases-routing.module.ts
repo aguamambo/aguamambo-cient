@@ -7,12 +7,10 @@ import { ListCutsComponent } from './cuts/list-cuts/list-cuts.component';
 import { Routes, RouterModule } from '@angular/router';
 import { ListSuspensionsComponent } from './suspension/list-suspensions/list-suspensions.component';
 import { RegisterSuspensionComponent } from './suspension/register-suspension/register-suspension.component';
-import { RegisterClientComponent } from './customers/register-customer/register-client.component';
-
+ 
 const routes: Routes = [ 
   { path: 'readings/add', component: RegisterReadingComponent },  
-  { path: 'readings/list', component: ListReadingsComponent },  
-  { path: 'customers/add', component: RegisterClientComponent }, 
+  { path: 'readings/list', component: ListReadingsComponent },   
   { path: 'customers/list', component: ListCustomersComponent }, 
   { path: 'cuts/add', component: RegisterCutComponent },
   { path: 'cuts/list', component: ListCutsComponent },

@@ -84,7 +84,7 @@ export const createClientFailure = createAction(
 // PUT clients/{id}
 export const updateClient = createAction(
   '[Client] Update Client',
-  props<{ clientId: string, client: IClient }>()
+  props<{ clientId: string, client: any }>()
 );
 
 export const updateClientSuccess = createAction(

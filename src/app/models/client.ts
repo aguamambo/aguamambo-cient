@@ -8,6 +8,7 @@ export interface IClient {
     contractStatus: number;
     exemptFromFines: true;
     contractTypeId: string;
+    contractId: string;
     contractType: string;
     zoneId: string;
     zone: string;

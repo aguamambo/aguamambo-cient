@@ -68,7 +68,7 @@ export const createContractFailure = createAction(
 // Pontract contracts/{id}
 export const updateContract = createAction(
   '[Contract] Update Contract',
-  props<{contractId: string, contract: IContract }>()
+  props<{contractId: string, contract: any }>()
 );
 
 export const updateContractSuccess = createAction(

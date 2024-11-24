@@ -6,6 +6,6 @@ export interface IContract {
     meterId: string;
     contractTypeId: string;
     description?: string;
-    contractStatus: string;
+    contractStatus: number;
     balance: number;
   }

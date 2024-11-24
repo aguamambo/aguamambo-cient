@@ -1,39 +1,122 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 h-full">
-    <app-breadcrumb 
-    title="Lista de Clientes" 
-    [breadcrumbItems]="['Dashboard', 'Listar Clientes']">
-    </app-breadcrumb>
+<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300 h-full">
+  <app-breadcrumb 
+      title="Lista de Clientes" 
+      [breadcrumbItems]="['Dashboard', 'Listar Clientes']">
+  </app-breadcrumb>
 
-    <ng-container *ngIf="(isClientLoading$ | async) || (isClientSaving$ | async)">
-        <div class="flex flex-col justify-center my-4 gap-1">
+  <ng-container *ngIf="(isClientLoading$ | async) || (isClientSaving$ | async)">
+      <div class="flex flex-col justify-center my-4 gap-1">
           <app-loading-spinner></app-loading-spinner>
           <span class="flex justify-center text-sm">
-            <ng-container *ngIf="(isClientSaving$ | async); else loadingData">
-              Salvando a leitura
-            </ng-container>
-            <ng-template #loadingData>
-              Carregando dados
-            </ng-template>
+              <ng-container *ngIf="(isClientSaving$ | async); else loadingData">
+                  Salvando a leitura
+              </ng-container>
+              <ng-template #loadingData>
+                  Carregando dados
+              </ng-template>
           </span>
-        </div>
-      </ng-container>
-
-     
+      </div>
+  </ng-container>
  
-     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
-        <h2 class="text-lg font-semibold mb-4">Lista de Clientes</h2>
-        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-            <ng-container *ngIf="clientsList.length > 0; else noData">
-                <app-table
-                    [data]="clientsList"
-                    [columns]="clientColumns"
-                    [totalCount]="clientsList.length"
-                    (rowClick)="editClient($event)">
-                </app-table>
-            </ng-container>
-            <ng-template #noData>
-                <div class="text-center p-4">Nenhum cliente disponível</div>
-            </ng-template>
-        </div>
-    </div>
+  <div class="w-full bg-light-mode dark:bg-deep-dark p-6 mt-6 rounded-md shadow-md">
+      <h3 class="text-lg font-semibold mb-4">Editar Cliente</h3>
+      <form [formGroup]="generalForm">
+          <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
+              
+              <div class="w-full">
+                  <label for="clientId" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Código</label>
+                  <input formControlName="clientId" id="clientId" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+              </div>
+
+              <div class="w-full">
+                  <label for="name" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Nome</label>
+                  <input formControlName="name" id="name" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+              </div>
+
+              <div class="w-full">
+                  <label for="phoneNumber" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contacto</label>
+                  <input formControlName="phoneNumber" id="phoneNumber" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+              </div>
+
+              <div class="w-full">
+                  <label for="address" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Endereço</label>
+                  <input formControlName="address" id="address" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+              </div>
+
+              <div class="w-full">
+                  <label for="nuit" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">NUIT</label>
+                  <input formControlName="nuit" id="nuit" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+              </div>
+
+              <div class="w-full">
+                  <label for="balance" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Saldo</label>
+                  <input formControlName="balance" id="balance" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+              </div>
+
+              <div class="w-full">
+                  <label for="contractStatus" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Estado do Contracto</label>
+                  <input formControlName="contractStatus" id="contractStatus" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+              </div>
+ 
+
+              <div class="w-full">
+                <label for="contractType" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Tipo de Contrato</label>
+                <app-custom-select formControlName="contractTypeId" id="contractType" [options]="contractTypeData" 
+                    (selectedValueChange)="onContractTypeSelect($event)">
+                </app-custom-select>
+              </div>
+              
+              <div class="w-full">
+                <label for="zone" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Zona</label>
+                <app-custom-select formControlName="zoneId" id="zone" [options]="zoneData" 
+                    (selectedValueChange)="onZoneSelect($event)">
+                </app-custom-select>
+              </div>
+              
+
+               <!-- Client Filters and Settings -->
+  <div class="w-full mt-6">
+    <app-checkbox formControlName="exemptFromFines" label="Isento de Multas"
+        (checkedChange)="onCheckboxValueChange('isentoDeMultas', $event)"></app-checkbox>
+</div>
+
+<div class="w-full mt-4">
+    <app-checkbox formControlName="wantsReceiptSMS" label="Receber Recibo"
+        (checkedChange)="onCheckboxValueChange('receberRecibo', $event)"></app-checkbox>
+</div>
+
+<div class="w-full mt-4">
+    <app-checkbox formControlName="wantsInvoiceSMS" label="Receber Factura"
+        (checkedChange)="onCheckboxValueChange('receberFactura', $event)"></app-checkbox>
+</div>
+
+
+          </div>
+
+          <div class="flex justify-end mt-6">
+              <button (click)="saveClient()" [disabled]="generalForm.invalid" class="bg-blue-500 text-white p-2 rounded-lg">
+                  Salvar
+              </button>
+          </div>
+      </form>
+  </div>
+
+ 
+  <!-- Client Table -->
+  <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6 mt-6">
+      <h2 class="text-lg font-semibold mb-4">Lista de Clientes</h2>
+      <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
+          <ng-container *ngIf="clientsList.length > 0; else noData">
+              <app-table
+                  [data]="clientsList"
+                  [columns]="clientColumns"
+                  [totalCount]="clientsList.length"
+                  (rowClick)="editClient($event)">
+              </app-table>
+          </ng-container>
+          <ng-template #noData>
+              <div class="text-center p-4">Nenhum cliente disponível</div>
+          </ng-template>
+      </div>
+  </div>
 </div>

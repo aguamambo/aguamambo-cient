@@ -126,9 +126,8 @@ const reducer = createReducer(
   // Update client
   on(updateClient, (state) => ({ ...state, isSaving: true })),
   on(updateClientSuccess, (state, { client }) =>
-    adapter.updateOne(
-      { id: client.clientId, changes: client },
-      { ...state, isSaving: false, successMessage: 'Client updated successfully!' }
+    ( 
+      { ...state, isSaving: false, selectedClient: client, successMessage: 'Client updated successfully!' }
     )
   ),
   on(updateClientFailure, (state, { error }) => ({
