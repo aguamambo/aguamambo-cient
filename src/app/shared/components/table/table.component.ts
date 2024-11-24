@@ -6,31 +6,67 @@ import { Router, ActivatedRoute } from '@angular/router';
   templateUrl: './table.component.html',
   styleUrl: './table.component.css'
 })
-export class TableComponent<T>  {
-
+export class  TableComponent<T> {
   @Input() data: T[] = [];
   @Input() columns: { key: keyof T; label: string }[] = [];
-  @Input() currentPage: number = 1;
-  @Input() pageSize: number = 10;
-  @Input() totalPages: number = 0;
-  @Input() hasNext: boolean = false;
-  @Input() hasPrevious: boolean = false;
-  @Input() totalCount: number = 0;
-  @Output() pageChange = new EventEmitter<number>();
-  @Output() rowClick = new EventEmitter<T>();  
-  itemsPerPage: number = 10;
+  @Input() pageSize: number = 5;
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  totalCountRecords: number = 0;
 
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
+  @Input() set totalCount(value: number) {
+    this.totalCountRecords = value;
+    this.totalPages = Math.ceil(this.totalCountRecords / this.pageSize);
   }
 
-  changePage(newPageNumber: number): void {
-    this.pageChange.emit(newPageNumber);
+  get totalCount(): number {
+    return this.totalCountRecords;
+  }
+
+  currentPage: number = 1;
+  totalPages: number = 0;
+  @Output() pageSizeChange = new EventEmitter<number>();
+  @Output() pageChange = new EventEmitter<number>();
+  @Output() rowClick = new EventEmitter<T>();
+
+  getPaginatedData(): T[] {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.data.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  changePage(newPage: number): void {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.currentPage = newPage;
+      this.pageChange.emit(newPage);
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.changePage(this.currentPage + 1);
+    }
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.changePage(this.currentPage - 1);
+    }
   }
 
   onRowClick(row: T): void {
     this.rowClick.emit(row);
+  }
+
+  private debounceTimer: any;
+
+  onPageSizeChange(event: Event): void {
+    clearTimeout(this.debounceTimer);
+    const newSize = +(event.target as HTMLSelectElement).value;
+    this.debounceTimer = setTimeout(() => {
+      this.pageSize = newSize;
+      this.currentPage = 1; 
+      this.totalPages = Math.ceil(this.totalCountRecords / this.pageSize); 
+      this.pageSizeChange.emit(this.pageSize); 
+      this.pageChange.emit(this.currentPage); 
+    }, 300);
   }
 }

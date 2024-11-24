@@ -5,22 +5,23 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, OnIni
   templateUrl: './pagination.component.html',
   styleUrls: ['./pagination.component.css']
 })
-export class PaginationComponent  implements OnChanges{
-  @Input() currentPage: number = 1;    
-  @Input() pageSize: number = 10;      
-  @Input() totalPages: number = 0;  
-  @Input() hasNext: boolean = false;
-  @Input() hasPrevious: boolean = false;
-  @Input() totalCount: number = 0;  
-  @Input() paginatedData: any[] = [];  
-  
+export class PaginationComponent implements OnChanges {
+  @Input() currentPage: number = 1;
+  @Input() pageSize: number = 10;
+  @Input() totalPages: number = 0;
+  @Input() totalCount: number = 0;
+  @Input() paginatedData: any[] = [];
+
   @Output() pageChange = new EventEmitter<number>();
 
   currentItems: number = 0;
-  
+  hasNext: boolean = false;
+  hasPrevious: boolean = false;
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+
   ngOnChanges(changes: SimpleChanges): void {
-   
-    if (changes['paginatedData'] || changes['totalCount']) {
+    if (changes['currentPage'] || changes['totalPages'] || changes['paginatedData'] || changes['totalCount']) {
+      this.updatePaginationState();
       this.updateCurrentItems();
     }
   }
@@ -29,7 +30,12 @@ export class PaginationComponent  implements OnChanges{
     this.currentItems = this.paginatedData.length;
   }
 
- changePage(newPage: number): void {     
+  updatePaginationState(): void {
+    this.hasNext = this.currentPage < this.totalPages;
+    this.hasPrevious = this.currentPage > 1;
+  }
+
+  changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.pageChange.emit(newPage);
     }

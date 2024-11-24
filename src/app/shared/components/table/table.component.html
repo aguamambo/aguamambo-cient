@@ -8,7 +8,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let row of data" class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm"
+            <tr *ngFor="let row of getPaginatedData()" 
+                class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm"
                 (click)="onRowClick(row)">
                 <td *ngFor="let column of columns" class="px-4 py-2 text-start">
                     {{ row[column.key] }}
@@ -17,8 +18,17 @@
         </tbody>
     </table>
 
-
-    <app-pagination [currentPage]="currentPage" [pageSize]="pageSize" [totalPages]="totalPages" [hasNext]="hasNext"
-        [hasPrevious]="hasPrevious" [totalCount]="totalCount" [paginatedData]="data"
-        (pageChange)="changePage($event)"></app-pagination>
+    <app-pagination [currentPage]="currentPage"
+                    [pageSize]="pageSize"
+                    [totalPages]="totalPages"
+                    [totalCount]="totalCountRecords"
+                    (pageChange)="changePage($event)">
+    </app-pagination>
+<div class=" flex justify-end px-12 gap-3">
+    <label for="pageSize">Tamanho de Pág.</label>
+    <select [(ngModel)]="pageSize" id="pageSize" class="border px-4 rounded-md" (change)="onPageSizeChange($event)" >
+        <option *ngFor="let size of [5, 10, 25, 50, 100]" [value]="size">{{ size }}</option>
+    </select>
+</div>
+      
 </div>
