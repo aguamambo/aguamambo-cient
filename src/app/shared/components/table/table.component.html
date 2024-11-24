@@ -26,8 +26,8 @@
     </app-pagination>
 <div class=" flex justify-end px-12 gap-3">
     <label for="pageSize">Tamanho da Pág.</label>
-    <select [(ngModel)]="pageSize" id="pageSize" class="border px-4 rounded-md" (change)="onPageSizeChange($event)" >
-        <option *ngFor="let size of [5, 10, 25, 50, 100]" [value]="size">{{ size }}</option>
+    <select [(ngModel)]="pageSize" id="pageSize" class="border px-4 rounded-md bg-light-mode dark:bg-slate-500 " (change)="onPageSizeChange($event)" >
+        <option class="cursor-pointer" *ngFor="let size of [5, 10, 25, 50, 100]" [value]="size">{{ size }}</option>
     </select>
 </div>
       
