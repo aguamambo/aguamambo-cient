@@ -10,7 +10,7 @@
     </div>
 
     <div *ngIf="isOpen" class="absolute mt-1 w-full rounded-xl bg-light-mode dark:bg-slate-500  z-50 shadow-lg">
-      <ul class="overflow-auto max-h-32 rounded-xl">
+      <ul class="overflow-auto max-h-40 rounded-xl">
         <li *ngFor="let option of options" (click)="selectOption(option)"
           class="px-4 py-2 hover:bg-deep-dark hover:text-light-mode text-gray-900 dark:text-light-mode cursor-pointer">
           {{ option.label }}
