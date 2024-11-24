@@ -48,7 +48,9 @@ export class SideBarComponent {
           label: 'Leituras',
           subMenuOptions: [
             { label: 'Registar Leitura', url: 'releases/readings/add' },
-            { label: 'Listar Leituras', url: 'releases/readings/list' }
+            { label: 'Listar Leituras', url: 'releases/readings/list' },
+            { label: 'Leituras Pendentes', url: 'releases/readings/pending' }
+            
           ],
           isOpen: false
         },

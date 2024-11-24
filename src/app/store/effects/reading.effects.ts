@@ -4,7 +4,7 @@ import { exhaustMap, map, catchError, of, tap } from "rxjs";
 import { IReading } from "src/app/models/reading";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess } from "../actions";
+import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess, getReadingByStatus, getReadingByStatusFailure, getReadingByStatusSuccess, updateBulkReadings, updateBulkReadingsFailure, updateBulkReadingsSuccess } from "../actions";
 import { Router } from "@angular/router";
 import { PdfService } from "src/app/services/pdf.service";
 
@@ -63,6 +63,21 @@ export class ReadingEffects {
     )
   );
 
+  getReadingByStatus$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(getReadingByStatus),
+      exhaustMap(action =>
+        this.apiService.get<IReading[]>(`/reading/by-state?state=${action.state}`).pipe(
+          map(readings => getReadingByStatusSuccess({ readings: readings })),
+          catchError(error => {
+            this.errorMessage.getErrorMessage(error.status);
+            return of(getReadingByStatusFailure({ error }));
+          })
+        )
+      )
+    )
+  );
+
   listAllReadings$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listAllReadings),
@@ -92,20 +107,7 @@ export class ReadingEffects {
       )
     )
   );
-
-//   createReadingSuccess$ = createEffect(
-//     () =>
-//         this.actions$.pipe(
-//             ofType(createReadingSuccess),
-//             map((action) => action.reading),
-//             tap((result) => { 
-//              this.apiService.get(`/invoice/waterBill/${result.readingId}`)  
-              
-//             })
-//         ),
-//     { dispatch: false }
-// );
-
+ 
   updateReading$ = createEffect(() =>
     this.actions$.pipe(
       ofType(updateReading),
@@ -115,6 +117,21 @@ export class ReadingEffects {
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status);
             return of(updateReadingFailure({ error }));
+          })
+        )
+      )
+    )
+  );
+
+  updateBulkReadings$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(updateBulkReadings),
+      exhaustMap(action =>
+        this.apiService.put<IReading[]>(`/reading/bulk-update`, action.payload).pipe(
+          map(readings => updateBulkReadingsSuccess({ readings })),
+          catchError(error => {
+            this.errorMessage.getErrorMessage(error.status);
+            return of(updateBulkReadingsFailure({ error }));
           })
         )
       )
@@ -183,7 +200,7 @@ export class ReadingEffects {
 
   refreshListAfterCreateOrUpdate$ = createEffect(() =>
     this.actions$.pipe(
-        ofType(createReadingSuccess, updateReadingSuccess),
+        ofType(createReadingSuccess, updateReadingSuccess, updateBulkReadingsSuccess),
         map(() => listAllReadings())
     )
 );

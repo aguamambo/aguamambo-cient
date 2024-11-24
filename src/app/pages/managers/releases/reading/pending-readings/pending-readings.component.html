@@ -1,12 +1,12 @@
 <div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
-    <app-breadcrumb title="Lista de Leituras" [breadcrumbItems]="['Dashboard', 'Listar Leituras']"></app-breadcrumb>
+    <app-breadcrumb title="Leituras Pendentes" [breadcrumbItems]="['Dashboard', 'Leituras Pendentes']"></app-breadcrumb>
     
     <ng-container *ngIf="(isReadingsLoading$ | async) || (isReadingSaving$ | async)">
         <div class="flex flex-col justify-center my-4 gap-1">
           <app-loading-spinner></app-loading-spinner>
           <span class="flex justify-center text-sm">
             <ng-container *ngIf="(isReadingSaving$ | async); else loadingData">
-              Actualizando a leitura
+              Actualizando leituras
             </ng-container>
             <ng-template #loadingData>
               Carregando dados
@@ -76,7 +76,25 @@
     </div>
 
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
-        <h2 class="text-lg font-semibold mb-4">Lista de Leituras</h2> 
+        <h2 class="text-lg font-semibold mb-4">Lista de Leituras</h2>
+ 
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-2">
+                <label for="bulkStatusChange" class="text-sm font-medium">Alterar Status para Todos</label>
+                <app-custom-drop-down
+                    id="bulkStatusChange"
+                    [(ngModel)]="selectedBulkStatus"
+                    [options]="statusData"
+                    (selectionChange)="onBulkStatusChange($event)">
+                </app-custom-drop-down>
+            </div>
+            <button
+                *ngIf="selectedBulkStatus"
+                (click)="applyBulkStatusChange()"
+                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 cursor-pointer">
+                Atualizar Todos
+            </button>
+        </div>
 
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="readingsList.length > 0; else noData">

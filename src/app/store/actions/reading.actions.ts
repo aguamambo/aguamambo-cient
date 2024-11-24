@@ -97,6 +97,22 @@ export const updateReadingFailure = createAction(
   props<{ error: any }>()
 );
 
+// PUT readings/bulk
+export const updateBulkReadings = createAction(
+  '[Reading] Update Bulk Readings',
+  props<{ payload: { readingIds: string[], state: string }}>()
+);
+
+export const updateBulkReadingsSuccess = createAction(
+  '[Reading] Update Bulk Readings Success',
+  props<{ readings: IReading[] }>()
+);
+
+export const updateBulkReadingsFailure = createAction(
+  '[Reading] Update Bulk Readings Failure',
+  props<{ error: any }>()
+);
+
 // DELETE readings/{id}
 export const deleteReading = createAction(
   '[Reading] Delete Reading',
@@ -157,5 +173,21 @@ export const getLastReadingByClientSuccess = createAction(
 
 export const getLastReadingByClientFailure = createAction(
   '[Reading] Load Last Reading By Client Failure',
+  props<{ error: any }>()
+);
+
+// GET reading/by-state
+export const getReadingByStatus = createAction(
+  '[Reading] Load Last Reading By Status',
+  props<{ state: string }>()
+);
+
+export const getReadingByStatusSuccess = createAction(
+  '[Reading] Load Last Reading By Status Success',
+  props<{ readings: IReading[] }>()
+);
+
+export const getReadingByStatusFailure = createAction(
+  '[Reading] Load Last Reading By Status Failure',
   props<{ error: any }>()
 );

@@ -11,6 +11,7 @@ import { RegisterReadingComponent } from "./reading/register-reading/register-re
 import { ReleasesRoutingModule } from "./releases-routing.module";
 import { ListSuspensionsComponent } from "./suspension/list-suspensions/list-suspensions.component";
 import { RegisterSuspensionComponent } from "./suspension/register-suspension/register-suspension.component";
+import { PendingReadingsComponent } from './reading/pending-readings/pending-readings.component';
 
  
 @NgModule({
@@ -21,7 +22,8 @@ import { RegisterSuspensionComponent } from "./suspension/register-suspension/re
     RegisterSuspensionComponent,
     RegisterCutComponent,
     ListCutsComponent,
-    ListCustomersComponent 
+    ListCustomersComponent,
+    PendingReadingsComponent 
   ],
   imports: [
     CommonModule, 

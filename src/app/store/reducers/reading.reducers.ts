@@ -32,6 +32,12 @@ import {
   getReadingByMeterId,
   getReadingByMeterIdFailure,
   getReadingByMeterIdSuccess,
+  getReadingByStatus,
+  getReadingByStatusFailure,
+  getReadingByStatusSuccess,
+  updateBulkReadings,
+  updateBulkReadingsFailure,
+  updateBulkReadingsSuccess,
 } from '../actions/reading.actions';
 import { Update } from '@ngrx/entity';
 
@@ -108,6 +114,19 @@ const reducer = createReducer(
     errorMessage: error,
   })),
 
+  // Get reading by Status
+  on(getReadingByStatus, (state) => ({ ...state, isLoading: true })),
+  on(getReadingByStatusSuccess, (state, { readings }) => ({
+    ...state,
+    selectedReadings: readings,
+    isLoading: false,
+  })),
+  on(getReadingByStatusFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error,
+  })),
+
   // List all readings
   on(listAllReadings, (state) => ({ ...state, isLoading: true })),
   on(listAllReadingsSuccess, (state, { readings }) =>
@@ -137,12 +156,24 @@ const reducer = createReducer(
   // Update reading
   on(updateReading, (state) => ({ ...state, isSaving: true })),
   on(updateReadingSuccess, (state, { reading }) =>
-    adapter.updateOne(
-      { id: reading.readingId, changes: reading },
-      { ...state, isSaving: false, successMessage: 'Reading updated successfully!' }
+   ( 
+      { ...state, isSaving: false,selectedReading: reading, successMessage: 'Reading updated successfully!' }
     )
   ),
   on(updateReadingFailure, (state, { error }) => ({
+    ...state,
+    isSaving: false,
+    errorMessage: error,
+  })),
+
+  // Update bulk readings
+  on(updateBulkReadings, (state) => ({ ...state, isSaving: true })),
+  on(updateBulkReadingsSuccess, (state, { readings }) =>
+     ( 
+      { ...state, isSaving: false,selectedReadings: readings,  successMessage: 'Readings updated successfully!' }
+    )
+  ),
+  on(updateBulkReadingsFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
     errorMessage: error,
