@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { IReceipt } from 'src/app/models/receipt';
+import { IFile } from 'src/app/models/file';
 
 // GET receipts/{id}
 export const getReceipt = createAction(
@@ -57,7 +58,7 @@ export const getReceiptFile = createAction(
 
 export const getReceiptFileSuccess = createAction(
   '[Receipt] Get Receipt File Success',
-  props<{ payload: string }>()
+  props<{ payload: IFile }>()
 );
 
 export const getReceiptFileFailure = createAction(

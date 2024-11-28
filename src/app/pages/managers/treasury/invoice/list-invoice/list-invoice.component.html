@@ -1,32 +1,67 @@
 <div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
     <app-breadcrumb title="Lista de Facturas" [breadcrumbItems]="['Dashboard', 'Listar Facturas']"></app-breadcrumb>
-     
+
     <ng-container *ngIf="(isInvoicesLoading$ | async)">
         <div class="flex flex-col justify-center my-4 gap-1">
-          <app-loading-spinner></app-loading-spinner>
-          <span class="flex justify-center text-sm">
-             
-              Carregando dados...
-             
-          </span>
+            <app-loading-spinner></app-loading-spinner>
+            <span class="flex justify-center text-sm">
+
+                Carregando dados...
+
+            </span>
         </div>
-      </ng-container>
- 
- 
-     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
+    </ng-container>
+
+
+    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
         <h2 class="text-lg font-semibold mb-4">Lista de Facturas</h2>
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="invoicesList.length > 0; else noData">
-                <app-table
-                    [data]="invoicesData"
-                    [columns]="invoiceColumns"
-                    [totalCount]="invoicesList.length"
-                    (rowClick)="editInvoice($event)">
+                <app-table [data]="invoicesData" [columns]="invoiceColumns" [totalCount]="invoicesList.length"
+                    (rowClick)="getInvoice($event)">
                 </app-table>
             </ng-container>
             <ng-template #noData>
                 <div class="text-center p-4">Nenhuma factura disponível</div>
             </ng-template>
+        </div>
+    </div>
+</div>
+
+
+
+<div *ngIf="isDialogOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-semibold">Visualizar PDF</h2>
+            <button class="text-gray-400 hover:text-gray-600" (click)="closeDialog()">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="currentColor">
+                    <path
+                        d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="mt-4">
+            <ng-container *ngIf="pdfUrl; else loading">
+                <iframe width="100%" height="100%" [src]="pdfUrl" frameborder="0" allowfullscreen>
+                </iframe>
+            </ng-container>
+            <ng-template #loading>
+                <div class="flex flex-col gap-4 items-center">
+                    <app-loading-spinner></app-loading-spinner>
+                    <p class="text-gray-700">{{ dialogMessage || 'Carregando PDF...' }}</p>
+                </div>
+            </ng-template>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end mt-6">
+            <button class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                (click)="closeDialog()">Fechar</button>
         </div>
     </div>
 </div>

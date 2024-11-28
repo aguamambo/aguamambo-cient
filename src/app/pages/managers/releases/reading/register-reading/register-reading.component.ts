@@ -3,7 +3,7 @@ import { getZoneByEnterpriseId } from './../../../../../store/actions/zone.actio
 import { selectReadingErrorMessage, selectReadingId, selectReadingIsSaving, selectReadingStatusCode, selectReadingSuccessMessage, selectSelectedMeterReading, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { select, Store } from "@ngrx/store";
 import { filter, first, Observable, skipWhile, Subject, take, takeUntil } from "rxjs";
 import { IClient } from "src/app/models/client";
@@ -40,8 +40,11 @@ export class RegisterReadingComponent implements OnInit {
   enterprisesList: IEnterprise[] = [];
   clientsList: IClient[] = [];
   readingsList: IReading[] = [];
-
-
+  isDialogOpen: boolean = false;
+  dialogType: 'success' | 'error' = 'success'; 
+  dialogMessage = ''; 
+  pdfUrl: SafeResourceUrl | null = null;
+  
   isZonesLoading$: Observable<boolean>;
   isEnterprisesLoading$: Observable<boolean>;
   isClientLoading$: Observable<boolean>;
@@ -202,6 +205,8 @@ export class RegisterReadingComponent implements OnInit {
 
     saveReading(): void {
       if (this.registReadingForm.valid) {
+        this.isDialogOpen = true;
+        this.dialogMessage = 'Salvando Leitura...';  
           const formData = this.registReadingForm.value;
           this.store.dispatch(createReading({ reading: formData }));
 
@@ -222,16 +227,22 @@ export class RegisterReadingComponent implements OnInit {
                       first()
                     ).subscribe((invoice) => {
                       if (invoice) {
-                        this.store.dispatch(getWaterBillByReadingId({readingId: invoice.readingId}))
-                        this.store.pipe(
-                          select(selectSelectedWaterBill), 
-                          filter((file) => !!file),
-                          first()).subscribe((fileBlob) => {
-                          if (fileBlob) {
-                            const fileUrl = URL.createObjectURL(fileBlob);
-                            this.fileUrl = this.sanitizer.bypassSecurityTrustUrl(fileUrl);
-                          }
-                        });
+
+                        this.store.dispatch(getWaterBillByReadingId({ readingId: invoice.readingId }));
+                        this.store
+                          .pipe(
+                            select(selectSelectedWaterBill),
+                            filter((file) => !!file),
+                            first()
+                          )
+                          .subscribe((file) => {
+                            if (file) {
+                              this.handleBase64File(file.base64)
+                            } else {
+                              this.dialogMessage = 'Falha ao carregar o arquivo.';
+                              this.isDialogOpen = true;
+                            }
+                          });
                       }
                     })
 
@@ -242,6 +253,44 @@ export class RegisterReadingComponent implements OnInit {
           });
       }
   }
+
+  handleBase64File(base64String: string): void {
+    const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, '');
+    this.openPdfFromBase64(cleanBase64);
+   
+}
+
+openPdfFromBase64(base64: string, mimeType: string = 'application/pdf'): void {
+  const blob = this.base64ToBlob(base64, mimeType);
+  const url = URL.createObjectURL(blob);
+  this.pdfUrl = url;
+  const pdfWindow = window.open('');
+  if (pdfWindow) {
+    this.isDialogOpen = false;
+    pdfWindow.document.write(`
+      <iframe 
+        width="100%" 
+        height="100%" 
+        src="${url}" 
+        frameborder="0" 
+        allowfullscreen>
+      </iframe>
+    `);
+  } else {
+    console.error('Unable to open a new window for the PDF.');
+  }
+}
+
+private base64ToBlob(base64: string, mimeType: string = 'application/octet-stream'): Blob {
+  const binaryString = atob(base64);
+  const length = binaryString.length;
+  const byteArray = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    byteArray[i] = binaryString.charCodeAt(i);
+  }
+  return new Blob([byteArray], { type: mimeType });
+} 
+
 
   onMonthSelect(selectedOption: { value: string; label: string }) {
     this.registReadingForm.get('readingMonth')?.setValue(selectedOption.value)
@@ -275,5 +324,18 @@ export class RegisterReadingComponent implements OnInit {
     } else {
       this.user = this.auth.decryptData(localStorage.getItem('name') || '')
     }
+  }
+
+  openDialog(type: 'success' | 'error', message: string): void {
+    this.dialogType = type;
+    this.dialogMessage = message;
+    this.isDialogOpen = true;
+  }
+
+ 
+  closeDialog(): void {
+    this.isDialogOpen = false;
+    this.registReadingForm.reset()
+    this.pdfUrl = null
   }
 }

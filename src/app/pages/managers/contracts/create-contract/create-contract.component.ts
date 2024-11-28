@@ -16,7 +16,7 @@ export class CreateContractComponent{
   isClientSaved: boolean = false;
   isMeterSaved: boolean = false;
   isContractSaved: boolean = false;
-  
+ 
   @ViewChild(ClientComponent) clientComponent!: ClientComponent;
   @ViewChild(MeterComponent) meterComponent!: MeterComponent;
   @ViewChild(ContractComponent) contractComponent!: ContractComponent;
@@ -79,5 +79,6 @@ export class CreateContractComponent{
     this.successMessage = "Contrato salvo com sucesso!";
     this.nextStep();
   }
- 
+
+
 }

@@ -30,13 +30,14 @@ import {
   getReceiptFileFailure,
   getReceiptFileSuccess,
 } from '../actions/receipt.actions'; 
+import { IFile } from 'src/app/models/file';
 
 export interface IReceiptState extends EntityState<IReceipt> {
   isLoading: boolean;
   isSaving: boolean;
   errorMessage: string;
   successMessage: string;
-  selectedFile: string;
+  selectedFile: IFile | null;
   error: any;
   selectedReceipt: IReceipt | null;
   selectedReceipts: IReceipt[] | null;
@@ -51,7 +52,7 @@ export const initialState: IReceiptState = adapter.getInitialState({
   isSaving: false,
   errorMessage: '',
   successMessage: '',
-  selectedFile: '',
+  selectedFile: null,
   error: null,
   selectedReceipt: null,
   selectedReceipts: null,

@@ -1,15 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { SafeUrl, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { select, Store } from '@ngrx/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
 import { IInvoice } from 'src/app/models/invoice';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
-import { IAppState, getZoneByEnterpriseId, getClientByZoneId, listAllInvoices } from 'src/app/store';
+import { IAppState, getZoneByEnterpriseId, getClientByZoneId, listAllInvoices, getWaterBillByReadingId } from 'src/app/store';
 import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
-import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
 import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 
 @Component({
@@ -24,6 +25,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
   counter: string = '';
   clientData: IOption[] = [];
   clientMetersData: IOption[] = [];
+  fileUrl: SafeUrl | null = null;
   zoneData: IOption[] = [];
   zones: IZone[] = [];
   lastInvoice: number = 0;
@@ -31,7 +33,11 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
   invoiceColumns: { key: keyof IInvoice; label: string }[] = [];
   isEditing: boolean = false;
   selectedinvoice!: IInvoice;
-
+  isDialogOpen: boolean = false;
+  dialogType: 'success' | 'error' = 'success'; 
+  dialogMessage = ''; 
+  pdfUrl: SafeResourceUrl | null = null;
+  
   isInvoicesLoading$: Observable<boolean>;
   isInvoiceSaving$: Observable<boolean>;
   private destroy$ = new Subject<void>();
@@ -41,7 +47,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
   getInvoices$ = this.store.pipe(select(selectSelectedInvoice));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
 
-  constructor( private store: Store<IAppState>) {
+  constructor( private store: Store<IAppState>, private sanitizer: DomSanitizer) {
 
     this.isInvoicesLoading$ = this.store.select(selectInvoiceIsLoading);
     this.isInvoiceSaving$ = this.store.select(selectInvoiceIsSaving);
@@ -177,9 +183,61 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
     ];
   }
 
-  editInvoice(invoice: IInvoice): void {
-    console.log(invoice);
+  getInvoice(invoice: IInvoice): void {
+    if (invoice) {
+      this.isDialogOpen = true;
+      this.store.dispatch(getWaterBillByReadingId({ readingId: invoice.readingId }));
+  
+      this.store
+        .pipe(
+          select(selectSelectedWaterBill),
+          filter((file) => !!file), 
+          first()
+        )
+        .subscribe((file) => { 
+          if (file ) { 
+            console.log(file);
+            
+            this.handleBase64File(file.base64); 
+        }});
+    }
   }
+  handleBase64File(base64String: string): void {
+    const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, '');
+    this.openPdfFromBase64(cleanBase64);
+   
+}
+
+openPdfFromBase64(base64: string, mimeType: string = 'application/pdf'): void {
+  const blob = this.base64ToBlob(base64, mimeType);
+  const url = URL.createObjectURL(blob);
+  this.pdfUrl = url;
+  const pdfWindow = window.open('');
+  if (pdfWindow) {
+    this.isDialogOpen = false;
+    pdfWindow.document.write(`
+      <iframe 
+        width="100%" 
+        height="100%" 
+        src="${url}" 
+        frameborder="0" 
+        allowfullscreen>
+      </iframe>
+    `);
+  } else {
+    console.error('Unable to open a new window for the PDF.');
+  }
+}
+
+private base64ToBlob(base64: string, mimeType: string = 'application/octet-stream'): Blob {
+  const binaryString = atob(base64);
+  const length = binaryString.length;
+  const byteArray = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    byteArray[i] = binaryString.charCodeAt(i);
+  }
+  return new Blob([byteArray], { type: mimeType });
+} 
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -187,5 +245,10 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${day}-${month}-${year}`;
+  }
+
+  closeDialog(): void {
+    this.isDialogOpen = false; 
+    this.pdfUrl = null
   }
 }

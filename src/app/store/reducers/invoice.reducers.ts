@@ -38,6 +38,7 @@ import {
   getInvoiceByMeterSuccess
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
+import { IFile } from 'src/app/models/file';
 
 export interface IInvoiceState extends EntityState<IInvoice> {
   isLoading: boolean;
@@ -47,7 +48,7 @@ export interface IInvoiceState extends EntityState<IInvoice> {
   error: any;
   selectedInvoice: IInvoice | null;
   selectedInvoices: IInvoice[] | null;
-  selectedWaterBillFile: Blob | null;
+  selectedWaterBillFile: IFile | null; 
   invoiceCount: number;
 }
 

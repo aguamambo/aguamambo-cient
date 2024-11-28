@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { IInvoice } from 'src/app/models/invoice';
+import { IFile } from 'src/app/models/file';
 
 // GET invoices/{id}
 export const getInvoice = createAction(
@@ -88,7 +89,7 @@ export const getWaterBillByReadingId = createAction(
 
 export const getWaterBillByReadingIdSuccess = createAction(
   '[Invoice] Get WaterBil by Reading Success',
-  props<{ payload: Blob }>()  
+  props<{ payload: IFile }>()  
 );
 
 export const getWaterBillByReadingIdFailure = createAction(

@@ -5,6 +5,7 @@ import { IInvoice } from "src/app/models/invoice";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
 import { getInvoice, getInvoiceSuccess, getInvoiceFailure, listAllInvoices, listAllInvoicesSuccess, listAllInvoicesFailure, createInvoice, createInvoiceSuccess, createInvoiceFailure, updateInvoice, updateInvoiceSuccess, updateInvoiceFailure, deleteInvoice, deleteInvoiceSuccess, deleteInvoiceFailure, loadInvoicesCount, loadInvoicesCountSuccess, loadInvoicesCountFailure, getInvoiceByReadingId, getInvoiceByReadingIdFailure, getInvoiceByReadingIdSuccess, getWaterBillByReadingId, getWaterBillByReadingIdFailure, getWaterBillByReadingIdSuccess, getInvoiceByClientId, getInvoiceByClientIdFailure, getInvoiceByClientIdSuccess, getInvoiceByStatus, getInvoiceByStatusFailure, getInvoiceByStatusSuccess, getInvoiceByMeter, getInvoiceByMeterFailure, getInvoiceByMeterSuccess } from "../actions";
+import { IFile } from "src/app/models/file";
 
 @Injectable()
 export class InvoiceEffects {
@@ -98,8 +99,8 @@ export class InvoiceEffects {
         this.actions$.pipe(
             ofType(getWaterBillByReadingId),
             exhaustMap(action =>
-                this.apiService.getFile<Blob>(`/invoice/waterBill/${action.readingId}`).pipe(
-                    map((fileBlob) => getWaterBillByReadingIdSuccess({ payload: fileBlob })),
+                this.apiService.get<IFile>(`/invoice/waterBill/${action.readingId}`).pipe(
+                    map((file) => getWaterBillByReadingIdSuccess({ payload: file })),
                     catchError(error => {
                         this.errorMessage.getErrorMessage(error.status);
                         return of(getWaterBillByReadingIdFailure({ error }));

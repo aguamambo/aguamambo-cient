@@ -1,4 +1,4 @@
-import { map } from 'rxjs';
+import { filter, first, map } from 'rxjs';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
@@ -12,7 +12,7 @@ import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
 import { listAllEnterprises, listAllContractTypes, getZoneByEnterpriseId, getClientByZoneId, createContract, listAllClientMeters, listAllAvailableMeters } from 'src/app/store';
 import { selectSelectedClients, selectClientErrorMessage, selectClientSuccessMessage } from 'src/app/store/selectors/client.selectors';
-import { selectContractIsSaving } from 'src/app/store/selectors/contract.selectors';
+import { selectContractIsSaving, selectSelectedContract } from 'src/app/store/selectors/contract.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
 import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
@@ -47,7 +47,10 @@ export class ContractComponent implements OnInit, OnDestroy {
   getZonesByEnterpriseId$ = this.store.pipe(select(selectSelectedZones));
   getMeters$ = this.store.pipe(select(selectSelectedAvailableMeters));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
-
+  isDialogOpen: boolean = false;
+  dialogType: 'success' | 'error' = 'success'; 
+  dialogMessage = ''; 
+  
   constructor(
     private fb: FormBuilder,
     private store: Store,
@@ -203,7 +206,18 @@ export class ContractComponent implements OnInit, OnDestroy {
     const contractData = this.contractForm.value;
         
     if (contractData) {
+      this.isDialogOpen = true;
+      this.dialogMessage = 'Salvando Contracto...';  
       this.store.dispatch(createContract({ contract: contractData }));
+      this.store.pipe(select(selectSelectedContract), filter((contract) => !!contract), first()).subscribe(contract=>{
+        if (contract) {
+         this.dialogMessage = 'Contracto criado com sucesso.';  
+        }
+        else
+          {
+            this.dialogMessage = 'Ocorreu um erro na criacao do contracto.';
+          }
+      })
       this.contractSaved.emit();  
     }
   }
@@ -222,4 +236,17 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.auth.logout();
     }
   }
+
+  openDialog(type: 'success' | 'error', message: string): void {
+    this.dialogType = type;
+    this.dialogMessage = message;
+    this.isDialogOpen = true;
+  }
+
+ 
+  closeDialog(): void {
+    this.isDialogOpen = false;
+    this.contractForm.reset()
+  }
+ 
 }

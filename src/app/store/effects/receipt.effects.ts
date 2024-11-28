@@ -5,6 +5,7 @@ import { IReceipt } from "src/app/models/receipt";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
 import { getReceipt, getReceiptSuccess, getReceiptFailure, listAllReceipts, listAllReceiptsSuccess, listAllReceiptsFailure, createReceipt, createReceiptSuccess, createReceiptFailure, updateReceipt, updateReceiptSuccess, updateReceiptFailure, deleteReceipt, deleteReceiptSuccess, deleteReceiptFailure, loadReceiptsCount, loadReceiptsCountSuccess, loadReceiptsCountFailure, getReceiptByClientId, getReceiptByClientIdFailure, getReceiptByClientIdSuccess, getReceiptPaymentMethods, getReceiptPaymentMethodsFailure, getReceiptPaymentMethodsSuccess, getReceiptFile, getReceiptFileFailure, getReceiptFileSuccess } from "../actions";
+import { IFile } from "src/app/models/file";
 
 @Injectable()
 export class ReceiptEffects {
@@ -48,7 +49,7 @@ export class ReceiptEffects {
     this.actions$.pipe(
       ofType(getReceiptFile),
       exhaustMap(action =>
-        this.apiService.get<string>(`/receipt/file/${action.receiptId}`).pipe(
+        this.apiService.get<IFile>(`/receipt/file/${action.receiptId}`).pipe(
           map(file => getReceiptFileSuccess({ payload: file })),
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status);

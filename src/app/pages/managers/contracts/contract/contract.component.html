@@ -1,93 +1,122 @@
 <div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
-  
-    <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[60vh] h-full rounded-lg  p-4">
-      <ng-container *ngIf="(isContractSaving$ | async)">
-        <div class="flex flex-col justify-center my-4 gap-1">
-          <app-loading-spinner></app-loading-spinner>
-          <span class="flex justify-center text-sm">
-            <ng-container *ngIf="(isContractSaving$ | async); else loadingData">
-              Salvando dados do contracte
-            </ng-container>
-            <ng-template #loadingData> Carregando dados </ng-template>
-          </span>
-        </div>
-      </ng-container>
-  
-      <div *ngIf="errorMessage$ | async as errorMessage" class="p-4 flex justify-center">
-        <p class="text-red-500">
-          {{ errorMessage ? 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.' : '' }}
-        </p>
+
+  <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[60vh] h-full rounded-lg  p-4">
+    <ng-container *ngIf="(isContractSaving$ | async)">
+      <div class="flex flex-col justify-center my-4 gap-1">
+        <app-loading-spinner></app-loading-spinner>
+        <span class="flex justify-center text-sm">
+          <ng-container *ngIf="(isContractSaving$ | async); else loadingData">
+            Salvando dados do contracte
+          </ng-container>
+          <ng-template #loadingData> Carregando dados </ng-template>
+        </span>
       </div>
-  
-      <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md">
-        <form [formGroup]="contractForm" class="py-4 dark:bg-deep-dark">
+    </ng-container>
 
-            <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
-                <div class="w-full">
-                    <app-custom-select   label="Empresa" [options]="enterpriseData"
-                        (selectedValueChange)="onValueSelected($event)">
-                    </app-custom-select>
-                </div>
+    <div *ngIf="errorMessage$ | async as errorMessage" class="p-4 flex justify-center">
+      <p class="text-red-500">
+        {{ errorMessage ? 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.' : '' }}
+      </p>
+    </div>
 
-                <div class="w-full">
-                    <app-custom-select label="Zona" [options]="zoneData"
-                        (selectedValueChange)="onEnterpriseSelect($event)">
-                    </app-custom-select>
-                </div>
-                <div class="w-full">
-                    <app-custom-select formControlName="clientId"   label="Cliente" [options]="clientData" (selectedValueChange)="onClientSelect($event)">
-                    </app-custom-select>
-                </div>
-            </div>
+    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md">
+      <form [formGroup]="contractForm" class="py-4 dark:bg-deep-dark">
 
-          <!-- Date fields -->
-          <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center">
-            <div class="w-full">
-                <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data Início</label>
-                <app-date-picker formControlName="startDate"></app-date-picker>
-            </div>
-            <div class="w-full">
-                <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data Fim</label>
-                <app-date-picker formControlName="endDate"></app-date-picker>
-            </div>
-            <div class="w-full">
-                <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Tipo de Contrato</label>
-                <app-custom-select formControlName="contractTypeId" [options]="contractTypeData"></app-custom-select>
-              </div>
-            </div>
-  
-          <!-- Other fields -->
-          <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center">
-           
-              <div class="w-full">
-                  <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Saldo</label>
-                  <input type="number" formControlName="balance"
-                  class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-text" />
-                </div>
-                
-                <div class="w-full">
-                <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-                <app-custom-select formControlName="meterId" [options]="meterData"></app-custom-select>
-            </div>
-            <div class="w-full">
-                <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Descrição</label>
-                <input type="text" formControlName="description"
-                class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-text" />
-            </div>
-            </div>
-            
-            <!-- Contract status and ID fields -->
-            <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center">
-              <div class="flex items-center justify-end w-full">
-                <app-checkbox formControlName="contractStatus" label="Activar o Contrato"
-                  (checkedChange)="onCheckboxValueChange('contractStatus', $event)"></app-checkbox>
-              </div>
-           
+        <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
+          <div class="w-full">
+            <app-custom-select label="Empresa" [options]="enterpriseData"
+              (selectedValueChange)="onValueSelected($event)">
+            </app-custom-select>
           </div>
-   
-          
-        </form>
-      </div>
+
+          <div class="w-full">
+            <app-custom-select label="Zona" [options]="zoneData" (selectedValueChange)="onEnterpriseSelect($event)">
+            </app-custom-select>
+          </div>
+          <div class="w-full">
+            <app-custom-select formControlName="clientId" label="Cliente" [options]="clientData"
+              (selectedValueChange)="onClientSelect($event)">
+            </app-custom-select>
+          </div>
+        </div>
+
+        <!-- Date fields -->
+        <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center">
+          <div class="w-full">
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data Início</label>
+            <app-date-picker formControlName="startDate"></app-date-picker>
+          </div>
+          <div class="w-full">
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data Fim</label>
+            <app-date-picker formControlName="endDate"></app-date-picker>
+          </div>
+          <div class="w-full">
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Tipo de Contrato</label>
+            <app-custom-select formControlName="contractTypeId" [options]="contractTypeData"></app-custom-select>
+          </div>
+        </div>
+
+        <!-- Other fields -->
+        <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center">
+
+          <div class="w-full">
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Saldo</label>
+            <input type="number" formControlName="balance"
+              class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-text" />
+          </div>
+
+          <div class="w-full">
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
+            <app-custom-select formControlName="meterId" [options]="meterData"></app-custom-select>
+          </div>
+          <div class="w-full">
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Descrição</label>
+            <input type="text" formControlName="description"
+              class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-text" />
+          </div>
+        </div>
+
+        <!-- Contract status and ID fields -->
+        <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center">
+          <div class="flex items-center justify-end w-full">
+            <app-checkbox formControlName="contractStatus" label="Activar o Contrato"
+              (checkedChange)="onCheckboxValueChange('contractStatus', $event)"></app-checkbox>
+          </div>
+
+        </div>
+
+
+      </form>
     </div>
   </div>
-  
+</div>
+
+
+
+<div *ngIf="isDialogOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+    <div class="flex justify-between items-center">
+      <h2 class="text-lg font-semibold">
+        Estado
+      </h2>
+      <button class="text-gray-400 hover:text-gray-600" (click)="closeDialog()">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+        </svg>
+      </button>
+    </div>
+
+
+    <div class="flex flex-col gap-4 mt-4">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="text-gray-700">{{ dialogMessage }}</p>
+    </div>
+
+
+    <div class="flex justify-end mt-6">
+      <button class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" (click)="closeDialog()">Fechar</button>
+    </div>
+  </div>
+</div>

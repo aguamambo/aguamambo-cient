@@ -2,43 +2,43 @@
     <table class="table-auto w-full border-collapse rounded-lg">
         <thead>
             <tr class="bg-[#353B46] rounded-t-lg text-xs overflow-x-auto">
-                <th *ngFor="let column of columns" class="px-4 py-2 text-white text-start cursor-pointer gap-1" (click)="onSort(column)">
-                    {{ column.label }} 
+                <th *ngFor="let column of columns" class="px-4 py-2 text-white text-start cursor-pointer gap-1"
+                    (click)="onSort(column)">
+                    {{ column.label }}
                     <span *ngIf="sortColumn === column.key">
-                        <svg *ngIf="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" >
+                        <svg *ngIf="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 19l-7-7 7-7"></path>
                         </svg>
-                        <svg *ngIf="sortDirection === 'desc'" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg *ngIf="sortDirection === 'desc'" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 5l7 7-7 7"></path>
                         </svg>
                     </span>
                 </th>
-                
             </tr>
         </thead>
         <tbody class="gap-1">
-            <tr *ngFor="let row of getPaginatedData()" class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm" (click)="onRowClick(row)">
+            <tr *ngFor="let row of getPaginatedData()"
+                class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm"
+                (click)="onRowClick(row)">
                 <td *ngFor="let column of columns" class="px-4 py-2 text-start">
                     {{ row[column.key] }}
                 </td>
             </tr>
         </tbody>
     </table>
-    
-    
-    
 
-    <app-pagination [currentPage]="currentPage"
-                    [pageSize]="pageSize"
-                    [totalPages]="totalPages"
-                    [totalCount]="totalCountRecords"
-                    (pageChange)="changePage($event)">
+    <app-pagination [currentPage]="currentPage" [pageSize]="pageSize" [totalPages]="totalPages"
+        [totalCount]="totalCountRecords" (pageChange)="changePage($event)">
     </app-pagination>
-<div class=" flex justify-end px-12 gap-3">
-    <label for="pageSize">Tamanho da Pág.</label>
-    <select [(ngModel)]="pageSize" id="pageSize" class="border px-4 rounded-md bg-light-mode dark:bg-slate-500 " (change)="onPageSizeChange($event)" >
-        <option class="cursor-pointer" *ngFor="let size of [5, 10, 25, 50, 100]" [value]="size">{{ size }}</option>
-    </select>
-</div>
-      
+    <div class=" flex justify-end px-12 gap-3">
+        <label for="pageSize">Tamanho da Pág.</label>
+        <select [(ngModel)]="pageSize" id="pageSize" class="border px-4 rounded-md bg-light-mode dark:bg-slate-500 "
+            (change)="onPageSizeChange($event)">
+            <option class="cursor-pointer" *ngFor="let size of [5, 10, 25, 50, 100]" [value]="size">{{ size }}</option>
+        </select>
+    </div>
 </div>
