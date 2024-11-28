@@ -37,7 +37,7 @@ export class ListReceiptComponent implements OnInit, OnDestroy {
   dialogMessage = ''; 
   pdfUrl: SafeResourceUrl | null = null;
   
-  isreceiptsLoading$: Observable<boolean>; 
+  isReceiptsLoading$: Observable<boolean>; 
   private destroy$ = new Subject<void>();
   getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
@@ -47,7 +47,7 @@ export class ListReceiptComponent implements OnInit, OnDestroy {
 
   constructor( private store: Store<IAppState>, private sanitizer: DomSanitizer) {
 
-    this.isreceiptsLoading$ = this.store.select(selectReceiptIsLoading); 
+    this.isReceiptsLoading$ = this.store.select(selectReceiptIsLoading); 
 
     this.receiptColumns = [
       { key: 'receiptID', label: 'Código' }, 
