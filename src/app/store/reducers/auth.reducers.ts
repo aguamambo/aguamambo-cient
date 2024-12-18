@@ -1,5 +1,5 @@
 import { createReducer, on, Action } from "@ngrx/store";
-import { register, registerSuccess, registerFailure, login, loginSuccess, loginFailure, refreshToken, refreshTokenSuccess, refreshTokenFailure, logout } from "../actions";
+import { register, registerSuccess, registerFailure, login, loginSuccess, loginFailure, refreshToken, refreshTokenSuccess, refreshTokenFailure, logout, resetAuthActions } from "../actions";
 import { IAuthResponse } from "src/app/models/authResponse";
 import { IUser } from "src/app/models/user";
 
@@ -102,7 +102,9 @@ const _authReducer = createReducer(
 
   on(logout, (state) => ({
     ...initialAuthState,
-  }))
+  })),
+  
+  on(resetAuthActions, () => initialAuthState)
 );
 
 export function authReducer(state: AuthState | undefined, action: Action) {

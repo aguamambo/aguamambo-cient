@@ -6,7 +6,8 @@ import {
     createContractType, createContractTypeSuccess, createContractTypeFailure,
     updateContractType, updateContractTypeSuccess, updateContractTypeFailure,
     deleteContractType, deleteContractTypeSuccess, deleteContractTypeFailure,
-    loadContractTypesCount, loadContractTypesCountSuccess, loadContractTypesCountFailure
+    loadContractTypesCount, loadContractTypesCountSuccess, loadContractTypesCountFailure,
+    resetContractTypeActions
 } from "../actions/contractType.actions";
 import { IContractType } from "src/app/models/contractType";
 
@@ -109,7 +110,9 @@ const reducer = createReducer(
         ...state,
         errorMessage: error,
         isLoading: false
-    }))
+    })),
+  
+    on(resetContractTypeActions, () => initialState)
 );
 
 // Export the reducer function

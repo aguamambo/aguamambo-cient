@@ -1,5 +1,6 @@
-import { getClientByZoneId } from './../../../../../store/actions/client.actions';
-import { getZoneByEnterpriseId } from './../../../../../store/actions/zone.actions';
+import { resetReadingActions } from './../../../../../store/actions/reading.actions';
+import { getClientByZoneId, resetClientActions } from './../../../../../store/actions/client.actions';
+import { getZoneByEnterpriseId, resetZonesActions } from './../../../../../store/actions/zone.actions';
 import { selectReadingErrorMessage, selectReadingId, selectReadingIsSaving, selectReadingStatusCode, selectReadingSuccessMessage, selectSelectedMeterReading, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
@@ -13,7 +14,7 @@ import { IReading } from "src/app/models/reading";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
-import { IAppState, createInvoice, createReading, getClientMeterByClient, getInvoiceByReadingId, getLastReadingByClient, getLastReadingByMeter, getWaterBillByReadingId, listAllEnterprises } from 'src/app/store';
+import { IAppState, createInvoice, createReading, getClientMeterByClient, getInvoiceByReadingId, getLastReadingByClient, getLastReadingByMeter, getWaterBillByReadingId, listAllEnterprises, resetClientMetersActions, resetEnterpriseActions } from 'src/app/store';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectClientMeterIsLoading, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
@@ -197,10 +198,8 @@ export class RegisterReadingComponent implements OnInit {
             this.counter = meters[0].meterId
             this.getReadingByMeter(this.counter)
           }
-        },
-        () => {
-          this.openDialog('error', 'Erro ao carregar medidores.');
         }
+        
       );
     }
   }
@@ -233,7 +232,7 @@ export class RegisterReadingComponent implements OnInit {
     if (this.validFields) {
       this._dialogService.open({
         title: 'Processando',
-        message: 'Aguarde um instante enquanto quarda ainformações da leitura.',
+        message: 'Aguarde um instante enquanto guarda ainformações da leitura.',
         type: 'loading',
         isProcessing: true,
       });
@@ -292,6 +291,7 @@ export class RegisterReadingComponent implements OnInit {
                       next: (file) => {
                         if (file) {
                           this.handleBase64File(file.base64);
+                          this.onReset()
                         }
                       },
                       error: () => {
@@ -307,7 +307,7 @@ export class RegisterReadingComponent implements OnInit {
           error: (error) => {
             this._dialogService.open({
               title: 'Erro',
-              message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
+              message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
               type: 'error',
               showConfirmButton: true, 
               cancelText: 'Cancelar',
@@ -331,6 +331,14 @@ export class RegisterReadingComponent implements OnInit {
     const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, '');
     this.openPdfFromBase64(cleanBase64);
 
+  }
+  
+  onReset(): void {
+    this.store.dispatch(resetReadingActions());
+    this.store.dispatch(resetClientActions());
+    this.store.dispatch(resetZonesActions());
+    this.store.dispatch(resetEnterpriseActions());
+    this.store.dispatch(resetClientMetersActions());
   }
 
   openPdfFromBase64(base64: string): void {

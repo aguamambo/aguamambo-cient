@@ -23,7 +23,8 @@ import {
   loadContractsCountFailure,
   getContractByClientId,
   getContractByClientIdFailure,
-  getContractByClientIdSuccess
+  getContractByClientIdSuccess,
+  resetContractActions
 } from "../actions/contract.actions";
 import { Update } from "@ngrx/entity";
 
@@ -136,7 +137,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetContractActions, () => initialState)
 );
 
 export function contractReducer(state: IContractState | undefined, action: Action) {

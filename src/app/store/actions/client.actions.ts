@@ -127,3 +127,7 @@ export const loadClientsCountFailure = createAction(
   '[Client] Load Clients Count Failure',
   props<{ error: any }>()
 );
+
+export const resetClientActions = createAction(
+  '[Client] Reset all actions'
+)

@@ -23,7 +23,8 @@ import {
   loadCutsCountFailure,
   getCutByClientId,
   getCutByClientIdFailure,
-  getCutByClientIdSuccess
+  getCutByClientIdSuccess,
+  resetCutActions
 } from "../actions/cut.actions";
 import { Update } from "@ngrx/entity";
 
@@ -136,7 +137,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetCutActions, () => initialState)
 );
 
 export function cutReducer(state: ICutState | undefined, action: Action) {

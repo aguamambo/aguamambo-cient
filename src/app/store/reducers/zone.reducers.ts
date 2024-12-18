@@ -23,6 +23,7 @@ import {
   getZoneByEnterpriseId,
   getZoneByEnterpriseIdFailure,
   getZoneByEnterpriseIdSuccess,
+  resetZonesActions,
 } from '../actions/zone.actions';
 import { Update } from '@ngrx/entity';
 
@@ -141,6 +142,8 @@ const reducer = createReducer(
     isLoading: false,
     errorMessage: error,
   })),
+  
+  on(resetZonesActions, () => initialState)
 );
 
 export function zoneReducer(

@@ -95,3 +95,8 @@ export const loadEnterprisesCountFailure = createAction(
   '[Enterprise] Load Enterprises Count Failure',
   props<{ error: any }>()
 );
+
+
+export const resetEnterpriseActions = createAction(
+  '[Enterprise] Reset all actions'
+)

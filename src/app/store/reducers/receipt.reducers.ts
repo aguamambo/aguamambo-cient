@@ -29,6 +29,7 @@ import {
   getReceiptFile,
   getReceiptFileFailure,
   getReceiptFileSuccess,
+  resetReceiptActions,
 } from '../actions/receipt.actions'; 
 import { IFile } from 'src/app/models/file';
 
@@ -174,6 +175,8 @@ const reducer = createReducer(
     isLoading: false,
     errorMessage: error,
   })),
+  
+  on(resetReceiptActions, () => initialState)
 );
 
 export function receiptReducer(

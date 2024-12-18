@@ -110,3 +110,8 @@ export const loadSuspensionsCountFailure = createAction(
   '[Suspension] Load Suspensions Count Failure',
   props<{ error: any }>()
 );
+
+
+export const resetSuspensionActions = createAction(
+  '[Suspension] Reset all actions'
+)

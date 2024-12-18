@@ -21,6 +21,7 @@ import {
   getLastActiveFineConfiguration,
   getLastActiveFineConfigurationSuccess,
   getLastActiveFineConfigurationFailure,
+  resetFineConfigurationActions,
 } from '../actions/fineConfiguration.actions';
 import { Update } from '@ngrx/entity';
 
@@ -122,7 +123,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetFineConfigurationActions, () => initialState)
 );
 
 export function fineConfigurationReducer(

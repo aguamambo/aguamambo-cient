@@ -19,7 +19,8 @@ import {
   deleteUserFailure,
   listAllRoles,
   listAllRolesFailure,
-  listAllRolesSuccess
+  listAllRolesSuccess,
+  resetUserActions
 } from '../actions/user.actions';
 import { Update } from '@ngrx/entity';
 
@@ -121,7 +122,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetUserActions, () => initialState)
 );
 
 export function userReducer(

@@ -111,3 +111,9 @@ export const loadContractsCountFailure = createAction(
   '[Contract] Load Contracts Count Failure',
   props<{ error: any }>()
 );
+
+
+export const resetContractActions = createAction(
+  '[Contract] Reset all actions' 
+);
+

@@ -23,6 +23,7 @@ import {
   getSuspensionByClientId,
   getSuspensionByClientIdFailure,
   getSuspensionByClientIdSuccess,
+  resetSuspensionActions,
 } from '../actions/suspension.actions';
 import { Update } from '@ngrx/entity';
 
@@ -140,6 +141,8 @@ const reducer = createReducer(
     isLoading: false,
     errorMessage: error,
   })),
+  
+  on(resetSuspensionActions, () => initialState)
 );
 
 export function suspensionReducer(

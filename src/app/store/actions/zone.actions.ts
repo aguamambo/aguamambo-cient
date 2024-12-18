@@ -110,4 +110,8 @@ export const loadZonesCountSuccess = createAction(
 export const loadZonesCountFailure = createAction(
   '[Zone] Load Zones Count Failure',
   props<{ error: any }>()
-);
+); 
+
+export const resetZonesActions = createAction(
+  '[Zones] Reset all actions'
+)

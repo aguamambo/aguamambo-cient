@@ -32,6 +32,7 @@ import {
   getRubricByMeterId,
   getRubricByMeterIdFailure,
   getRubricByMeterIdSuccess,
+  resetRubricActions,
 } from '../actions/rubric.actions';
 import { Update } from '@ngrx/entity';
 
@@ -188,6 +189,8 @@ const reducer = createReducer(
     isLoading: false,
     errorMessage: error,
   })),
+  
+  on(resetRubricActions, () => initialState)
 
 );
 

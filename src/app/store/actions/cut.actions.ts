@@ -111,3 +111,8 @@ export const loadCutsCountFailure = createAction(
   '[Cut] Load Cuts Count Failure',
   props<{ error: any }>()
 );
+
+
+export const resetCutActions = createAction(
+  '[Cut] Reset all actions'
+)

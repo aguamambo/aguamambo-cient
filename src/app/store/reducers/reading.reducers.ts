@@ -38,6 +38,7 @@ import {
   updateBulkReadings,
   updateBulkReadingsFailure,
   updateBulkReadingsSuccess,
+  resetReadingActions,
 } from '../actions/reading.actions';
 import { Update } from '@ngrx/entity';
 
@@ -228,6 +229,8 @@ const reducer = createReducer(
     isLoading: false,
     errorMessage: error,
   })),
+  
+  on(resetReadingActions, () => initialState)
 
 );
 

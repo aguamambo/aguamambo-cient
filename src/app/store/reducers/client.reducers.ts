@@ -25,7 +25,8 @@ import {
   getClientByZoneIdSuccess,
   getClientByContractTypeId,
   getClientByContractTypeIdFailure,
-  getClientByContractTypeIdSuccess
+  getClientByContractTypeIdSuccess,
+  resetClientActions
 } from "../actions/client.actions";
 import { Update } from "@ngrx/entity";
 
@@ -158,7 +159,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetClientActions, () => initialState)
 );
 
 export function clientReducer(state: IClientState | undefined, action: Action) {

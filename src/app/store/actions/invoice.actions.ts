@@ -174,3 +174,8 @@ export const loadInvoicesCountFailure = createAction(
   '[Invoice] Load Invoices Count Failure',
   props<{ error: any }>()
 );
+
+
+export const resetInvoiceActions = createAction(
+  '[Invoice] Reset all actions'
+)

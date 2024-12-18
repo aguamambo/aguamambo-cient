@@ -52,3 +52,7 @@ export const refreshTokenFailure = createAction(
 export const logout = createAction(
   '[Auth] Logout'
 );
+
+export const resetAuthActions = createAction(
+  '[Auth] Reset all actions'
+)

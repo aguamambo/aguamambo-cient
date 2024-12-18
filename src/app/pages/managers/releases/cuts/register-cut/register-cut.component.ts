@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { filter, first, Observable, Subject, takeUntil } from "rxjs";
 import { GenericConfig } from "src/app/core/config/generic.config";
 import { IClient } from "src/app/models/client";
 import { IEnterprise } from "src/app/models/enterprise";
@@ -12,7 +12,7 @@ import { DialogService } from "src/app/services/dialog.service";
 import { IAppState, createCut, getClientByZoneId, getClientMeterByClient, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
 import { selectClientMeterIsLoading, selectSelectedClientMeter, selectSelectedClientMeters } from "src/app/store/selectors/clientMeter.selectors";
-import { selectCutIsSaving } from "src/app/store/selectors/cut.selectors";
+import { selectCutIsSaving, selectSelectedCut } from "src/app/store/selectors/cut.selectors";
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
 import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
@@ -48,6 +48,7 @@ export class RegisterCutComponent  implements OnInit {
   user: string = '';
   clientId: string = '';
   year: number = 0;
+  counter: string = '';
   meter: string | null = '';
 
   constructor(
@@ -142,31 +143,31 @@ export class RegisterCutComponent  implements OnInit {
     }
   }
 
-   onClientSelect(selectedClient: { label: string, value: string }): void {
-    this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
-      if (clients) {
-
-        const clientDetails = clients.find(client => client.clientId === selectedClient.value);
-        if (clientDetails) {
-          this.clientId = clientDetails.clientId
-
-          this.store.dispatch(getClientMeterByClient({ clientId: this.clientId }))
-
-          this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
-            if (meters) {
-              this.clientMetersData = [
-                { label: 'Seleccione...', value: '' },
-                ...meters.map(meter => ({
-                  label: meter.meterId || '',
-                  value: meter.meterId || ''
-                }))
-              ];
-
-            }
-          })
+  onClientSelect(selectedClient: { label: string, value: string }): void {
+    const clientDetails = this.clientsList.find(client => client.clientId === selectedClient.value);
+    if (clientDetails) {
+      this.counter = ''
+      this.clientId = clientDetails.clientId;
+      this.store.dispatch(getClientMeterByClient({ clientId: this.clientId }));
+  
+      this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe(
+        (meters) => {
+          if (meters) {
+            this.clientMetersData = [ 
+              ...meters.map(meter => ({ label: meter.meterId || '', value: meter.meterId || '' }))
+            ];
+            this.counter = meters[0].meterId
+             
+          }
         }
-      }
-    });
+        
+      );
+    }
+  }
+  isFormValid(): boolean {
+    const result =  Object.values(this.registCutForm.value).every(value => value !== null && value !== undefined);
+    
+    return result
   }
   getClients(){
     this.store.dispatch(listAllClients());
@@ -191,8 +192,37 @@ export class RegisterCutComponent  implements OnInit {
 
   saveCut(): void {
     if (this.registCutForm.valid) {
+
+      this._dialogService.open({
+        title: 'Processando',
+        message: 'Aguarde um instante enquanto guarda ainformações do corte.',
+        type: 'loading',
+        isProcessing: true,
+      });
+
       const formData = this.registCutForm.value;
       this.store.dispatch(createCut({cut: formData}))
+      this.store.pipe(select(selectSelectedCut), filter((cut) => !!cut), first())
+      .subscribe({
+        next: (cut) => {
+          if (cut) { 
+            this._dialogService.open({
+              title: 'Sucesso',
+              message: 'Corte criado com sucesso!',
+              type: 'success',
+              showConfirmButton: true, 
+            });
+           
+          }},
+          error: (error) => {
+            this._dialogService.open({
+              title: 'Erro',
+              message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
+              type: 'error',
+              showConfirmButton: true, 
+              cancelText: 'Cancelar',
+            });
+          },})
     } else {
       
     }

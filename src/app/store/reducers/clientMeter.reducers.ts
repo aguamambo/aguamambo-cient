@@ -25,7 +25,8 @@ import {
   getClientMeterByClientSuccess,
   listAllAvailableMeters,
   listAllAvailableMetersFailure,
-  listAllAvailableMetersSuccess
+  listAllAvailableMetersSuccess,
+  resetClientMetersActions
 } from "../actions/clientMeter.actions";
 import { Update } from "@ngrx/entity";
 
@@ -151,7 +152,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetClientMetersActions, () => initialState)
 );
 
 export function clientMeterReducer(state: IClientMeterState | undefined, action: Action) {

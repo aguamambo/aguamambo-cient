@@ -159,3 +159,8 @@ export const getLastRubricByClientFailure = createAction(
   '[Rubric] Load Last Rubric By Client Failure',
   props<{ error: any }>()
 );
+
+
+export const resetRubricActions = createAction(
+  '[Rubric] Reset all actions'
+)

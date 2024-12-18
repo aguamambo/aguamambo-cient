@@ -35,7 +35,8 @@ import {
   getInvoiceByStatusSuccess,
   getInvoiceByMeter,
   getInvoiceByMeterFailure,
-  getInvoiceByMeterSuccess
+  getInvoiceByMeterSuccess,
+  resetInvoiceActions
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
 import { IFile } from 'src/app/models/file';
@@ -207,7 +208,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetInvoiceActions, () => initialState)
 );
 
 export function invoiceReducer(

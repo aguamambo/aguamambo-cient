@@ -95,3 +95,8 @@ export const loadContractTypesCountFailure = createAction(
   '[ContractType] Load Contract Types Count Failure',
   props<{ error: any }>()
 );
+
+
+export const resetContractTypeActions = createAction(
+  '[ContractType] Reset all actions'
+)

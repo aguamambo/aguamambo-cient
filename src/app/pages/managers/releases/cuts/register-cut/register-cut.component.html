@@ -2,16 +2,13 @@
     <app-breadcrumb title="Registar Novo Corte" [breadcrumbItems]="['Dashboard', 'Registar Corte']"></app-breadcrumb>
 
     <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[40vh] h-full rounded-lg shadow-md p-4">
-        <ng-container *ngIf="(isZonesLoading$ | async) || (isEnterprisesLoading$ | async) || (isClientLoading$ | async) || (isCutSaving$ | async)  || (isMeterLoading$ | async)">
+        <ng-container *ngIf="(isZonesLoading$ | async) || (isEnterprisesLoading$ | async) || (isClientLoading$ | async) ||  (isMeterLoading$ | async)">
             <div class="flex flex-col justify-center my-4 gap-1">
               <app-loading-spinner></app-loading-spinner>
               <span class="flex justify-center text-sm">
-                <ng-container *ngIf="(isCutSaving$ | async); else loadingData">
-                  Salvando a corte
-                </ng-container>
-                <ng-template #loadingData>
+                
                   Carregando dados
-                </ng-template>
+                
               </span>
             </div>
           </ng-container>
@@ -47,10 +44,11 @@
                 </div>
                 <div class="w-full">
                     <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-                    <app-custom-drop-down
-                        [options]="clientMetersData"
-                    (selectionChange)="onMeterSeclected($event)"> 
-                    </app-custom-drop-down>
+                    <app-autocomplete-input
+                        [dataSource]="clientMetersData"
+                        [placeholder]="counter"
+                    (valueSelected)="onMeterSeclected($event)"> 
+                    </app-autocomplete-input>
                 </div>
             </div>
 

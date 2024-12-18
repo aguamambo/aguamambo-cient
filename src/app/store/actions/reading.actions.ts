@@ -191,3 +191,7 @@ export const getReadingByStatusFailure = createAction(
   '[Reading] Load Last Reading By Status Failure',
   props<{ error: any }>()
 );
+
+export const resetReadingActions = createAction(
+  '[Reading] Reset all actions'
+)

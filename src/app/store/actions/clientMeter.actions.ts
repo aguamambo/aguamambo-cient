@@ -126,3 +126,7 @@ export const loadClientMetersCountFailure = createAction(
   '[ClientMeter] Load Client Meters Count Failure',
   props<{ error: any }>()
 );
+
+export const resetClientMetersActions = createAction(
+  '[ClientMeters] Reset all actions'
+)

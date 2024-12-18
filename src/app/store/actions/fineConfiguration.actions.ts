@@ -95,3 +95,8 @@ export const getLastActiveFineConfigurationFailure = createAction(
   '[FineConfiguration] Load Last Active Fine Configuration Failure',
   props<{ error: any }>()
 );
+
+
+export const resetFineConfigurationActions = createAction(
+  '[FineConfiguration] Reset all actions'
+)

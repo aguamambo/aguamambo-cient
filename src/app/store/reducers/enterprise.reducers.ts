@@ -20,7 +20,8 @@ import {
   deleteEnterpriseFailure,
   loadEnterprisesCount,
   loadEnterprisesCountSuccess,
-  loadEnterprisesCountFailure
+  loadEnterprisesCountFailure,
+  resetEnterpriseActions
 } from "../actions/enterprise.actions";
 import { Update } from "@ngrx/entity";
 
@@ -125,7 +126,9 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error,
-  }))
+  })),
+  
+  on(resetEnterpriseActions, () => initialState)
 );
 
 export function enterpriseReducer(state: IEnterpriseState | undefined, action: Action) {
