@@ -8,6 +8,7 @@ import { IEnterprise } from "src/app/models/enterprise";
 import { IOption } from "src/app/models/option";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from "src/app/services/auth.service";
+import { DialogService } from "src/app/services/dialog.service";
 import { IAppState, createCut, getClientByZoneId, getClientMeterByClient, getZoneByEnterpriseId, listAllClients, listAllEnterprises } from "src/app/store";
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
 import { selectClientMeterIsLoading, selectSelectedClientMeter, selectSelectedClientMeters } from "src/app/store/selectors/clientMeter.selectors";
@@ -49,7 +50,11 @@ export class RegisterCutComponent  implements OnInit {
   year: number = 0;
   meter: string | null = '';
 
-  constructor(private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
+  constructor(
+    private store: Store<IAppState>, 
+    private auth: AuthService, 
+    private _dialogService: DialogService,
+    private generic: GenericConfig) { 
     this.isClientsLoading$ = this.store.select(selectClientIsLoading);
     this.isCutSaving$ = this.store.select(selectCutIsSaving);
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { Subject, Observable, takeUntil, filter } from 'rxjs';
+import { Subject, Observable, takeUntil, filter, first } from 'rxjs';
 import { GenericConfig } from 'src/app/core/config/generic.config';
 import { IClient } from 'src/app/models/client';
 import { IContractType } from 'src/app/models/contractType';
@@ -40,6 +40,8 @@ export class ClientComponent implements OnInit {
   year: number = 0
   monthsData: IOption[] = [];
   user: string = '';
+  selectedZoneId: string = '';
+  selectedEnterpriseId: string = '';
   isAccordionOpen = false;
 
   constructor(private fb: FormBuilder, private store: Store, private generic: GenericConfig, private auth: AuthService) { }
@@ -110,16 +112,25 @@ export class ClientComponent implements OnInit {
 
   saveClient(): void {
     const clientData = this.clientForm.value;
-    if ((this.checkIsNotNull(clientData.name)) && (this.checkIsNotNull(clientData.phoneNumber)) && (this.checkIsNotNull(clientData.address)) && (this.checkIsNotNull(clientData.zoneId))) {  
+
+    console.log(clientData);
+    
+    if (
+        (this.checkIsNotNull(clientData.name)) && 
+        (this.checkIsNotNull(clientData.phoneNumber)) && 
+        (this.checkIsNotNull(clientData.address)) && 
+        (this.checkIsNotNull(clientData.zoneId))) {  
       this.store.dispatch(createClient({ client: clientData }));
-      this.getClient$.pipe( 
-        filter(client => !!client), 
-        takeUntil(this.destroy$)
+      this.store.pipe( 
+        select(selectSelectedClient),
+        filter(client => !!client),
+        first()
       )
       .subscribe(client => {
         if (client) {
+          console.log(client);
           
-          this.clientSaved.emit(client.clientId);
+          this.clientSaved.emit(client);
           this.clientForm.reset();
         }
       });

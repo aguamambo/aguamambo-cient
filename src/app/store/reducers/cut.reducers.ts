@@ -82,7 +82,7 @@ const reducer = createReducer(
   // List all cuts
   on(listAllCuts, (state) => ({ ...state, isLoading: true })),
   on(listAllCutsSuccess, (state, { cuts }) =>
-    adapter.setAll(cuts, { ...state, isLoading: false })
+    ( { ...state, selectedCuts: cuts,isLoading: false })
   ),
   on(listAllCutsFailure, (state, { error }) => ({
     ...state,
@@ -93,7 +93,7 @@ const reducer = createReducer(
   // Create cut
   on(createCut, (state) => ({ ...state, isSaving: true })),
   on(createCutSuccess, (state, { cut }) =>
-    adapter.addOne(cut, { ...state, isSaving: false, successMessage: 'Cut created successfully!' })
+    ( { ...state, isSaving: false, selectedCut: cut, successMessage: 'Cut created successfully!' })
   ),
   on(createCutFailure, (state, { error }) => ({
     ...state,
@@ -104,9 +104,8 @@ const reducer = createReducer(
   // Update cut
   on(updateCut, (state) => ({ ...state, isSaving: true })),
   on(updateCutSuccess, (state, { cut }) =>
-    adapter.updateOne(
-      { id: cut.cutId, changes: cut },
-      { ...state, isSaving: false, successMessage: 'Cut updated successfully!' }
+   ( 
+      { ...state, isSaving: false, selectedCut: cut, successMessage: 'Cut updated successfully!' }
     )
   ),
   on(updateCutFailure, (state, { error }) => ({

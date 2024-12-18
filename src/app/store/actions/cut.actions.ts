@@ -4,48 +4,48 @@ import { ICut } from 'src/app/models/cut';
 
 // GET cuts/{id}
 export const getCut = createAction(
-  '[Cut] Load Cut',
+  '[Cut] Get Cut',
   props<{ cutId: string }>()
 );
 
 export const getCutSuccess = createAction(
-  '[Cut] Load Cut Success',
+  '[Cut] Get Cut Success',
   props<{ cut: ICut }>()
 );
 
 export const getCutFailure = createAction(
-  '[Cut] Load Cut Failure',
+  '[Cut] Get Cut Failure',
   props<{ error: any }>()
 );
 
 // GET cuts/{clientId}
 export const getCutByClientId = createAction(
-  '[Cut] Load Cut By ClientId',
+  '[Cut] Get Cut By ClientId',
   props<{ clientId: string }>()
 );
 
 export const getCutByClientIdSuccess = createAction(
-  '[Cut] Load Cut By ClientId Success',
+  '[Cut] Get Cut By ClientId Success',
   props<{ cuts: ICut[] }>()
 );
 
 export const getCutByClientIdFailure = createAction(
-  '[Cut] Load Cut By ClientId Failure',
+  '[Cut] Get Cut By ClientId Failure',
   props<{ error: any }>()
 );
 
 // GET cuts
 export const listAllCuts = createAction(
-  '[Cut] Load Cuts'
+  '[Cut] List Cuts'
 );
 
 export const listAllCutsSuccess = createAction(
-  '[Cut] Load Cuts Success',
+  '[Cut] List Cuts Success',
   props<{ cuts: ICut[] }>()
 );
 
 export const listAllCutsFailure = createAction(
-  '[Cut] Load Cuts Failure',
+  '[Cut] List Cuts Failure',
   props<{ error: any }>()
 );
 

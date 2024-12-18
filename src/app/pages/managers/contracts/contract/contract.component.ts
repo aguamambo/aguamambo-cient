@@ -1,5 +1,5 @@
 import { filter, first, map } from 'rxjs';
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { Subject, Observable, takeUntil } from 'rxjs';
@@ -10,12 +10,12 @@ import { IEnterprise } from 'src/app/models/enterprise';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
-import { listAllEnterprises, listAllContractTypes, getZoneByEnterpriseId, getClientByZoneId, createContract, listAllClientMeters, listAllAvailableMeters } from 'src/app/store';
+import { listAllEnterprises, listAllContractTypes, getZoneByEnterpriseId, getClientByZoneId, createContract, listAllClientMeters, listAllAvailableMeters, getZone } from 'src/app/store';
 import { selectSelectedClients, selectClientErrorMessage, selectClientSuccessMessage } from 'src/app/store/selectors/client.selectors';
 import { selectContractIsSaving, selectSelectedContract } from 'src/app/store/selectors/contract.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
-import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
+import { selectSelectedZone, selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 import { selectSelectedAvailableMeters, selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { IClientMeter } from 'src/app/models/clientMeter';
 
@@ -25,6 +25,10 @@ import { IClientMeter } from 'src/app/models/clientMeter';
   styleUrl: './contract.component.css'
 })
 export class ContractComponent implements OnInit, OnDestroy {
+  @Input() meter!: IClientMeter;  
+  @Input() client!: IClient;  
+  @Input() enterpriseId!: string;  
+  @Input() zoneId!: string;     
   @Output() contractSaved = new EventEmitter<any>();
 
   contractForm!: FormGroup;
@@ -38,6 +42,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   enterpriseData: IOption[] = [];
   zoneData: IOption[] = []; 
   meterData: IOption[] = []; 
+  selectedZone!: IZone; 
   clientsList: IClient[] = []; 
   zoneList: IZone[] = [];
   meterList: IClientMeter[] = [];
@@ -50,7 +55,8 @@ export class ContractComponent implements OnInit, OnDestroy {
   isDialogOpen: boolean = false;
   dialogType: 'success' | 'error' = 'success'; 
   dialogMessage = ''; 
-  
+  contractData: any;
+
   constructor(
     private fb: FormBuilder,
     private store: Store,
@@ -60,19 +66,28 @@ export class ContractComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.checkSession();
-
-    // Initialize the form with validation rules
+ 
     this.contractForm = this.fb.group({
       startDate: new FormControl(null),
       endDate: new FormControl(null),
       description: new FormControl(null),
       balance: new FormControl(null),
-      contractStatus: new FormControl(false),
+      contractStatus: new FormControl(true),
       clientId: new FormControl(null),
       client: new FormControl(null),
       meterId: new FormControl(null),
       contractTypeId: new FormControl(null)
     });
+
+    this.contractData = {
+      meter: this.meter,
+      client: this.client,
+      enterpriseId: this.enterpriseId,
+      zoneId: this.zoneId
+    };
+
+    console.log(this.contractData);
+    
 
     this.isContractSaving$ = this.store.select(selectContractIsSaving);
     this.errorMessage$ = this.store.select(selectClientErrorMessage);
@@ -85,6 +100,13 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.store.dispatch(listAllEnterprises());
     this.store.dispatch(listAllContractTypes());
     this.store.dispatch(listAllAvailableMeters());
+
+    // this.store.dispatch(getZone({zoneId: this.client.zoneId}))
+    // this.store.pipe(select(selectSelectedZone), filter((zone) => !!zone), first()).subscribe(zone => {
+    //   if (zone) {
+    //     this.selectedZone = zone
+    //   }
+    // })
 
     this.getContractTypes$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
         if (response) {
@@ -102,8 +124,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
         if (enterprises) {
             this.enterprisesList = enterprises;
-            this.enterpriseData = [
-                { label: 'Seleccione...', value: '' },
+            this.enterpriseData = [ 
                 ...enterprises.map(Enterprise => ({
                     label: Enterprise.name,
                     value: Enterprise.enterpriseId
@@ -130,8 +151,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.getMeters$.pipe(takeUntil(this.destroy$)).subscribe(meters => {
       if (meters) {
         this.meterList = meters
-        this.meterData = [
-          {label: 'Seleccione...', value: ''},
+        this.meterData = [ 
           ...meters.map(meter => ({
             label: meter.meterId,
             value: meter.meterId
@@ -144,8 +164,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.getZonesByEnterpriseId$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
         if (response) {
             this.zoneList = response;
-            this.zoneData = [
-                { label: 'Seleccione...', value: '' },
+            this.zoneData = [ 
                 ...response.map(zone => ({
                     label: zone.designation,
                     value: zone.zoneId
@@ -164,8 +183,7 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.getZonesByEnterpriseId$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
         if (response) {
           this.zoneList = response;
-          this.zoneData = [
-            { label: 'Seleccione...', value: '' },
+          this.zoneData = [ 
             ...response.map(zone => ({
               label: zone.designation,
               value: zone.zoneId
@@ -183,8 +201,7 @@ export class ContractComponent implements OnInit, OnDestroy {
       this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
         if (clients) {
           this.clientsList = clients;
-          this.clientData = [
-            { label: 'Seleccione...', value: '' },
+          this.clientData = [ 
             ...clients.map(client => ({
               label: client.name,
               value: client.clientId
@@ -204,7 +221,8 @@ export class ContractComponent implements OnInit, OnDestroy {
  
   saveContract(): void {
     const contractData = this.contractForm.value;
-        
+ 
+     
     if (contractData) {
       this.isDialogOpen = true;
       this.dialogMessage = 'Salvando Contracto...';  

@@ -37,10 +37,12 @@ export class RegisterReceiptComponent implements OnInit {
   contractList: IContract[] = [];
   invoicesData: IInvoice[] = [];
   private destroy$ = new Subject<void>();
+  private unsubscribe$ = new Subject<void>();
   clientsList: IClient[] = [];
   invoicesToBePaid: IInvoice[] = [];
+  selectedContractValue: string | null = null;
   invoiceColumns: { key: keyof IInvoice; label: string }[] = [];
-  saldoDivida: number = 0;
+  customerBalance: number = 0;
   enablePaymentButton: boolean = false;
   valorPago: number = 0;
   outstandingAmount: number = 0;
@@ -74,9 +76,11 @@ export class RegisterReceiptComponent implements OnInit {
 
   }
   ngOnInit() {
+    
     this.getData()
   }
 
+  
   getData() {
 
     this.store.dispatch(listAllClients());
@@ -109,39 +113,37 @@ export class RegisterReceiptComponent implements OnInit {
   }
 
   onClientSelected(event: { value: string; label: string }) {
-    this.form.get('clientId')?.setValue(event.value)
-    this.store.dispatch(getContractByClientId({ clientId: event.value }))
-    this.store.pipe(select(selectSelectedContracts)).subscribe(contracts => {
-      if (contracts) {
-        this.contractList = contracts
-        this.contractsData = [
-          { label: 'Seleccione...', value: '' },
-          ...contracts.map(contract => ({
-            label: contract.meterId,
-            value: contract.contractId
-          }))
-        ];
+    this.form.get('clientId')?.setValue(event.value);
+    this.store.dispatch(getContractByClientId({ clientId: event.value }));
+
+    this.store.pipe(select(selectSelectedContracts), takeUntil(this.unsubscribe$)).subscribe(contracts => {
+      if (contracts && contracts.length > 0) {
+        this.contractList = contracts;
+        const firstContract = { value: contracts[0].contractId, label: contracts[0].meterId };
+        this.selectedContractValue = firstContract.value;  
+        this.contractsData = contracts.map(contract => ({
+          label: contract.meterId,
+          value: contract.contractId,
+        }));
+        this.onContractSelected(firstContract); 
       }
-    })
-
-
+    });
   }
 
   onContractSelected(event: { value: string; label: string }) {
-    
-    this.store.dispatch(getInvoiceByMeter({ meterId: event.label }))
-
-    this.store.pipe(
-      select(selectSelectedInvoices)
-    ).subscribe(invoices => {
-      if (invoices) {
-        this.invoicesData = invoices.filter(invoice => invoice.paymentStatus === false)
-      }
-    })
-
     const selectedContract = this.contractList.find(contract => contract.contractId === event.value);
-    if (selectedContract)
-      this.saldoDivida = selectedContract.balance
+
+    if (selectedContract) {
+      this.customerBalance = selectedContract.balance;
+
+      // Fetch invoices only if meter ID changes
+      this.store.dispatch(getInvoiceByMeter({ meterId: event.label }));
+      this.store.pipe(select(selectSelectedInvoices), takeUntil(this.unsubscribe$)).subscribe(invoices => {
+        if (invoices) {
+          this.invoicesData = invoices.filter(invoice => !invoice.paymentStatus);
+        }
+      });
+    }
   }
 
   addInvoiceTosPayment(invoice: IInvoice) {
@@ -220,7 +222,7 @@ export class RegisterReceiptComponent implements OnInit {
 
   calculateOutstandingAmount() {
     const totalInvoices = this.invoicesToBePaid.reduce((total, invoice) => total + invoice.totalAmount, 0);
-    this.outstandingAmount = totalInvoices - this.saldoDivida - this.valorPago;
+    this.outstandingAmount = totalInvoices - this.customerBalance - this.valorPago;
   }
 
   formatCurrency(amount: number | null): string {

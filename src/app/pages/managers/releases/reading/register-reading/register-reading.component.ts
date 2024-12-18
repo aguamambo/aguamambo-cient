@@ -12,6 +12,7 @@ import { IOption } from "src/app/models/option";
 import { IReading } from "src/app/models/reading";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from 'src/app/services/auth.service';
+import { DialogService } from 'src/app/services/dialog.service';
 import { IAppState, createInvoice, createReading, getClientMeterByClient, getInvoiceByReadingId, getLastReadingByClient, getLastReadingByMeter, getWaterBillByReadingId, listAllEnterprises } from 'src/app/store';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectClientMeterIsLoading, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
@@ -27,7 +28,7 @@ import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selector
 export class RegisterReadingComponent implements OnInit {
   registReadingForm!: FormGroup;
   lastReading: number = 0;
-  counter: string | null = '';
+  counter: string = '';
   readingId: string | null = null;
   fileUrl: SafeUrl | null = null;
   clientId: string | null = null;
@@ -41,10 +42,11 @@ export class RegisterReadingComponent implements OnInit {
   clientsList: IClient[] = [];
   readingsList: IReading[] = [];
   isDialogOpen: boolean = false;
-  dialogType: 'success' | 'error' = 'success'; 
-  dialogMessage = ''; 
+  validFields: boolean = false;
+  dialogType: 'success' | 'error' = 'success';
+  dialogMessage = '';
   pdfUrl: SafeResourceUrl | null = null;
-  
+
   isZonesLoading$: Observable<boolean>;
   isEnterprisesLoading$: Observable<boolean>;
   isClientLoading$: Observable<boolean>;
@@ -63,7 +65,12 @@ export class RegisterReadingComponent implements OnInit {
   private destroy$ = new Subject<void>();
   user: string = '';
 
-  constructor(private store: Store<IAppState>, private auth: AuthService,private sanitizer: DomSanitizer) {
+  constructor(
+    private store: Store<IAppState>, 
+    private auth: AuthService, 
+    private _dialogService: DialogService,
+    private sanitizer: DomSanitizer
+  ) {
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
     this.isEnterprisesLoading$ = this.store.select(selectEnterpriseIsLoading);
     this.isClientLoading$ = this.store.select(selectClientIsLoading);
@@ -109,89 +116,100 @@ export class RegisterReadingComponent implements OnInit {
     });
 
   }
+  
+  getReadingByMeter(counter: string){
+    this.registReadingForm.get('meterId')?.setValue( counter)
+            this.store.dispatch(getLastReadingByMeter({ meterId:  counter }));
+    this.getReadingsByCMeterId$.pipe(
+      skipWhile((readings) => !readings),
+      first()
+    ).subscribe((readings) => {
+      if (readings) {
+        this.lastReading = readings.currentReading;
+        this.readingId = readings.readingId;
+      }
+    });
+
+  }
+
+  isFormValid(): boolean {
+    const result =  Object.values(this.registReadingForm.value).every(value => value !== null && value !== undefined);
+    this.validFields = result
+    return result
+  }
 
   onValueSelected(option: IOption): void {
     if (option && option.value) {
+      this.counter = ''
       this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
-      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
-        if (zones) {
-          this.zoneList = zones;
-          this.zoneData = [
-            { label: 'Seleccione...', value: '' },
-            ...zones.map(zone => ({
-              label: zone.designation,
-              value: zone.zoneId
-            }))
-          ];
+      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe(
+        (zones) => {
+          if (zones) {
+            this.zoneList = zones;
+            this.zoneData = [
+              { label: 'Seleccione...', value: '' },
+              ...zones.map(zone => ({ label: zone.designation, value: zone.zoneId }))
+            ];
+          }
+        },
+        () => {
+          this.openDialog('error', 'Erro ao carregar zonas.');
         }
-      });
+      );
     }
   }
-
+  
   onEnterpriseSelect(event: { value: string; label: string }): void {
     if (event && event.value) {
-      const selectedValue = event.value;
-      this.store.dispatch(getClientByZoneId({ zoneId: selectedValue }));
-      this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
-        if (clients) {
-          this.clientsList = clients;
-          this.clientData = [
-            { label: 'Seleccione...', value: '' },
-            ...clients.map(client => ({
-              label: client.name,
-              value: client.clientId
-            }))
-          ];
+      this.counter = '' 
+      this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
+      this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
+        (clients) => {
+          if (clients) {
+            this.clientsList = clients;
+            this.clientData = [
+              { label: 'Seleccione...', value: '' },
+              ...clients.map(client => ({ label: client.name, value: client.clientId }))
+            ];
+          }
+        },
+        () => {
+          this.openDialog('error', 'Erro ao carregar clientes.');
         }
-      });
+      );
     }
   }
+  
 
   onClientSelect(selectedClient: { label: string, value: string }): void {
-
-    this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
-      if (clients) {
-
-        const clientDetails = clients.find(client => client.clientId === selectedClient.value);
-        if (clientDetails) {
-          this.clientId = clientDetails.clientId
-
-          this.store.dispatch(getClientMeterByClient({ clientId: this.clientId }))
-
-          this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
-            if (meters) {
-              this.clientMetersData = [
-                { label: 'Seleccione...', value: '' },
-                ...meters.map(meter => ({
-                  label: meter.meterId || '',
-                  value: meter.meterId || ''
-                }))
-              ];
-
-            }
-          })
+    const clientDetails = this.clientsList.find(client => client.clientId === selectedClient.value);
+    if (clientDetails) {
+      this.counter = ''
+      this.clientId = clientDetails.clientId;
+      this.store.dispatch(getClientMeterByClient({ clientId: this.clientId }));
+  
+      this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe(
+        (meters) => {
+          if (meters) {
+            this.clientMetersData = [ 
+              ...meters.map(meter => ({ label: meter.meterId || '', value: meter.meterId || '' }))
+            ];
+            this.counter = meters[0].meterId
+            this.getReadingByMeter(this.counter)
+          }
+        },
+        () => {
+          this.openDialog('error', 'Erro ao carregar medidores.');
         }
-      }
-    });
+      );
+    }
   }
-
-   onMeterSeclected(option: IOption) {
+  
+  onMeterSeclected(option: IOption) {
     if (option && option.value) {
       this.lastReading = 0
       this.counter = option.value
-      this.store.dispatch(getLastReadingByMeter({ meterId: this.counter }));
-
-      this.registReadingForm.get('meterId')?.setValue(this.counter)
-
-      this.getReadingsByCMeterId$.pipe(
-        skipWhile((readings) => !readings), 
-        first()  
-      ).subscribe((readings) => {
-        if (readings) { 
-          this.lastReading = readings.currentReading;
-          this.readingId = readings.readingId;
-        } 
-      });
+      this.getReadingByMeter(this.counter)
     }
   }
 
@@ -199,97 +217,190 @@ export class RegisterReadingComponent implements OnInit {
     return new Date().getFullYear();
   }
 
-  onNumberInputChange(inputElement: HTMLInputElement): void {
-    inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
+  onNumberInputChange(inputElement: HTMLInputElement, controlName: string): void {
+    const sanitizedValue = inputElement.value.replace(/[^0-9]/g, '');
+    inputElement.value = sanitizedValue; 
+    if (sanitizedValue) {
+      this.registReadingForm.get(controlName)?.setValue(sanitizedValue);
+    } else
+      this.registReadingForm.get(controlName)?.setValue(null);
+
+    this.isFormValid();
   }
 
-    saveReading(): void {
-      if (this.registReadingForm.valid) {
-        this.isDialogOpen = true;
-        this.dialogMessage = 'Salvando Leitura...';  
-          const formData = this.registReadingForm.value;
-          this.store.dispatch(createReading({ reading: formData }));
-
-          this.getCreatedReading$.pipe(
-              filter((reading) => !!reading),
-              first()
-          ).subscribe((reading) => { 
-            let count = 0
-              if (reading) {
-                if (count === 0) {
-                  const payload = {
-                    readingId: reading.readingId
-                  }
-                    this.store.dispatch(createInvoice({payload: payload}))
-                    this.store.pipe(
-                      select(selectSelectedInvoice),
-                      filter((invoice)=>!!invoice),
-                      first()
-                    ).subscribe((invoice) => {
-                      if (invoice) {
-
-                        this.store.dispatch(getWaterBillByReadingId({ readingId: invoice.readingId }));
-                        this.store
-                          .pipe(
-                            select(selectSelectedWaterBill),
-                            filter((file) => !!file),
-                            first()
-                          )
-                          .subscribe((file) => {
-                            if (file) {
-                              this.handleBase64File(file.base64)
-                            } else {
-                              this.dialogMessage = 'Falha ao carregar o arquivo.';
-                              this.isDialogOpen = true;
-                            }
-                          });
-                      }
-                    })
-
+  saveReading(): void {
+ 
+    if (this.validFields) {
+      this._dialogService.open({
+        title: 'Processando',
+        message: 'Aguarde um instante enquanto quarda ainformações da leitura.',
+        type: 'loading',
+        isProcessing: true,
+      });
+  
+      const formData = this.registReadingForm.value;
+  
+      this.store.dispatch(createReading({ reading: formData }));
+  
+      this.getCreatedReading$
+        .pipe(filter((reading) => !!reading), first())
+        .subscribe({
+          next: (reading) => {
+            if (reading) {
+              
+              const payload = { readingId: reading.readingId };
+              this._dialogService.open({
+                title: 'Sucesso',
+                message: 'Leitura salva com sucesso!',
+                type: 'success',
+                showConfirmButton: true, 
+              });
+              
+              this.store.dispatch(createInvoice({ payload }));
+            }
+  
+            this.store
+              .pipe(
+                select(selectSelectedInvoice),
+                filter((invoice) => !!invoice),
+                first()
+              )
+              .subscribe({
+                next: (invoice) => {
+                  if (invoice) {
                     
+                    this._dialogService.close(true);
+                    this._dialogService.open({
+                      title: 'Factura',
+                      message: 'Carregando dados da Factura.',
+                      type: 'loading',
+                      isProcessing: true,
+                    }); 
+  
+                  this.store.dispatch(
+                    getWaterBillByReadingId({ readingId: invoice.readingId })
+                  );
+  
                 }
-                count ++
-              }
-          });
-      }
+                  this.store
+                    .pipe(
+                      select(selectSelectedWaterBill),
+                      filter((file) => !!file),
+                      first()
+                    )
+                    .subscribe({
+                      next: (file) => {
+                        if (file) {
+                          this.handleBase64File(file.base64);
+                        }
+                      },
+                      error: () => {
+                        this.openDialog('error', 'Failed to load the invoice file.');
+                      },
+                    });
+                },
+                error: () => {
+                  this.openDialog('error', 'Error fetching the invoice.');
+                },
+              });
+          },
+          error: (error) => {
+            this._dialogService.open({
+              title: 'Erro',
+              message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
+              type: 'error',
+              showConfirmButton: true, 
+              cancelText: 'Cancelar',
+            });
+          },
+        });
+    }
+    else{
+      this._dialogService.open({
+        title: 'Erro',
+        message: 'Por favor preenche todos os campos antes de submeter',
+        type: 'error',
+        showConfirmButton: true, 
+        cancelText: 'Cancelar',
+      });
+    }
   }
+  
 
   handleBase64File(base64String: string): void {
     const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, '');
     this.openPdfFromBase64(cleanBase64);
-   
-}
 
-openPdfFromBase64(base64: string, mimeType: string = 'application/pdf'): void {
-  const blob = this.base64ToBlob(base64, mimeType);
-  const url = URL.createObjectURL(blob);
-  this.pdfUrl = url;
-  const pdfWindow = window.open('');
-  if (pdfWindow) {
-    this.isDialogOpen = false;
-    pdfWindow.document.write(`
-      <iframe 
-        width="100%" 
-        height="100%" 
-        src="${url}" 
-        frameborder="0" 
-        allowfullscreen>
-      </iframe>
-    `);
-  } else {
-    console.error('Unable to open a new window for the PDF.');
   }
-}
 
-private base64ToBlob(base64: string, mimeType: string = 'application/octet-stream'): Blob {
-  const binaryString = atob(base64);
-  const length = binaryString.length;
-  const byteArray = new Uint8Array(length);
-  for (let i = 0; i < length; i++) {
-    byteArray[i] = binaryString.charCodeAt(i);
+  openPdfFromBase64(base64: string): void {
+    try{
+      
+      const blob = this.base64ToBlob(base64, 'application/pdf');
+      const url = URL.createObjectURL(blob);
+      const pdfWindow = window.open('','_blank');
+      if (pdfWindow) {
+        pdfWindow.document.write(
+          `
+            <html>
+              <head>
+                <style>
+                  @import "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
+                </style>
+              </head>
+              <body class="overflow-hidden bg-gradient-to-br from-blue-100 via-white to-blue-800 flex items-center justify-center h-screen p-6">
+                <div class="relative bg-slate-800 rounded-xl shadow-2xl p-4 max-w-5xl w-full h-[90vh]">
+                  <button 
+                    onclick="window.close()" 
+                    class="absolute top-5 left-5 p-2 rounded-full bg-gray-800 text-white text-sm font-medium hover:bg-red-700 shadow-md" 
+                    title="Fechar">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                      <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                    </svg>
+                  </button>
+                  <iframe 
+                    class="w-full h-full rounded-lg shadow-lg border border-gray-200" 
+                    src="${url}#zoom=100" 
+                    frameborder="0" 
+                    allowfullscreen>
+                  </iframe>
+                </div>
+              </body>
+            </html>
+          `
+        )
+        this._dialogService.close(true)
+      }
+      else{
+        this._dialogService.open({
+          title: 'Erro ao carregar a factura',
+          message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
+          type: 'error',
+          showConfirmButton: true, 
+          cancelText: 'Cancelar',
+        });
+      }
+
+    } catch (error) {
+      this._dialogService.open({
+        title: 'Erro ao carregar a factura',
+        message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
+        type: 'error',
+        showConfirmButton: true, 
+        cancelText: 'Cancelar',
+      });
+    }
   }
-  return new Blob([byteArray], { type: mimeType });
-} 
+  
+  private base64ToBlob(base64: string, mimeType: string = 'application/octet-stream'): Blob {
+    const binaryString = atob(base64);
+    const length = binaryString.length;
+    const byteArray = new Uint8Array(length);
+    for (let i = 0; i < length; i++) {
+      byteArray[i] = binaryString.charCodeAt(i);
+    }
+    return new Blob([byteArray], { type: mimeType });
+  }
 
 
   onMonthSelect(selectedOption: { value: string; label: string }) {
@@ -332,7 +443,7 @@ private base64ToBlob(base64: string, mimeType: string = 'application/octet-strea
     this.isDialogOpen = true;
   }
 
- 
+
   closeDialog(): void {
     this.isDialogOpen = false;
     this.registReadingForm.reset()

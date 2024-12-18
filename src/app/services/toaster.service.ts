@@ -24,15 +24,15 @@ export class ToasterService {
     this.showToast({ message, type: 'error', icon: this.errorIcon });
   }
 
-  showSuccess(message: string, icon: string) {
+  showSuccess(message: string) {
     this.showToast({ message, type: 'success', icon: this.successIcon });
   }
 
-  showInfo(message: string, icon: string) {
+  showInfo(message: string) {
     this.showToast({ message, type: 'info', icon: this.infoIcon });
   }
 
-  showWarning(message: string, icon: string) {
+  showWarning(message: string) {
     this.showToast({ message, type: 'warning', icon: this.warningIcon });
   }
 

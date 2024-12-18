@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DialogService } from './services/dialog.service';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +8,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'eagua-client';
-  constructor() {
+  constructor(private dialogService: DialogService) { 
    localStorage.clear()
-  }
+  } 
 }

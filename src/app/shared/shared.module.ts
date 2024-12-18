@@ -19,7 +19,8 @@ import { DatePickerComponent } from './components/date-picker/date-picker.compon
 import { CardComponent } from './components/card/card.component';
 import { TabComponent } from './components/tab/tab.component';
 import { TabItemComponent } from './components/tab-item/tab-item.component';
-import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
+import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component'; 
+import { DialogComponent } from './dialog/dialog.component';
 
 @NgModule({
   declarations: [ 
@@ -39,7 +40,9 @@ import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component
     DatePickerComponent, 
     CardComponent, 
     TabComponent, 
-    TabItemComponent, PdfViewerComponent
+    TabItemComponent, 
+    PdfViewerComponent,  
+    DialogComponent
   ],
   imports: [
     CommonModule,
@@ -64,7 +67,9 @@ import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component
     DatePickerComponent,
     CardComponent,
     TabComponent,
-    TabItemComponent
+    TabItemComponent,
+    PdfViewerComponent,  
+    DialogComponent
   ]
 })
 export class SharedModule { }

@@ -44,13 +44,17 @@
     }
     @if (currentStep === 2) {
         <ng-container>
-            <app-meter (meterSaved)="onMeterSaved()"></app-meter>
+            <app-meter (meterSaved)="onMeterSaved($event)"></app-meter>
         </ng-container>
     }
     @if (currentStep === 3) {
-        <ng-container>
-            <app-contract (contractSaved)="onContractSaved()"></app-contract>
-        </ng-container>
+        <app-contract
+            [meter]="savedMeter"
+            [client]="savedClient"
+            [enterpriseId]="selectedEnterpriseId"
+            [zoneId]="selectedZoneId"
+            (contractSaved)="onContractSaved()">
+        </app-contract>
     }
 
     <div class="flex justify-between px-4">

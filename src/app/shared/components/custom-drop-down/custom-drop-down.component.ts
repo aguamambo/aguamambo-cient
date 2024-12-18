@@ -4,15 +4,15 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 @Component({
   selector: 'app-custom-drop-down',
   templateUrl: './custom-drop-down.component.html',
-  styleUrl: './custom-drop-down.component.css',
+  styleUrls: ['./custom-drop-down.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => CustomDropDownComponent),
-      multi: true
-    }
-  ]
-}) 
+      multi: true,
+    },
+  ],
+})
 export class CustomDropDownComponent implements OnInit, ControlValueAccessor {
   @Input() label: string = '';
   @Input() options: { value: string; label: string }[] = [];
@@ -26,28 +26,24 @@ export class CustomDropDownComponent implements OnInit, ControlValueAccessor {
   private onTouched: any = () => {};
 
   ngOnInit(): void {
-    this.setCurrentMonth();
+    this.initializeFirstOption();
   }
-
  
-  private setCurrentMonth(): void {
-    const currentMonth = new Date().getMonth() + 1; // Get current month (0-based, so +1)
-    const selectedOption = this.options.find(option => option.value === currentMonth.toString());
-
-    if (selectedOption) {
-      this.selectedValue = selectedOption.value;
-      this.selectedLabel = selectedOption.label;
-      this.onChange(selectedOption.value);
-      this.selectionChange.emit(selectedOption);
+  private initializeFirstOption(): void {
+    if (this.options.length > 0) {
+      const firstOption = this.options[0];
+      this.selectedValue = firstOption.value;
+      this.selectedLabel = firstOption.label;
+      this.onChange(firstOption.value);
+      this.selectionChange.emit(firstOption);
     }
   }
 
- 
-  toggleDropdown() {
+  toggleDropdown(): void {
     this.isOpen = !this.isOpen;
-  } 
+  }
 
-  selectOption(option: { value: string; label: string }) {
+  selectOption(option: { value: string; label: string }): void {
     this.selectedValue = option.value;
     this.selectedLabel = option.label;
     this.isOpen = false;
@@ -55,7 +51,6 @@ export class CustomDropDownComponent implements OnInit, ControlValueAccessor {
     this.selectionChange.emit(option);
   }
 
- 
   writeValue(value: any): void {
     if (value) {
       const selectedOption = this.options.find(option => option.value === value);
@@ -66,12 +61,10 @@ export class CustomDropDownComponent implements OnInit, ControlValueAccessor {
     }
   }
 
- 
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }

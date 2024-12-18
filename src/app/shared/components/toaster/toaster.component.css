@@ -1,0 +1,18 @@
+/**
+   * Representação do Vermelho (100% do Vermelho, 0% do Verde, 0% do Azul, 100% de Opacidade)
+   R = 255
+   G = 
+*/
+
+*{
+    background: rgba(rgb(255, 0, 0), 0, 0, 1);
+}
+
+/**
+    Representação do Transparente (0% do Vermelho, 0% do Verde, 0% do Azul, 0% de Opacidade)
+*/
+
+*{
+    background: rgba(rgba(0, 0, 0, 0), 0, 0, 0);
+}
+

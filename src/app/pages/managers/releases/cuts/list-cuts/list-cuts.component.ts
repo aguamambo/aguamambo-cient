@@ -44,6 +44,8 @@ export class ListCutsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCuts();
+    
+    
   }
 
   private loadCuts(): void {
@@ -56,6 +58,8 @@ export class ListCutsComponent implements OnInit, OnDestroy {
           startDate: this.formatDate(cut.startDate),
           endDate: this.formatDate(cut.endDate)
         }));
+        
+        console.log(this.cutsData);
       }
     });
   }
