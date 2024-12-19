@@ -15,9 +15,14 @@
 
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
         <h2 class="text-lg font-semibold mb-4">Lista de Facturas</h2>
+
+        <div *ngIf="invoicesList.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+            <app-search-input  (searchChange)="filterInvoices($event)"></app-search-input>
+        </div>
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="invoicesList.length > 0; else noData">
-                <app-table [data]="invoicesData" [columns]="invoiceColumns" [totalCount]="invoicesList.length"
+                <app-table [data]="filteredInvoices" [columns]="invoiceColumns" [totalCount]="filteredInvoices.length"
                     (rowClick)="getInvoice($event)">
                 </app-table>
             </ng-container>

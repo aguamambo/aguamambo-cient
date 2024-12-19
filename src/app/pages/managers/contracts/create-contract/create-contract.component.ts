@@ -52,7 +52,6 @@ export class CreateContractComponent {
         this.currentStep++;
       }
 
-  
       setTimeout(() => {
         this.buttonDisabled = false;
       }, 200);
@@ -66,9 +65,7 @@ export class CreateContractComponent {
     }
   }
 
-  onClientSaved(client: IClient) {
-    console.log('Log Client', client);
-    
+  onClientSaved(client: IClient) {    
     if (client && client.clientId && !this.isClientSaved) {
       this.isClientSaved = true;
       this.clientId = client.clientId;

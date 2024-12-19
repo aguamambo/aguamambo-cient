@@ -16,6 +16,7 @@ export class ListSuspensionsComponent implements OnInit, OnDestroy {
   suspensionForm: FormGroup;
   suspensionsList: ISuspension[] = [];
   suspensionsData: ISuspension[] = [];
+  filteredSuspensions: ISuspension[] = [];
   clientsData: IOption[] = [];
   suspensionColumns: { key: keyof ISuspension; label: string }[] = [];
   isEditing: boolean = false;
@@ -27,10 +28,9 @@ export class ListSuspensionsComponent implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder, private store: Store<IAppState>) {
     this.suspensionForm = this.fb.group({
-      clientId: ['', Validators.required],
+      meterId: ['', Validators.required],
       reason: ['', Validators.required],
-      startDate: ['', Validators.required],
-      endDate: [''],
+      startDate: ['', Validators.required], 
       status: ['', Validators.required]
     });
 
@@ -39,9 +39,8 @@ export class ListSuspensionsComponent implements OnInit, OnDestroy {
 
     this.suspensionColumns = [
       { key: 'suspensionId', label: 'Código' },
-      { key: 'clientId', label: 'Código do Cliente' }, 
-      { key: 'startDate', label: 'Data Início' },
-      { key: 'endDate', label: 'Data Fim' } 
+      { key: 'meterId', label: 'Contador Suspenso' }, 
+      { key: 'startDate', label: 'Data Início' } 
     ];
   }
 
@@ -57,20 +56,29 @@ export class ListSuspensionsComponent implements OnInit, OnDestroy {
         this.suspensionsList = suspensions;
         this.suspensionsData = suspensions.map(suspension => ({
           ...suspension,
-          startDate: this.formatDate(suspension.startDate),
-          endDate: suspension.endDate ? this.formatDate(suspension.endDate) : ''
+          startDate: this.formatDate(suspension.startDate) 
         }));
+
+        this.filteredSuspensions = [...this.suspensionsData]
       }
     });
+  }
+
+  filterSuspensions(searchTerm: string): void {
+    const searchTermLower = searchTerm.toLowerCase();
+    this.filteredSuspensions = this.suspensionsData.filter(suspension =>
+      Object.values(suspension).some(value =>
+        String(value).toLowerCase().includes(searchTermLower)
+      )
+    );
   }
 
   editSuspension(suspension: ISuspension): void {
     this.isEditing = true;
     this.selectedSuspension = suspension;
     this.suspensionForm.patchValue({
-      clientId: suspension.clientId, 
-      startDate: suspension.startDate,
-      endDate: suspension.endDate 
+      meterId: suspension.meterId, 
+      startDate: suspension.startDate 
     });
   }
 

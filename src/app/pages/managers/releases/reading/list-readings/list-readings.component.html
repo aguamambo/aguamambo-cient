@@ -78,12 +78,17 @@
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
         <h2 class="text-lg font-semibold mb-4">Lista de Leituras</h2> 
 
+        <div *ngIf="readingsList.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+            <app-search-input  (searchChange)="filterReadings($event)"></app-search-input>
+        </div>
+
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="readingsList.length > 0; else noData">
                 <app-table
-                    [data]="readingsData"
+                    [data]="filteredReadings"
                     [columns]="readingColumns"
-                    [totalCount]="readingsList.length"
+                    [totalCount]="filteredReadings.length"
                     (rowClick)="editReading($event)">
                 </app-table>
             </ng-container>

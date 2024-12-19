@@ -251,8 +251,7 @@ export class RegisterReadingComponent implements OnInit {
               this._dialogService.open({
                 title: 'Sucesso',
                 message: 'Leitura salva com sucesso!',
-                type: 'success',
-                showConfirmButton: true, 
+                type: 'success'
               });
               
               this.store.dispatch(createInvoice({ payload }));

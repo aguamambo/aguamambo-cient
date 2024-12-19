@@ -8,6 +8,7 @@ import { IContractType } from 'src/app/models/contractType';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
+import { DialogService } from 'src/app/services/dialog.service';
 import { listAllZones, listAllContractTypes, createClient} from 'src/app/store';
 import { selectSelectedClient, selectClientIsSaving, selectClientErrorMessage, selectClientSuccessMessage, selectClientStatusCode } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
@@ -44,7 +45,12 @@ export class ClientComponent implements OnInit {
   selectedEnterpriseId: string = '';
   isAccordionOpen = false;
 
-  constructor(private fb: FormBuilder, private store: Store, private generic: GenericConfig, private auth: AuthService) { }
+  constructor(
+    private fb: FormBuilder, 
+    private store: Store, 
+    private _dialogService: DialogService,
+    private generic: GenericConfig, 
+    private auth: AuthService) { }
 
   ngOnInit(): void {
       this.checkSession();
@@ -126,13 +132,29 @@ export class ClientComponent implements OnInit {
         filter(client => !!client),
         first()
       )
-      .subscribe(client => {
-        if (client) {
-          console.log(client);
-          
+      .subscribe({
+        next: (client) => {
+          if (client) {
+            this._dialogService.open({
+              title: 'Sucesso',
+              message: 'Cliente criado com sucesso!',
+              type: 'success'
+            });
+            
+          }
           this.clientSaved.emit(client);
           this.clientForm.reset();
+        }, 
+        error: (error) => {
+          this._dialogService.open({
+            title: 'Erro',
+            message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
+            type: 'error',
+            showConfirmButton: true, 
+            cancelText: 'Cancelar',
+          });
         }
+  
       });
     } else {
       this.clientSaved.emit();  

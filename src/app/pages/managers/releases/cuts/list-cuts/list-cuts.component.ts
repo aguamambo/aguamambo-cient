@@ -15,6 +15,7 @@ export class ListCutsComponent implements OnInit, OnDestroy {
   cutForm: FormGroup;
   cutsList: ICut[] = [];
   cutsData: ICut[] = [];
+  filteredCuts: ICut[] = [];
   cutColumns: { key: keyof ICut; label: string }[] = [];
   isEditing: boolean = false;
   selectedCut!: ICut;
@@ -26,9 +27,8 @@ export class ListCutsComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder, private store: Store<IAppState>) {
     this.cutForm = this.fb.group({
       cutsId: ['', Validators.required],
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required],
-      clientId: ['', Validators.required]
+      startDate: ['', Validators.required], 
+      meterId: ['', Validators.required]
     });
 
     this.isCutsLoading$ = this.store.select(selectCutIsLoading);
@@ -36,9 +36,8 @@ export class ListCutsComponent implements OnInit, OnDestroy {
 
     this.cutColumns = [
       { key: 'cutId', label: 'Código de Corte' },
-      { key: 'startDate', label: 'Data de Início' },
-      { key: 'endDate', label: 'Data de Fim' },
-      { key: 'clientId', label: 'ID do Cliente' }
+      { key: 'startDate', label: 'Data de Início' }, 
+      { key: 'meterId', label: 'Contador afectado' }
     ];
   }
 
@@ -55,13 +54,22 @@ export class ListCutsComponent implements OnInit, OnDestroy {
         this.cutsList = cuts;
         this.cutsData = cuts.map(cut => ({
           ...cut,
-          startDate: this.formatDate(cut.startDate),
-          endDate: this.formatDate(cut.endDate)
+          startDate: this.formatDate(cut.startDate) 
         }));
-        
-        console.log(this.cutsData);
+         
+        this.filteredCuts = [...this.cutsData]
       }
     });
+  }
+
+    
+  filterCuts(searchTerm: string): void {
+    const searchTermLower = searchTerm.toLowerCase();
+    this.filteredCuts = this.cutsData.filter(cut =>
+      Object.values(cut).some(value =>
+        String(value).toLowerCase().includes(searchTermLower)
+      )
+    );
   }
 
   editCut(cut: ICut): void {
@@ -69,9 +77,8 @@ export class ListCutsComponent implements OnInit, OnDestroy {
     this.selectedCut = cut;
     this.cutForm.patchValue({
       cutsId: cut.cutId,
-      startDate: cut.startDate,
-      endDate: cut.endDate,
-      clientId: cut.clientId
+      startDate: cut.startDate, 
+      meterId: cut.meterId
     });
   }
 

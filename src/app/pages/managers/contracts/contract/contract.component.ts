@@ -18,6 +18,7 @@ import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.se
 import { selectSelectedZone, selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 import { selectSelectedAvailableMeters, selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { IClientMeter } from 'src/app/models/clientMeter';
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-contract',
@@ -61,6 +62,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private store: Store,
     private generic: GenericConfig,
+    private _dialogService: DialogService,
     private auth: AuthService
   ) { }
 
@@ -87,7 +89,7 @@ export class ContractComponent implements OnInit, OnDestroy {
     };
 
     console.log(this.contractData);
-    
+
 
     this.isContractSaving$ = this.store.select(selectContractIsSaving);
     this.errorMessage$ = this.store.select(selectClientErrorMessage);
@@ -224,18 +226,37 @@ export class ContractComponent implements OnInit, OnDestroy {
  
      
     if (contractData) {
-      this.isDialogOpen = true;
-      this.dialogMessage = 'Salvando Contracto...';  
+
+      this._dialogService.open({
+        title: 'Processando',
+        message: 'Aguarde um instante enquanto guarda ainformações de celebração do contracto.',
+        type: 'loading',
+        isProcessing: true,
+      });
+  
+      
       this.store.dispatch(createContract({ contract: contractData }));
-      this.store.pipe(select(selectSelectedContract), filter((contract) => !!contract), first()).subscribe(contract=>{
-        if (contract) {
-         this.dialogMessage = 'Contracto criado com sucesso.';  
-        }
-        else
-          {
-            this.dialogMessage = 'Ocorreu um erro na criacao do contracto.';
+      this.store.pipe(select(selectSelectedContract), filter((contract) => !!contract), first()) .subscribe({
+        next: (contract) => {
+          if (contract) {
+            this._dialogService.open({
+              title: 'Sucesso',
+              message: 'Contracto criado com sucesso!',
+              type: 'success'
+            });
+            
           }
-      })
+        }, 
+        error: (error) => {
+          this._dialogService.open({
+            title: 'Erro',
+            message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
+            type: 'error',
+            showConfirmButton: true, 
+            cancelText: 'Cancelar',
+          });
+        }
+      })         
       this.contractSaved.emit();  
     }
   }

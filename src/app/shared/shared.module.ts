@@ -21,6 +21,7 @@ import { TabComponent } from './components/tab/tab.component';
 import { TabItemComponent } from './components/tab-item/tab-item.component';
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component'; 
 import { DialogComponent } from './dialog/dialog.component';
+import { SearchInputComponent } from './search-input/search-input.component';
 
 @NgModule({
   declarations: [ 
@@ -42,7 +43,7 @@ import { DialogComponent } from './dialog/dialog.component';
     TabComponent, 
     TabItemComponent, 
     PdfViewerComponent,  
-    DialogComponent
+    DialogComponent, SearchInputComponent
   ],
   imports: [
     CommonModule,
@@ -69,7 +70,8 @@ import { DialogComponent } from './dialog/dialog.component';
     TabComponent,
     TabItemComponent,
     PdfViewerComponent,  
-    DialogComponent
+    DialogComponent,
+    SearchInputComponent
   ]
 })
 export class SharedModule { }

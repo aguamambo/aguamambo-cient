@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 h-full">
+<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 ">
     <app-breadcrumb title="Lista de Contratos" [breadcrumbItems]="['Dashboard', 'Listar Contratos']">
     </app-breadcrumb>
 
@@ -14,9 +14,15 @@
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
             <h2 class="text-lg font-semibold mb-4">Lista de Contratos</h2>
+
+            <div *ngIf="contractsList.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+                <app-search-input  (searchChange)="filterContracts($event)"></app-search-input>
+            </div>
+
             <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
                 <ng-container *ngIf="contractsList.length > 0; else noData">
-                    <app-table [data]="contractsData" [columns]="contractColumns" [totalCount]="contractsList.length"
+                    <app-table [data]="filteredContracts" [columns]="contractColumns" [totalCount]="filteredContracts.length"
                         (rowClick)="getContract($event)">
                     </app-table>
                 </ng-container>

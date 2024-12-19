@@ -21,6 +21,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   readingForm: FormGroup;
   readingsList: IReading[] = [];
   readingsData: IReading[] = [];
+  filteredReadings: IReading[] = [];
   monthsData: IOption[] = [];
   statusData: IOption[] = [];
   counter: string = '';
@@ -99,6 +100,8 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
           createdAt: this.formatDate(reading.createdAt),
           updatedAt: this.formatDate(reading.updatedAt)
         }));
+
+        this.filteredReadings = [...this.readingsData]
       }
     });
   }
@@ -237,6 +240,15 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   onMonthSelect(selectedOption: { value: string }): void {
     this.readingForm.get('readingMonth')?.setValue(selectedOption.value);
+  }
+
+  filterReadings(searchTerm: string): void {
+    const searchTermLower = searchTerm.toLowerCase();
+    this.filteredReadings = this.readingsData.filter(reading =>
+      Object.values(reading).some(value =>
+        String(value).toLowerCase().includes(searchTermLower)
+      )
+    );
   }
 
   generateMonths(): void {

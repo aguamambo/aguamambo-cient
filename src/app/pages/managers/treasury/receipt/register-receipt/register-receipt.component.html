@@ -17,7 +17,7 @@
       </div>
     </ng-container>
 
-    <div class="flex gap-4 p-6">
+    <div class="flex gap-4 p-6 shadow-md rounded-lg">
       <div class="flex flex-col w-1/3 gap-3 px-3">
         <label class="font-semibold text-sm">Ano Económico</label>
         <input type="text" [value]="currentYear"
@@ -41,10 +41,13 @@
         </app-autocomplete-input>
       </div>
 
-      <div class="flex flex-col w-1/3 gap-3 px-3">
-        <app-custom-drop-down label="Contrato" [options]="contractsData"
-          (selectionChange)="onContractSelected($event)">
-        </app-custom-drop-down>
+      <div class="flex flex-col w-1/3 gap-1 px-3">
+        <label class="font-semibold text-sm">Contador</label>
+        <app-autocomplete-input
+              [dataSource]="contractsData"
+              [placeholder]="counter"
+          (valueSelected)="onContractSelected($event)"> 
+          </app-autocomplete-input>
 
       </div>
 
@@ -54,7 +57,11 @@
       <label class="font-semibold text-lg mb-2 block py-1 px-3">
         Lista de Faturas
       </label>
-      <app-table [data]="invoicesData" [columns]="invoiceColumns" [totalCount]="invoicesData.length"
+      <div *ngIf="invoicesData.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+        <app-search-input  (searchChange)="filterInvoices($event)"></app-search-input>
+    </div>
+      <app-table [data]="filteredInvoices" [columns]="invoiceColumns" [totalCount]="filteredInvoices.length"
         (rowClick)="addInvoiceToPayment($event)">
       </app-table>
     </div>
@@ -68,7 +75,7 @@
       </app-table>
     </div>
 
-    <div class="flex justify-between items-center p-6 gap-3">
+    <div class="flex justify-between items-center p-6 gap-3 shadow-md rounded-lg">
       <div class="w-1/5">
         <label class="font-semibold text-sm"></label>
         <app-custom-drop-down label="Método de Pagamento" [options]="paymentMethods"
@@ -87,7 +94,7 @@
         <span class="font-bold">{{ formatCurrency(outstandingAmount) }}</span>
       </div>
 
-      <div class="flex flex-col ">
+      <div class="flex flex-col pr-6">
         <label class="font-semibold text-sm">Saldo</label>
         <span class="font-bold">{{ formatCurrency(customerBalance) }}</span>
       </div>

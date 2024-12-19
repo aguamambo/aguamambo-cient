@@ -1,6 +1,5 @@
 export interface ICut {
     cutId: string;
-    startDate: string;
-    endDate: string;
-    clientId: string;
+    startDate: string; 
+    meterId: string;
   }

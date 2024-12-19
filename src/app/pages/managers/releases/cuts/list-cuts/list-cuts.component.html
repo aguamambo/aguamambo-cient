@@ -30,17 +30,13 @@
                     <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data de Início</label>
                     <input type="date" formControlName="startDate" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
                 </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data de Fim</label>
-                    <input type="date" formControlName="endDate" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
+ 
             </div>
 
             <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
                 <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">ID do Cliente</label>
-                    <input formControlName="clientId" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
+                    <input formControlName="meterId" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
                 </div>
             </div>
 
@@ -58,12 +54,17 @@
     <!-- Table for Displaying Cuts List -->
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
         <h2 class="text-lg font-semibold mb-4">Lista de Cortes</h2>
+        <div *ngIf="cutsData.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+            <app-search-input  (searchChange)="filterCuts($event)"></app-search-input>
+        </div>
+
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="cutsList.length > 0; else noData">
                 <app-table
-                    [data]="cutsData"
+                    [data]="filteredCuts"
                     [columns]="cutColumns"
-                    [totalCount]="cutsList.length"
+                    [totalCount]="filteredCuts.length"
                     (rowClick)="editCut($event)">
                 </app-table>
             </ng-container>

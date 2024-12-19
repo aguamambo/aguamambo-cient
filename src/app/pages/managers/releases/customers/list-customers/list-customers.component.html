@@ -105,12 +105,17 @@
   <!-- Client Table -->
   <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6 mt-6">
       <h2 class="text-lg font-semibold mb-4">Lista de Clientes</h2>
+
+      <div *ngIf="clientsList.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+        <app-search-input  (searchChange)="filterClients($event)"></app-search-input>
+    </div>
       <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
           <ng-container *ngIf="clientsList.length > 0; else noData">
               <app-table
-                  [data]="clientsList"
+                  [data]="filteredClients"
                   [columns]="clientColumns"
-                  [totalCount]="clientsList.length"
+                  [totalCount]="filteredClients.length"
                   (rowClick)="editClient($event)">
               </app-table>
           </ng-container>

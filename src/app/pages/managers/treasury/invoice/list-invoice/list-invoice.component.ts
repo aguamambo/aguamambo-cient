@@ -21,6 +21,7 @@ import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 export class ListInvoiceComponent  implements OnInit, OnDestroy {
   invoicesList: IInvoice[] = [];
   invoicesData: IInvoice[] = [];
+  filteredInvoices: IInvoice[] = [];
   monthsData: IOption[] = [];
   counter: string = '';
   clientData: IOption[] = [];
@@ -81,8 +82,19 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
           limitDate: this.formatDate(invoice.limitDate),
           paymentDate: this.formatDate(invoice.paymentDate)
         }));
+
+        this.filteredInvoices = [... this.invoicesData]
       }
     });
+  }
+
+  filterInvoices(searchTerm: string): void {
+    const searchTermLower = searchTerm.toLowerCase();
+    this.filteredInvoices = this.invoicesList.filter(invoice =>
+      Object.values(invoice).some(value =>
+        String(value).toLowerCase().includes(searchTermLower)
+      )
+    );
   }
 
   loadEnterpriseData(): void {

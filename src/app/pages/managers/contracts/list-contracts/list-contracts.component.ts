@@ -17,6 +17,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 export class ListContractsComponent {
   contractsList: IContract[] = [];
   contractsData: IContract[] = [];
+  filteredContracts: IContract[] = [];  
   contractColumns: { key: keyof IContract; label: string }[] = [];
   isContractsLoading$: Observable<boolean>;
   private destroy$ = new Subject<void>();
@@ -52,12 +53,22 @@ export class ListContractsComponent {
           startDate: this.formatDate(contract.startDate),
           endDate: this.formatDate(contract.endDate)
         }));
+        this.filteredContracts = [...this.contractsData];
       }
     });
   }
 
   getContract(contract: IContract): void {
 
+  }
+
+  filterContracts(searchTerm: string): void {
+    const searchTermLower = searchTerm.toLowerCase();
+    this.filteredContracts = this.contractsData.filter(contract =>
+      Object.values(contract).some(value =>
+        String(value).toLowerCase().includes(searchTermLower)
+      )
+    );
   }
 
   formatDate(dateString: string): string {

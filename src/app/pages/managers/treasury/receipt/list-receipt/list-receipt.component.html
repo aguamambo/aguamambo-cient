@@ -14,9 +14,14 @@
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
             <h2 class="text-lg font-semibold mb-4">Lista de Recibos</h2>
+            <div *ngIf="receiptsList.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+                <app-search-input  (searchChange)="filterReceipts($event)"></app-search-input>
+            </div>
+
             <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
                 <ng-container *ngIf="receiptsList.length > 0; else noData">
-                    <app-table [data]="receiptsData" [columns]="receiptColumns" [totalCount]="receiptsList.length"
+                    <app-table [data]="filteredReceipts" [columns]="receiptColumns" [totalCount]="filteredReceipts.length"
                         (rowClick)="getReceipt($event)">
                     </app-table>
                 </ng-container>

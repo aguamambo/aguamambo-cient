@@ -28,15 +28,6 @@
                     <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data de Início</label>
                     <input type="date" formControlName="startDate" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
                 </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data de Fim</label>
-                    <input type="date" formControlName="endDate" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
-            </div>
-
-            <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
-                 
                 <div class="w-full">
                     <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Observações</label>
                     <textarea
@@ -45,7 +36,6 @@
                     </textarea>
                 </div>
             </div>
-
         </form>
         <div class="flex mt-4 p-6">
             <button
@@ -59,12 +49,18 @@
 
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
         <h2 class="text-lg font-semibold mb-4">Lista de Suspensões</h2>
+
+        <div *ngIf="suspensionsList.length > 0" class="grid grid-cols-2 px-6  w-full">
+
+            <app-search-input  (searchChange)="filterSuspensions($event)"></app-search-input>
+        </div>
+
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="suspensionsList.length > 0; else noData">
                 <app-table
-                    [data]="suspensionsData"
+                    [data]="filteredSuspensions"
                     [columns]="suspensionColumns"
-                    [totalCount]="suspensionsList.length"
+                    [totalCount]="filteredSuspensions.length"
                     (rowClick)="editSuspension($event)">
                 </app-table>
             </ng-container>

@@ -32,6 +32,7 @@ export class ListCustomersComponent implements OnInit, OnDestroy {
   contractTypes!: IContractType[];
   contractsList!: IContract[];
   private destroy$ = new Subject<void>();
+  filteredClients: IClient[] = [];
   clientsList: IClient[] = [];
   clientColumns: { key: keyof IClient; label: string }[] = [];
   isClientSaving$!: Observable<boolean>;
@@ -247,10 +248,20 @@ export class ListCustomersComponent implements OnInit, OnDestroy {
             : '',
         };
       });
+
+      this.filteredClients = [...this.clientsList]
     }
     
   }
   
+  filterClients(searchTerm: string): void {
+    const searchTermLower = searchTerm.toLowerCase();
+    this.filteredClients = this.clientsList.filter(client =>
+      Object.values(client).some(value =>
+        String(value).toLowerCase().includes(searchTermLower)
+      )
+    );
+  }
 
   onCheckboxValueChange(controlName: string, isChecked: boolean) {
     this.generalForm.get(controlName)?.setValue(isChecked);

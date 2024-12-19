@@ -1,9 +1,10 @@
+import { filter } from 'rxjs';
 import { IOption } from './../../../../../models/option';
 import * as pdfjsLib from 'pdfjs-dist';
 import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser'; 
 import { select, Store } from '@ngrx/store';
-import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
+import { first, Observable, Subject, takeUntil } from 'rxjs';
 import { IReceipt } from 'src/app/models/receipt';
 import { IAppState, getZoneByEnterpriseId, getClientByZoneId, getWaterBillByReadingId, listAllReceipts, getReceiptFile } from 'src/app/store';
 import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
@@ -21,6 +22,7 @@ import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 export class ListReceiptComponent implements OnInit, OnDestroy {
   receiptsList: IReceipt[] = [];
   receiptsData: IReceipt[] = [];
+  filteredReceipts: IReceipt[] = [];
   monthsData: IOption[] = [];
   counter: string = '';
   clientData: IOption[] = [];
@@ -74,8 +76,19 @@ export class ListReceiptComponent implements OnInit, OnDestroy {
           ...receipt, 
           paymentDate: this.formatDate(receipt.paymentDate)
         }));
+
+        this.filteredReceipts = [...this.receiptsData]
       }
     });
+  }
+  
+  filterReceipts(searchTerm: string): void {
+    const searchTermLower = searchTerm.toLowerCase();
+    this.filteredReceipts = this.receiptsData.filter(receipt =>
+      Object.values(receipt).some(value =>
+        String(value).toLowerCase().includes(searchTermLower)
+      )
+    );
   }
    
   ngOnDestroy(): void {
