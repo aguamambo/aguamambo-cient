@@ -66,8 +66,7 @@ export class RegisterSuspensionComponent  implements OnInit {
     
     this.registSuspensionForm = new FormGroup({  
         meterId: new FormControl(null),
-        startDate: new FormControl(null),
-        endDate: new FormControl(null),
+        startDate: new FormControl(null) 
     });
 
   }

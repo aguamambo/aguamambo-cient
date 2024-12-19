@@ -75,8 +75,7 @@ export class RegisterCutComponent  implements OnInit {
   initForm(): void {
     
     this.registCutForm = new FormGroup({  
-        startDate: new FormControl(null),
-        endDate: new FormControl(null), 
+        startDate: new FormControl(null), 
         meterId: new FormControl(null)
     });
 
