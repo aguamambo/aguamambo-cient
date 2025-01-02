@@ -43,7 +43,8 @@ import { SearchInputComponent } from './search-input/search-input.component';
     TabComponent, 
     TabItemComponent, 
     PdfViewerComponent,  
-    DialogComponent, SearchInputComponent
+    DialogComponent, 
+    SearchInputComponent
   ],
   imports: [
     CommonModule,
