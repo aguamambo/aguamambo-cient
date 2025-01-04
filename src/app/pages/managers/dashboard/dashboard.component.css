@@ -20,6 +20,7 @@
     .stats-grid {
         grid-template-columns: 1fr; /* 1 coluna */
     }
+    
 }
 
 /* 2 colunas: entre 429px e 1206px */
