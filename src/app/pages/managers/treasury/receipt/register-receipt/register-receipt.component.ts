@@ -123,6 +123,7 @@ export class RegisterReceiptComponent implements OnInit {
     );
   }
   onClientSelected(event: { value: string; label: string }) {
+    this.store.pipe(select(resetContractActions))
     this.form.get('clientId')?.setValue(event.value);
     this.store.dispatch(getContractByClientId({ clientId: event.value }));
 
