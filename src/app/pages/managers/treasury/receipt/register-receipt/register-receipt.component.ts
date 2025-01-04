@@ -6,7 +6,7 @@ import { IInvoice } from './../../../../../models/invoice';
 import { Component, OnInit } from '@angular/core';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
-import { createReceipt, getContractByClientId, getInvoiceByClientId, getInvoiceByMeter, getInvoiceByStatus, getReceiptFile, getReceiptPaymentMethods, listAllClients, resetClientActions, resetClientMetersActions, resetContractActions, resetReceiptActions } from 'src/app/store';
+import { createReceipt, getContractByClientId, getInvoiceByClientId, getInvoiceByMeter, getInvoiceByStatus, getReceiptFile, getReceiptPaymentMethods, listAllClients, resetClientActions, resetClientMetersActions, resetContractActions, resetInvoiceActions, resetReceiptActions } from 'src/app/store';
 import { IClient } from 'src/app/models/client';
 import { IOption } from 'src/app/models/option';
 import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
@@ -124,9 +124,10 @@ export class RegisterReceiptComponent implements OnInit {
   }
   onClientSelected(event: { value: string; label: string }) {
     this.store.pipe(select(resetContractActions))
+    this.store.pipe(select(resetInvoiceActions))
+    
     this.form.get('clientId')?.setValue(event.value);
-    this.store.dispatch(getContractByClientId({ clientId: event.value }));
-
+    this.store.dispatch(getContractByClientId({ clientId: event.value })); 
     this.store.pipe(select(selectSelectedContracts), takeUntil(this.unsubscribe$)).subscribe(contracts => {
       if (contracts && contracts.length > 0) {
         this.contractList = contracts;
