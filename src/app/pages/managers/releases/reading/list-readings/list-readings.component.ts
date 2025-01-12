@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, pipe } from 'rxjs';
-import { filter, first, takeUntil } from 'rxjs/operators';
+import { delay, filter, first, takeUntil } from 'rxjs/operators';
 import { IOption } from 'src/app/models/option';
 import { IReading } from 'src/app/models/reading';
 import { IZone } from 'src/app/models/zone';
@@ -99,12 +99,26 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
         this.readingsData = readings.map(reading => ({
           ...reading,
           createdAt: this.formatDate(reading.createdAt),
-          updatedAt: this.formatDate(reading.updatedAt)
+          updatedAt: this.formatDate(reading.updatedAt),
+          state: this.translateState(reading.state)
         }));
 
         this.filteredReadings = [...this.readingsData]
       }
     });
+  }
+
+  translateState(state: string): string {
+    switch (state) {
+      case 'PENDING':
+        return 'PENDENTE';
+      case 'APPROVED':
+        return 'APROVADO';
+      case 'CANCELED':
+        return 'CANCELADO';
+      default:
+        return state; 
+    }
   }
 
   private setFormControlState(isEnabled: boolean): void {
@@ -145,6 +159,10 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       this.isEditing = false;
       this.readingForm.reset();
       this.setFormControlState(false);
+
+      delay(5000)
+
+      this.loadData()
     }
   }
 

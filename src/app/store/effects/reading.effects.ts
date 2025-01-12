@@ -200,8 +200,15 @@ export class ReadingEffects {
 
   refreshListAfterCreateOrUpdate$ = createEffect(() =>
     this.actions$.pipe(
-        ofType(createReadingSuccess, updateReadingSuccess, updateBulkReadingsSuccess),
+        ofType(createReadingSuccess, updateReadingSuccess),
         map(() => listAllReadings())
     )
-);
+  );
+
+  refreshListAfterUpdateBulk$ = createEffect(() =>
+    this.actions$.pipe(
+        ofType( updateBulkReadingsSuccess),
+        map(() => getReadingByStatus({state: 'PENDING'}))
+    )
+  );
 }
