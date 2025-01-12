@@ -34,6 +34,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   selectedReading!: IReading;
   selectedBulkStatus: any;
+  setState: string = ""
 
   isReadingsLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
@@ -133,7 +134,13 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.readingForm.controls['readingYear'].enable(); 
     
     if (this.readingForm.valid && this.isEditing) {
-      const payload = this.readingForm.value;
+      const payload = {
+        readingMonth: this.selectedReading.readingMonth,
+        currentReading: this.selectedReading.currentReading,
+        readingYear: this.selectedReading.readingYear,
+        state: this.readingForm.get('state')?.value
+      }
+
       this.store.dispatch(updateReading({ readingId: this.selectedReading.readingId, reading: payload }));
       this.isEditing = false;
       this.readingForm.reset();
@@ -205,6 +212,8 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   onStatusSelect(event: { value: string }): void {
     if (event?.value) {
       this.readingForm.get('state')?.setValue(event.value);
+
+     this.setState = event.value;      
     }
   }
 

@@ -84,7 +84,7 @@ export const createReadingFailure = createAction(
 // PUT readings/{id}
 export const updateReading = createAction(
   '[Reading] Update Reading',
-  props<{ readingId: string, reading: IReading }>()
+  props<{ readingId: string, reading: any }>()
 );
 
 export const updateReadingSuccess = createAction(
