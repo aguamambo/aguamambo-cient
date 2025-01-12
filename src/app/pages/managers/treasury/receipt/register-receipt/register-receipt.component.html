@@ -53,20 +53,21 @@
 
     </div>
 
-    <div class="p-6 border-y">
+    <div class="p-6 border-y" *ngIf="invoicesData.length > 0">
       <label class="font-semibold text-lg mb-2 block py-1 px-3">
         Lista de Faturas
       </label>
-      <div *ngIf="invoicesData.length > 0" class="grid grid-cols-2 px-6  w-full">
+      <div  class="grid grid-cols-2 px-6  w-full">
 
         <app-search-input  (searchChange)="filterInvoices($event)"></app-search-input>
+        <div class="flex justify-center items-center"><span>* Seleccione a factura a pagar</span></div>
     </div>
       <app-table [data]="filteredInvoices" [columns]="invoiceColumns" [totalCount]="filteredInvoices.length"
         (rowClick)="addInvoiceToPayment($event)">
       </app-table>
     </div>
 
-    <div class="p-6">
+    <div class="p-6" *ngIf="invoicesToBePaid.length > 0">
       <label class="font-semibold text-lg mb-2 block py-1 px-3">
         Faturas a Serem Pagas
       </label>
