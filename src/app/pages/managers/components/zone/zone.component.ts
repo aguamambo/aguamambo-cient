@@ -103,14 +103,7 @@ export class ZoneComponent implements OnInit {
 
       if (this.isEditing) {
 
-        setTimeout(() => { 
-          this._dialogService.open({
-            title: 'Actualizacao da Zona',
-            message: 'Actualizando a Zona...',
-            isProcessing: true,
-            showConfirmButton: false,
-          })
-        }, 5000);
+        
         this._store.dispatch(updateZone({ zoneId: payload.zoneId, zone: payload }));
 
 
@@ -119,6 +112,7 @@ export class ZoneComponent implements OnInit {
             if (error) {
               this._dialogService.open({
                 title: 'Actualizacao da Zona',
+                type:'loading',
                 message: error,
                 isProcessing: false,
                 showConfirmButton: false,
@@ -131,12 +125,13 @@ export class ZoneComponent implements OnInit {
                     this.isEditing = false;
                     this._dialogService.open({
                       title: 'Actualizacao da Zona',
+                      type: 'success',
                       message: 'Zona Actualizada com sucesso!',
                       isProcessing: false,
                       showConfirmButton: false,
                     })
                   } else {
-                    this.openFeedbackDialog('Error', 'Ocorreu um erro ao actualizar a zona!');
+                    this.openFeedbackDialog('error','Actualizaçã da Zona', 'Ocorreu um erro ao actualizar a zona!');
                   }
                 });
             }
@@ -145,16 +140,16 @@ export class ZoneComponent implements OnInit {
 
 
       } else {
-        // this._store.dispatch(createZone({ zone: payload }));
-        // this._store.pipe(select(selectSelectedZone), filter((zone) => !!zone))
-        //   .subscribe((zone) => {
-        //     if (zone) {
-        //       this.openFeedbackDialog('Success', 'Zone created successfully!');
-        //       this.zoneForm.reset();
-        //     } else {
-        //       this.openFeedbackDialog('Error', 'There was an error creating the zone!');
-        //     }
-        //   });
+        this._store.dispatch(createZone({ zone: payload }));
+        this._store.pipe(select(selectSelectedZone), filter((zone) => !!zone))
+          .subscribe((zone) => {
+            if (zone) {
+              this.openFeedbackDialog('success','Criação de Zona', 'Zona criada com sucesso!');
+              this.zoneForm.reset();
+            } else {
+              this.openFeedbackDialog('error','Criação de Zona', 'U erro ocorreu ao criar a Zona!');
+            }
+          });
       }
     }
   }
@@ -171,6 +166,7 @@ export class ZoneComponent implements OnInit {
 
     this._dialogService.open({
       title: 'Delete Zone',
+      type: 'info',
       message: `Are you sure you want to delete the zone "${zoneToDelete.designation}"?`,
       confirmText: 'Yes, Delete',
       cancelText: 'Cancel'
@@ -183,16 +179,14 @@ export class ZoneComponent implements OnInit {
   }
 
 
-  private openFeedbackDialog(title: string, message: string): void {
+  openFeedbackDialog(type: 'success' | 'error',title: string, message: string): void {
     this._dialogService.open({
       title: title,
       message: message,
+      type: type,
       confirmText: 'OK',
       isProcessing: false,
-    }).subscribe(() => {
-
-      console.log(`${title}: ${message}`);
-    });
+    }) 
   }
 
 

@@ -15,6 +15,15 @@ module.exports = {
         'scrollbar-thumb': '#21B4FD',
         'scrollbar-track': '#21B4FD'
       },
+      animation: {
+        fadeIn: 'fadeIn 0.3s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+      }
     },
   },
   plugins: [

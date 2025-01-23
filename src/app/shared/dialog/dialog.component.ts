@@ -8,8 +8,9 @@ import { DialogService } from 'src/app/services/dialog.service';
 })
 export class DialogComponent implements OnInit {
   isDialogVisible = false;
+  isLoading = false;
   config: {
-    type?: 'loading' | 'success' | 'error';
+    type?: 'loading' | 'success' | 'error' | 'info';
     message?: string;
     showConfirmButton?: boolean;
     confirmText?: string;
@@ -19,9 +20,12 @@ export class DialogComponent implements OnInit {
   constructor(private dialogService: DialogService) {}
 
   ngOnInit(): void {
-    // Subscribe to the visibility and config observables
     this.dialogService.isDialogVisible().subscribe((visible) => {
-      this.isDialogVisible = visible;
+      if (visible) {
+        this.showDialogWithDelay();
+      } else {
+        this.isDialogVisible = false;
+      }
     });
 
     this.dialogService.getDialogConfig().subscribe((config) => {
@@ -31,11 +35,20 @@ export class DialogComponent implements OnInit {
     });
   }
 
-  onConfirm(): void {
-    this.dialogService.close(true); // Close the dialog with a positive result
+  showDialogWithDelay(): void {
+    this.isLoading = true; // Show loading spinner
+    this.isDialogVisible = true;
+
+    setTimeout(() => {
+      this.isLoading = false; // Hide loading spinner
+    }, 5000); // Delay for 5 seconds
+  }
+
+  onClose(): void {
+    this.dialogService.close(true);
   }
 
   onCancel(): void {
-    this.dialogService.close(false); // Close the dialog with a negative result
+    this.dialogService.close(false);
   }
 }

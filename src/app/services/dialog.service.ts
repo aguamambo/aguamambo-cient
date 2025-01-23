@@ -8,7 +8,7 @@ interface DialogConfig {
   cancelText?: string;
   isProcessing?: boolean; 
   showConfirmButton?: boolean;
-  type?: 'loading' | 'success' | 'error';  
+  type?: 'loading' | 'success' | 'error' | 'info';  
   icon?: string;  
 }
 
