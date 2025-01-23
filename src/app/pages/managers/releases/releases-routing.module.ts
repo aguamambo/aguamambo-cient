@@ -8,16 +8,17 @@ import { Routes, RouterModule } from '@angular/router';
 import { ListSuspensionsComponent } from './suspension/list-suspensions/list-suspensions.component';
 import { RegisterSuspensionComponent } from './suspension/register-suspension/register-suspension.component';
 import { PendingReadingsComponent } from './reading/pending-readings/pending-readings.component';
+import { authGuard } from 'src/app/core/guards/auth.guard';
  
 const routes: Routes = [ 
-  { path: 'readings/add', component: RegisterReadingComponent },  
-  { path: 'readings/list', component: ListReadingsComponent },   
-  { path: 'readings/pending', component: PendingReadingsComponent },   
-  { path: 'customers/list', component: ListCustomersComponent }, 
-  { path: 'cuts/add', component: RegisterCutComponent },
-  { path: 'cuts/list', component: ListCutsComponent },
-  { path: 'suspensions/add', component: RegisterSuspensionComponent }, 
-  { path: 'suspensions/list', component: ListSuspensionsComponent }, 
+  { path: 'readings/add', component: RegisterReadingComponent ,canActivate: [authGuard] },  
+  { path: 'readings/list', component: ListReadingsComponent,canActivate: [authGuard]  },   
+  { path: 'readings/pending', component: PendingReadingsComponent,canActivate: [authGuard]  },   
+  { path: 'customers/list', component: ListCustomersComponent,canActivate: [authGuard]  }, 
+  { path: 'cuts/add', component: RegisterCutComponent,canActivate: [authGuard]  },
+  { path: 'cuts/list', component: ListCutsComponent,canActivate: [authGuard]  },
+  { path: 'suspensions/add', component: RegisterSuspensionComponent,canActivate: [authGuard]  }, 
+  { path: 'suspensions/list', component: ListSuspensionsComponent,canActivate: [authGuard]  }, 
 ];
 
 @NgModule({

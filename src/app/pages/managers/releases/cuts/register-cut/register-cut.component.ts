@@ -66,8 +66,7 @@ export class RegisterCutComponent  implements OnInit {
     this.year = this.generic.getCurrentYear()
   }
 
-  ngOnInit(): void {
-    this.user = this.auth.checkSession();
+  ngOnInit(): void { 
     this.initForm();
     this.loadData();
   }
