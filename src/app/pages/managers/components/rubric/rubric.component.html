@@ -16,7 +16,7 @@
       <h2 class="text-lg font-semibold mb-4">
         {{ isEditing ? 'Editar Rúbrica' : 'Adicionar Nova Rúbrica' }}
       </h2>
-      <form [formGroup]="rubricForm" (ngSubmit)="submitRubricForm()" class="space-y-4">
+      <form [formGroup]="rubricForm" class="space-y-4">
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label class="block text-deep-dark dark:text-light-mode text-sm font-bold mb-2">Nome</label>
@@ -31,10 +31,10 @@
             <input type="text" formControlName="price" class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
           </div>
         </div>
-        <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          {{ isEditing ? 'Actualizar Dados' : 'Adicionar Rúbrica' }}
-        </button>
       </form>
+      <button (click)="submitRubric()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        {{ isEditing ? 'Actualizar Dados' : 'Adicionar Rúbrica' }}
+      </button>
     </div>
   
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">

@@ -4,64 +4,64 @@ import { IRubric } from 'src/app/models/rubric';
 
 // GET rubrics/{id}
 export const getRubric = createAction(
-  '[Rubric] Load Rubric',
+  '[Rubric] Get Rubric',
   props<{ rubricId: string }>()
 );
 
 export const getRubricSuccess = createAction(
-  '[Rubric] Load Rubric Success',
+  '[Rubric] Get Rubric Success',
   props<{ rubric: IRubric }>()
 );
 
 export const getRubricFailure = createAction(
-  '[Rubric] Load Rubric Failure',
+  '[Rubric] Get Rubric Failure',
   props<{ error: any }>()
 );
 
 // GET rubrics/{id}
 export const getRubricByMeterId = createAction(
-  '[Rubric] Load Rubric',
+  '[Rubric] Get Rubric By MeterId',
   props<{ meterId: string }>()
 );
 
 export const getRubricByMeterIdSuccess = createAction(
-  '[Rubric] Load Rubric Success',
+  '[Rubric] Get Rubric By MeterId Success',
   props<{ rubrics: IRubric[] }>()
 );
 
 export const getRubricByMeterIdFailure = createAction(
-  '[Rubric] Load Rubric Failure',
+  '[Rubric] Get Rubric By MeterId Failure',
   props<{ error: any }>()
 );
 
 // GET rubrics/{id}
 export const getRubricByClientId = createAction(
-  '[Rubric] Load Rubric',
+  '[Rubric] Get Rubric By ClientId',
   props<{ clientId: string }>()
 );
 
 export const getRubricByClientIdSuccess = createAction(
-  '[Rubric] Load Rubric Success',
+  '[Rubric] Get Rubric By ClientId Success',
   props<{ rubrics: IRubric[] }>()
 );
 
 export const getRubricByClientIdFailure = createAction(
-  '[Rubric] Load Rubric Failure',
+  '[Rubric] Get Rubric By ClientId Failure',
   props<{ error: any }>()
 );
 
 // GET rubrics
 export const listAllRubrics = createAction(
-  '[Rubric] Load Rubrics'
+  '[Rubric] List Rubrics'
 );
 
 export const listAllRubricsSuccess = createAction(
-  '[Rubric] Load Rubrics Success',
+  '[Rubric] List Rubrics Success',
   props<{ rubrics: IRubric[] }>()
 );
 
 export const listAllRubricsFailure = createAction(
-  '[Rubric] Load Rubrics Failure',
+  '[Rubric] List Rubrics Failure',
   props<{ error: any }>()
 );
 
