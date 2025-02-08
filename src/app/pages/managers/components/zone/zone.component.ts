@@ -1,6 +1,6 @@
 import { createZone, deleteZone, getZone, listAllZones, updateZone } from './../../../../store/actions/zone.actions';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { delay, filter, finalize, Observable, pipe, Subject, takeUntil } from 'rxjs';
 import { IEnterprise } from 'src/app/models/enterprise';
@@ -45,7 +45,7 @@ export class ZoneComponent implements OnInit {
       zoneId: [''],
       designation: ['', Validators.required],
       description: ['', Validators.required],
-      enterpriseId: ['', Validators.required]
+      enterpriseId: ['', Validators.required],
     });
 
     this.isZonesLoading$ = this._store.select(selectZoneIsLoading);
@@ -69,7 +69,7 @@ export class ZoneComponent implements OnInit {
     this._store.dispatch(listAllEnterprises());
 
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
-      if (enterprises) { 
+      if (enterprises) {
         this.enterprisesList = enterprises;
         this.enterpriseData = [
           { label: 'Seleccione...', value: '' },
@@ -80,7 +80,7 @@ export class ZoneComponent implements OnInit {
         ];
 
         this.getZones$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
-          if (zones) { 
+          if (zones) {
             this.zones = zones.map(zone => {
               const enterprise = enterprises.find(e => e.enterpriseId === zone.enterpriseId);
               return {
@@ -95,62 +95,82 @@ export class ZoneComponent implements OnInit {
     });
   }
 
-  submitForm(): void {
+  submitZoneForm(): void {
 
     if (this.zoneForm.valid) {
 
       const payload = this.zoneForm.value;
 
       if (this.isEditing) {
-
-        
         this._store.dispatch(updateZone({ zoneId: payload.zoneId, zone: payload }));
-
-
         this._store.pipe(select(selectZoneErrorMessage)).subscribe(
           error => {
             if (error) {
               this._dialogService.open({
                 title: 'Actualizacao da Zona',
-                type:'loading',
-                message: error,
+                type: 'error',
+                message: 'Um erro ocorreu ao actualizar a Zona! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
               })
             } else {
-              this._store.pipe(select(selectSelectedZones), filter((zones) => !!zones))
-                .subscribe((zones) => {
-                  if (zones) {
-                    this.zoneForm.reset();
+              this._store.pipe(select(selectSelectedZones), filter((zone) => !!zone))
+                .subscribe((zone) => {
+                  if (zone) {
+                    this.eraseForm();
                     this.isEditing = false;
                     this._dialogService.open({
                       title: 'Actualizacao da Zona',
                       type: 'success',
-                      message: 'Zona Actualizada com sucesso!',
+                      message: 'Zona Actualizado com sucesso!',
                       isProcessing: false,
                       showConfirmButton: false,
                     })
-                  } else {
-                    this.openFeedbackDialog('error','Actualizaçã da Zona', 'Ocorreu um erro ao actualizar a zona!');
                   }
                 });
             }
           }
         )
-
-
       } else {
         this._store.dispatch(createZone({ zone: payload }));
-        this._store.pipe(select(selectSelectedZone), filter((zone) => !!zone))
-          .subscribe((zone) => {
-            if (zone) {
-              this.openFeedbackDialog('success','Criação de Zona', 'Zona criada com sucesso!');
-              this.zoneForm.reset();
+        this._store.pipe(select(selectZoneErrorMessage)).subscribe(
+          error => {
+            if (error) {
+              this._dialogService.open({
+                title: 'Criação da Zona',
+                type: 'error',
+                message: 'Um erro ocorreu ao criar a Zona! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
+                isProcessing: false,
+                showConfirmButton: false,
+              })
             } else {
-              this.openFeedbackDialog('error','Criação de Zona', 'U erro ocorreu ao criar a Zona!');
+              this._store.pipe(select(selectSelectedZone), filter((zone) => !!zone))
+                .subscribe((zone) => {
+                  if (zone) {
+                    this._dialogService.open({
+                      title: 'Criação de Zona',
+                      type: 'success',
+                      message: 'Zona criada com sucesso!',
+                      isProcessing: false,
+                      showConfirmButton: false,
+                    })
+                    this.eraseForm();
+                  }
+                });
             }
-          });
+
+          })
+
       }
+    }
+    else {
+      this._dialogService.open({
+        title: 'Validação de Dados',
+        type: 'info',
+        message: 'Por favor verifique se os campos estão devidadmente preenchidos e volte a submeter.',
+        isProcessing: false,
+        showConfirmButton: false,
+      })
     }
   }
 
@@ -178,22 +198,32 @@ export class ZoneComponent implements OnInit {
     });
   }
 
+  
+  eraseForm(){
+    this.zoneForm.reset();
+  }
 
-  openFeedbackDialog(type: 'success' | 'error',title: string, message: string): void {
+  openFeedbackDialog(type: 'success' | 'error', title: string, message: string): void {
     this._dialogService.open({
       title: title,
       message: message,
       type: type,
       confirmText: 'OK',
       isProcessing: false,
-    }) 
+    })
   }
 
 
   editzone(zone: IZone): void {
     this.isEditing = true;
     this.zone = zone
-    this.zoneForm.patchValue(zone);
+    this.zoneForm.patchValue({
+      zoneId: this.zone.zoneId,
+      designation: this.zone.designation,
+      description: this.zone.description,
+      enterpriseId: this.zone.enterpriseId,
+      enterpriseName: this.zone.enterpriseName
+    });
   }
 
   onValueSelected(option: IOption): void {

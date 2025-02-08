@@ -61,7 +61,7 @@ const reducer = createReducer(
   on(getEnterpriseFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all enterprises
@@ -71,7 +71,7 @@ const reducer = createReducer(
   on(listAllEnterprisesFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create enterprise
@@ -82,7 +82,7 @@ const reducer = createReducer(
   on(createEnterpriseFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update enterprise
@@ -99,7 +99,7 @@ const reducer = createReducer(
   on(updateEnterpriseFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete enterprise
@@ -112,7 +112,7 @@ const reducer = createReducer(
   on(deleteEnterpriseFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get enterprises count
@@ -125,7 +125,7 @@ const reducer = createReducer(
   on(loadEnterprisesCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetEnterpriseActions, () => initialState)

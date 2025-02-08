@@ -22,7 +22,7 @@ export class ReceiptEffects {
         this.apiService.get<IReceipt>(`/receipt/${action.receiptId}`).pipe(
           map(receipt => getReceiptSuccess({ receipt })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReceiptFailure({ error }));
           })
         )
@@ -37,7 +37,7 @@ export class ReceiptEffects {
         this.apiService.get<string[]>(`/receipt/payment-methods`).pipe(
           map(paymentMethods => getReceiptPaymentMethodsSuccess({ payload: paymentMethods })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReceiptPaymentMethodsFailure({ error }));
           })
         )
@@ -52,7 +52,7 @@ export class ReceiptEffects {
         this.apiService.get<IFile>(`/receipt/file/${action.receiptId}`).pipe(
           map(file => getReceiptFileSuccess({ payload: file })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReceiptFileFailure({ error }));
           })
         )
@@ -67,7 +67,7 @@ export class ReceiptEffects {
         this.apiService.get<IReceipt[]>(`/receipt/${action.clientId}`).pipe(
           map(receipts => getReceiptByClientIdSuccess({ receipts: receipts })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReceiptByClientIdFailure({ error }));
           })
         )
@@ -82,7 +82,7 @@ export class ReceiptEffects {
         this.apiService.get<IReceipt[]>('/receipt').pipe(
           map(receipts => listAllReceiptsSuccess({ receipts })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(listAllReceiptsFailure({ error }));
           })
         )
@@ -97,7 +97,7 @@ export class ReceiptEffects {
         this.apiService.post<IReceipt>('/receipt', action.receipt).pipe(
           map(receipt => createReceiptSuccess({ receipt })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(createReceiptFailure({ error }));
           })
         )
@@ -112,7 +112,7 @@ export class ReceiptEffects {
         this.apiService.put<IReceipt>(`/receipt/${action.receiptId}`, action.receipt).pipe(
           map(receipt => updateReceiptSuccess({ receipt })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(updateReceiptFailure({ error }));
           })
         )
@@ -127,7 +127,7 @@ export class ReceiptEffects {
         this.apiService.delete(`/receipt/${action.receiptId}`).pipe(
           map(() => deleteReceiptSuccess({ receiptId: action.receiptId })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(deleteReceiptFailure({ error }));
           })
         )
@@ -142,7 +142,7 @@ export class ReceiptEffects {
         this.apiService.get<number>('/receipt/count').pipe(
           map(count => loadReceiptsCountSuccess({ count })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(loadReceiptsCountFailure({ error }));
           })
         )

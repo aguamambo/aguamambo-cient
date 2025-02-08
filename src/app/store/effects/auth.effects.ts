@@ -26,7 +26,7 @@ export class AuthEffects {
                 this.apiService.post<IAuthResponse>('/auth/register', action.user).pipe(
                     map(authResponse => registerSuccess({ authResponse })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(registerFailure({ error }));
                     })
                 )
@@ -41,7 +41,7 @@ export class AuthEffects {
                 this.auth.login(action.credentials.username, action.credentials.password).pipe(
                     map(authResponse => loginSuccess({ authResponse: authResponse })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(loginFailure({ error }));
                     })
                 )
@@ -55,6 +55,7 @@ export class AuthEffects {
                 ofType(loginSuccess),
                 map((action) => action.authResponse),
                 tap((response: IAuthResponse) => {
+
                     localStorage.setItem('token', response.token);
                     localStorage.setItem('refreshToken', response.refreshToken);
                     localStorage.setItem('userId', this.auth.encryptData(response.userId));
@@ -88,7 +89,7 @@ export class AuthEffects {
                 this.apiService.post<IAuthResponse>('/auth/refresh-token', action.tokenRefreshRequest).pipe(
                     map(authResponse => refreshTokenSuccess({ authResponse })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(refreshTokenFailure({ error }));
                     })
                 )

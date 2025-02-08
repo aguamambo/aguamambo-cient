@@ -24,7 +24,7 @@ export class ReadingEffects {
         this.apiService.get<IReading>(`/reading/${action.readingId}`).pipe(
           map(reading => getReadingSuccess({ reading })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReadingFailure({ error }));
           })
         )
@@ -39,7 +39,7 @@ export class ReadingEffects {
         this.apiService.get<IReading[]>(`/reading/by-meter/${action.meterId}`).pipe(
           map(readings => getReadingByMeterIdSuccess({ readings: readings })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReadingByMeterIdFailure({ error }));
           })
         )
@@ -55,7 +55,7 @@ export class ReadingEffects {
         this.apiService.get<IReading[]>(`/reading/by-client/${action.clientId}`).pipe(
           map(readings => getReadingByClientIdSuccess({ readings: readings })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReadingByClientIdFailure({ error }));
           })
         )
@@ -70,7 +70,7 @@ export class ReadingEffects {
         this.apiService.get<IReading[]>(`/reading/by-state?state=${action.state}`).pipe(
           map(readings => getReadingByStatusSuccess({ readings: readings })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getReadingByStatusFailure({ error }));
           })
         )
@@ -85,7 +85,7 @@ export class ReadingEffects {
         this.apiService.get<IReading[]>('/reading').pipe(
           map(readings => listAllReadingsSuccess({ readings })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(listAllReadingsFailure({ error }));
           })
         )
@@ -100,7 +100,7 @@ export class ReadingEffects {
         this.apiService.post<IReading>('/reading', action.reading).pipe(  
           map(reading => createReadingSuccess({reading: reading})),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(createReadingFailure({ error: error, statusCode: error.status }));
           })
         )
@@ -115,7 +115,7 @@ export class ReadingEffects {
         this.apiService.put<IReading>(`/reading/${action.readingId}`, action.reading).pipe(
           map(reading => updateReadingSuccess({ reading })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(updateReadingFailure({ error }));
           })
         )
@@ -130,7 +130,7 @@ export class ReadingEffects {
         this.apiService.put<IReading[]>(`/reading/bulk-update`, action.payload).pipe(
           map(readings => updateBulkReadingsSuccess({ readings })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(updateBulkReadingsFailure({ error }));
           })
         )
@@ -145,7 +145,7 @@ export class ReadingEffects {
         this.apiService.delete(`/reading/${action.readingId}`).pipe(
           map(() => deleteReadingSuccess({ readingId: action.readingId })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(deleteReadingFailure({ error }));
           })
         )
@@ -160,7 +160,7 @@ export class ReadingEffects {
         this.apiService.get<IReading>(`/reading/meter/${action.meterId}/last`).pipe(
           map(reading => getLastReadingByMeterSuccess({ reading })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getLastReadingByMeterFailure({ error }));
           })
         )
@@ -175,7 +175,7 @@ export class ReadingEffects {
         this.apiService.get<number>('/reading/count').pipe(
           map(count => loadReadingsCountSuccess({ count })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(loadReadingsCountFailure({ error }));
           })
         )
@@ -190,7 +190,7 @@ export class ReadingEffects {
         this.apiService.get<IReading>(`/reading/client/${action.clientId}/last`).pipe(
           map(reading => getLastReadingByClientSuccess({ reading })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getLastReadingByClientFailure({ error }));
           })
         )

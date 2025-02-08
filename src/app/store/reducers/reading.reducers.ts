@@ -86,7 +86,7 @@ const reducer = createReducer(
   on(getReadingFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get reading by ID
@@ -99,7 +99,7 @@ const reducer = createReducer(
   on(getReadingByMeterIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get reading by ID
@@ -112,7 +112,7 @@ const reducer = createReducer(
   on(getReadingByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get reading by Status
@@ -125,7 +125,7 @@ const reducer = createReducer(
   on(getReadingByStatusFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all readings
@@ -136,7 +136,7 @@ const reducer = createReducer(
   on(listAllReadingsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create reading
@@ -151,7 +151,7 @@ const reducer = createReducer(
     ...state,
     isSaving: false,
     statusCode: statusCode,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update reading
@@ -164,7 +164,7 @@ const reducer = createReducer(
   on(updateReadingFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update bulk readings
@@ -177,7 +177,7 @@ const reducer = createReducer(
   on(updateBulkReadingsFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete reading
@@ -188,7 +188,7 @@ const reducer = createReducer(
   on(deleteReadingFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load last reading by meter
@@ -201,7 +201,7 @@ const reducer = createReducer(
   on(getLastReadingByMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load readings count
@@ -214,7 +214,7 @@ const reducer = createReducer(
   on(loadReadingsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load last reading by client
@@ -227,7 +227,7 @@ const reducer = createReducer(
   on(getLastReadingByClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetReadingActions, () => initialState)

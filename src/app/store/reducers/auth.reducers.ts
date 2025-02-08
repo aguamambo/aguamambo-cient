@@ -49,7 +49,7 @@ const _authReducer = createReducer(
   on(registerFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.message || 'Registration failed',
+    errorMessage: error.error || 'Registration failed',
     successMessage: null,
   })),
 
@@ -74,7 +74,7 @@ const _authReducer = createReducer(
     loggingIn: false,
     loginFailed: true,
     loginError: error,
-    errorMessage: error.message || 'Login failed',
+    errorMessage: error.error || 'Login failed',
     successMessage: null,
   })),
 
@@ -96,7 +96,7 @@ const _authReducer = createReducer(
   on(refreshTokenFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.message || 'Token refresh failed',
+    errorMessage: error.error || 'Token refresh failed',
     successMessage: null,
   })),
 

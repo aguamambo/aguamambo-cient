@@ -10,7 +10,7 @@ import { authGuard } from 'src/app/core/guards/auth.guard';
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent,canActivate: [authGuard] },
   { path: 'reports', component: ReportsComponent,canActivate: [authGuard]  },
-  { path: 'setup', component: SetupComponent },
+  { path: 'setup', component: SetupComponent,canActivate: [authGuard]  },
   { path: 'settings', component: SettingsComponent,canActivate: [authGuard]  },
   { path: 'backups', component: BackupComponent,canActivate: [authGuard]  },
   {path: 'releases', loadChildren: () => import('./releases/releases.module').then(m => m.ReleasesModule)},

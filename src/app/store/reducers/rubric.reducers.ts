@@ -76,7 +76,7 @@ const reducer = createReducer(
   on(getRubricFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get rubric by ID
@@ -89,7 +89,7 @@ const reducer = createReducer(
   on(getRubricByMeterIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get rubric by ID
@@ -102,7 +102,7 @@ const reducer = createReducer(
   on(getRubricByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all rubrics
@@ -113,7 +113,7 @@ const reducer = createReducer(
   on(listAllRubricsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create rubric
@@ -124,7 +124,7 @@ const reducer = createReducer(
   on(createRubricFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update rubric
@@ -137,7 +137,7 @@ const reducer = createReducer(
   on(updateRubricFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete rubric
@@ -148,7 +148,7 @@ const reducer = createReducer(
   on(deleteRubricFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load last rubric by meter
@@ -161,7 +161,7 @@ const reducer = createReducer(
   on(getLastRubricByMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load rubrics count
@@ -174,7 +174,7 @@ const reducer = createReducer(
   on(loadRubricsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load last rubric by client
@@ -187,7 +187,7 @@ const reducer = createReducer(
   on(getLastRubricByClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetRubricActions, () => initialState)

@@ -21,7 +21,7 @@ export class UserEffects {
         this.apiService.get<IUser>(`/user/${action.userId}`).pipe(
           map(user => getUserSuccess({ user })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getUserFailure({ error }));
           })
         )
@@ -36,7 +36,7 @@ export class UserEffects {
         this.apiService.get<IUser[]>('/user').pipe(
           map(users => listAllUsersSuccess({ users })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(listAllUsersFailure({ error }));
           })
         )
@@ -51,7 +51,7 @@ export class UserEffects {
         this.apiService.get<string[]>('/user/roles').pipe(
           map(roles => listAllRolesSuccess({ roles: roles })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(listAllRolesFailure({ error }));
           })
         )
@@ -66,7 +66,7 @@ export class UserEffects {
         this.apiService.post<IUser>('/user', action.user).pipe(
           map(user => createUserSuccess({ user })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(createUserFailure({ error }));
           })
         )
@@ -81,7 +81,7 @@ export class UserEffects {
         this.apiService.put<IUser>(`/user/${action.userId}`, action.user).pipe(
           map(user => updateUserSuccess({ user })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(updateUserFailure({ error }));
           })
         )
@@ -96,7 +96,7 @@ export class UserEffects {
         this.apiService.delete(`/user/${action.userId}`).pipe(
           map(() => deleteUserSuccess({ userId: action.userId })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(deleteUserFailure({ error }));
           })
         )

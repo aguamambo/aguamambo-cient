@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface ToastMessage {
+  error?: string;
   message: string;
   type: 'error' | 'success' | 'info' | 'warning';
   icon: string
@@ -20,20 +21,20 @@ export class ToasterService {
   
   private toastSubject = new BehaviorSubject<ToastMessage | null>(null)
 
-  showError(message: string) {
-    this.showToast({ message, type: 'error', icon: this.errorIcon });
+  showError(message: string, error?: string) {
+    this.showToast({ message, error, type: 'error', icon: this.errorIcon });
   }
 
-  showSuccess(message: string) {
-    this.showToast({ message, type: 'success', icon: this.successIcon });
+  showSuccess(message: string, error?: string ) {
+    this.showToast({ message, error, type: 'success', icon: this.successIcon });
   }
 
-  showInfo(message: string) {
-    this.showToast({ message, type: 'info', icon: this.infoIcon });
+  showInfo(message: string, error?: string) {
+    this.showToast({ message, error, type: 'info', icon: this.infoIcon });
   }
 
-  showWarning(message: string) {
-    this.showToast({ message, type: 'warning', icon: this.warningIcon });
+  showWarning(message: string, error?: string) {
+    this.showToast({ message, error, type: 'warning', icon: this.warningIcon });
   }
 
   private showToast(toastMessage: ToastMessage) {

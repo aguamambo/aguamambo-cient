@@ -63,7 +63,7 @@ const reducer = createReducer(
   on(getUserFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all Users
@@ -74,7 +74,7 @@ const reducer = createReducer(
   on(listAllUsersFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
  // List all Roles
@@ -85,7 +85,7 @@ const reducer = createReducer(
   on(listAllRolesFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create User
@@ -96,7 +96,7 @@ const reducer = createReducer(
   on(createUserFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update User
@@ -110,7 +110,7 @@ const reducer = createReducer(
   on(updateUserFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete User
@@ -121,7 +121,7 @@ const reducer = createReducer(
   on(deleteUserFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetUserActions, () => initialState)

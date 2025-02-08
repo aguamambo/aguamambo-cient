@@ -21,7 +21,7 @@ export class ZoneEffects {
         this.apiService.get<IZone>(`/zone/${action.zoneId}`).pipe(
           map(zone => getZoneSuccess({ zone })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getZoneFailure({ error }));
           })
         )
@@ -36,7 +36,7 @@ export class ZoneEffects {
         this.apiService.get<IZone[]>(`/zone/by-enterprise/${action.enterpriseId}`).pipe(
           map(zones => getZoneByEnterpriseIdSuccess({ zones: zones })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getZoneByEnterpriseIdFailure({ error }));
           })
         )
@@ -51,7 +51,7 @@ export class ZoneEffects {
         this.apiService.get<IZone[]>('/zone').pipe(
           map(zones => listAllZonesSuccess({ zones })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(listAllZonesFailure({ error }));
           })
         )
@@ -66,7 +66,7 @@ export class ZoneEffects {
         this.apiService.post<IZone>('/zone', action.zone).pipe(
           map(zone => createZoneSuccess({ zone })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(createZoneFailure({ error }));
           })
         )
@@ -81,7 +81,7 @@ export class ZoneEffects {
         this.apiService.put<IZone>(`/zone/${action.zoneId}`, action.zone).pipe(
           map(zone => updateZoneSuccess({ zone })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(updateZoneFailure({ error }));
           })
         )
@@ -96,7 +96,7 @@ export class ZoneEffects {
         this.apiService.delete(`/zone/${action.zoneId}`).pipe(
           map(() => deleteZoneSuccess({ zoneId: action.zoneId })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(deleteZoneFailure({ error }));
           })
         )
@@ -111,7 +111,7 @@ export class ZoneEffects {
         this.apiService.get<{ count: number }>('/zone/count').pipe(
           map(response => loadZonesCountSuccess({ count: response.count })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+            this.errorMessage.getErrorMessage(error.status, error.error);
             return of(loadZonesCountFailure({ error }));
           })
         )

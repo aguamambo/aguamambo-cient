@@ -22,7 +22,7 @@ export class InvoiceEffects {
                 this.apiService.get<IInvoice>(`/invoice/${action.invoiceId}`).pipe(
                     map(invoice => getInvoiceSuccess({ invoice })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getInvoiceFailure({ error }));
                     })
                 )
@@ -37,7 +37,7 @@ export class InvoiceEffects {
                 this.apiService.get<IInvoice>(`/invoice/by-reading/${action.readingId}`).pipe(
                     map(invoice => getInvoiceByReadingIdSuccess({ invoice })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getInvoiceByReadingIdFailure({ error }));
                     })
                 )
@@ -53,7 +53,7 @@ export class InvoiceEffects {
                 this.apiService.get<IInvoice[]>(`/invoice/client/${action.clientId}`).pipe(
                     map(invoice => getInvoiceByClientIdSuccess({ invoice })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getInvoiceByClientIdFailure({ error }));
                     })
                 )
@@ -68,7 +68,7 @@ export class InvoiceEffects {
                 this.apiService.get<IInvoice[]>(`/invoice/client/by-status/${action.clientId}?paymentStatus=${action.status}`).pipe(
                     map(invoice => getInvoiceByStatusSuccess({ invoice })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getInvoiceByStatusFailure({ error }));
                     })
                 )
@@ -85,7 +85,7 @@ export class InvoiceEffects {
                 this.apiService.get<IInvoice[]>(`/invoice/meter/${action.meterId}`).pipe(
                     map(invoice => getInvoiceByMeterSuccess({ invoice })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getInvoiceByMeterFailure({ error }));
                     })
                 )
@@ -102,7 +102,7 @@ export class InvoiceEffects {
                 this.apiService.get<IFile>(`/invoice/waterBill/${action.readingId}`).pipe(
                     map((file) => getWaterBillByReadingIdSuccess({ payload: file })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getWaterBillByReadingIdFailure({ error }));
                     })
                 )
@@ -119,7 +119,7 @@ export class InvoiceEffects {
                 this.apiService.get<IInvoice[]>('/invoice').pipe(
                     map(invoices => listAllInvoicesSuccess({ invoices })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(listAllInvoicesFailure({ error }));
                     })
                 )
@@ -134,7 +134,7 @@ export class InvoiceEffects {
                 this.apiService.post<IInvoice>('/invoice', action.payload).pipe(
                     map(invoice => createInvoiceSuccess({ invoice })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createInvoiceFailure({ error }));
                     })
                 )
@@ -149,7 +149,7 @@ export class InvoiceEffects {
                 this.apiService.put<IInvoice>(`/invoice/${action.invoiceId}`, action.invoice).pipe(
                     map(invoice => updateInvoiceSuccess({ invoice })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateInvoiceFailure({ error }));
                     })
                 )
@@ -164,7 +164,7 @@ export class InvoiceEffects {
                 this.apiService.delete(`/invoice/${action.invoiceId}`).pipe(
                     map(() => deleteInvoiceSuccess({ invoiceId: action.invoiceId })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(deleteInvoiceFailure({ error }));
                     })
                 )
@@ -179,7 +179,7 @@ export class InvoiceEffects {
                 this.apiService.get<number>('/invoice/count').pipe(
                     map(count => loadInvoicesCountSuccess({ count })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(loadInvoicesCountFailure({ error }));
                     })
                 )

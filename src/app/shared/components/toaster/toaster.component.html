@@ -13,6 +13,9 @@
                 <path [attr.d]="toastMessage.icon" />
             </svg>
         </span>
-        <span>{{ toastMessage.message }}</span>
+        <div class="flex flex-col gap-4">
+            <span>{{ toastMessage.message }}</span>
+            <span class="font-semibold">{{toastMessage.error}}</span>
+        </div>
     </div>
 </div>

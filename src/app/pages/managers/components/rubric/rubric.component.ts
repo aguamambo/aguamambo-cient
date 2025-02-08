@@ -14,6 +14,7 @@ import { selectSelectedRubrics, selectRubricIsLoading, selectRubricIsSaving, sel
   templateUrl: './rubric.component.html',
 })
 export class RubricComponent implements OnInit {
+
   rubricForm: FormGroup;
   rubrics: IRubric[] = [];
   isEditing: boolean = false;
@@ -26,15 +27,16 @@ export class RubricComponent implements OnInit {
   getRubrics$ = this._store.pipe(select(selectSelectedRubrics));
 
 
-  constructor(private _fb: FormBuilder,
+  constructor(
+    private _fb: FormBuilder,
     private _store: Store<IAppState>,
-    private _dialogService: DialogService,
-    private _toaster: ToasterService) {
+    private _dialogService: DialogService
+  ) {
     this.rubricForm = this._fb.group({
       rubricId: [''],
       name: ['', Validators.required],
-      description:  ['', Validators.required],
-      price: [null,  Validators.min(0)],
+      description: ['', Validators.required],
+      price: [null, Validators.min(0)],
     });
 
     this.isRubricsLoading$ = this._store.select(selectRubricIsLoading);
@@ -61,8 +63,8 @@ export class RubricComponent implements OnInit {
     })
   }
 
-  submitRubric(): void {  
-  
+  submitRubricForm(): void {
+
     if (this.rubricForm.valid) {
 
       const payload = this.rubricForm.value;
@@ -74,8 +76,8 @@ export class RubricComponent implements OnInit {
             if (error) {
               this._dialogService.open({
                 title: 'Actualizacao da Rúbrica',
-                type: 'loading',
-                message: error,
+                type: 'error',
+                message: 'Um erro ocorreu ao actualizar a Rúbrica! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
               })
@@ -83,7 +85,7 @@ export class RubricComponent implements OnInit {
               this._store.pipe(select(selectSelectedRubrics), filter((rubric) => !!rubric))
                 .subscribe((rubric) => {
                   if (rubric) {
-                    this.rubricForm.reset();
+                    this.eraseForm()
                     this.isEditing = false;
                     this._dialogService.open({
                       title: 'Actualizacao da Rúbrica',
@@ -92,8 +94,6 @@ export class RubricComponent implements OnInit {
                       isProcessing: false,
                       showConfirmButton: false,
                     })
-                  } else {
-                    this.openFeedbackDialog('error', 'Actualizaçã da Rúbrica', 'Ocorreu um erro ao actualizar a Rúbrica!');
                   }
                 });
             }
@@ -101,34 +101,60 @@ export class RubricComponent implements OnInit {
         )
       } else {
         this._store.dispatch(createRubric({ rubric: payload }));
-        this._store.pipe(select(selectSelectedRubric), filter((rubric) => !!rubric))
-          .subscribe((rubric) => {
-            if (rubric) {
-              this.openFeedbackDialog('success', 'Criação de Rúbrica', 'Rúbrica criada com sucesso!');
-              this.rubricForm.reset();
+        this._store.pipe(select(selectRubricErrorMessage)).subscribe(
+          error => {
+            if (error) {
+              this._dialogService.open({
+                title: 'Criação da Rúbrica',
+                type: 'error',
+                message: 'Um erro ocorreu ao criar a Rúbrica! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
+                isProcessing: false,
+                showConfirmButton: false,
+              })
             } else {
-              this.openFeedbackDialog('error', 'Criação de Rúbrica', 'U erro ocorreu ao criar a Rúbrica!');
+              this._store.pipe(select(selectSelectedRubric), filter((rubric) => !!rubric))
+                .subscribe((rubric) => {
+                  if (rubric) {
+                    this._dialogService.open({
+                      title: 'Criação de Rúbrica',
+                      type: 'success',
+                      message: 'Rúbrica criada com sucesso!',
+                      isProcessing: false,
+                      showConfirmButton: false,
+                    })
+                    this.eraseForm()
+                  }
+                });
             }
-          });
+
+          })
+
       }
+    }
+    else {
+      this._dialogService.open({
+        title: 'Validação de Dados',
+        type: 'info',
+        message: 'Por favor verifique se os campos estão devidadmente preenchidos e volte a submeter.',
+        isProcessing: false,
+        showConfirmButton: false,
+      })
     }
   }
 
-  openFeedbackDialog(type: 'success' | 'error', title: string, message: string): void {
-    this._dialogService.open({
-      title: title,
-      message: message,
-      type: type,
-      confirmText: 'OK',
-      isProcessing: false,
-    })
+  eraseForm() {
+    this.rubricForm.reset();
   }
-
 
   editRubric(rubric: any): void {
     this.isEditing = true;
     this.rubric = rubric;
-    this.rubricForm.patchValue(rubric);
+    this.rubricForm.patchValue({
+      rubricId: this.rubric.rubricId,
+      name: this.rubric.name,
+      description: this.rubric.description,
+      price: this.rubric.price
+    });
   }
 
   deleteRubric(index: number): void {

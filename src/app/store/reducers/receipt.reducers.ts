@@ -74,7 +74,7 @@ const reducer = createReducer(
   on(getReceiptFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get receipt by ID
@@ -87,7 +87,7 @@ const reducer = createReducer(
   on(getReceiptPaymentMethodsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
  // Get receipt by ID
   on(getReceiptFile, (state) => ({ ...state, isLoading: true })),
@@ -99,7 +99,7 @@ const reducer = createReducer(
   on(getReceiptFileFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get receipt by ID
@@ -112,7 +112,7 @@ const reducer = createReducer(
   on(getReceiptByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all receipts
@@ -125,7 +125,7 @@ const reducer = createReducer(
   on(listAllReceiptsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create receipt
@@ -136,7 +136,7 @@ const reducer = createReducer(
   on(createReceiptFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update receipt
@@ -149,7 +149,7 @@ const reducer = createReducer(
   on(updateReceiptFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete receipt
@@ -160,7 +160,7 @@ const reducer = createReducer(
   on(deleteReceiptFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load receipts count
@@ -173,7 +173,7 @@ const reducer = createReducer(
   on(loadReceiptsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetReceiptActions, () => initialState)

@@ -79,7 +79,7 @@ const reducer = createReducer(
   on(getInvoiceFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get invoice by ID
@@ -92,7 +92,7 @@ const reducer = createReducer(
   on(getInvoiceByReadingIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get invoice by ID
@@ -105,7 +105,7 @@ const reducer = createReducer(
   on(getInvoiceByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   on(getInvoiceByStatus, (state) => ({ ...state, isLoading: true })),
@@ -117,7 +117,7 @@ const reducer = createReducer(
   on(getInvoiceByStatusFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   on(getInvoiceByMeter, (state) => ({ ...state, isLoading: true })),
@@ -129,7 +129,7 @@ const reducer = createReducer(
   on(getInvoiceByMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   on(getWaterBillByReadingId, (state) => ({ ...state, isLoading: true })),
@@ -144,7 +144,7 @@ const reducer = createReducer(
   on(getWaterBillByReadingIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all invoices
@@ -159,7 +159,7 @@ const reducer = createReducer(
   on(listAllInvoicesFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create invoice
@@ -170,7 +170,7 @@ const reducer = createReducer(
   on(createInvoiceFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update invoice
@@ -183,7 +183,7 @@ const reducer = createReducer(
   on(updateInvoiceFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete invoice
@@ -194,7 +194,7 @@ const reducer = createReducer(
   on(deleteInvoiceFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load invoice count
@@ -207,7 +207,7 @@ const reducer = createReducer(
   on(loadInvoicesCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetInvoiceActions, () => initialState)

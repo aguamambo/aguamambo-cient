@@ -22,7 +22,7 @@ export class ClientEffects {
                 this.apiService.get<IClient>(`/client/${action.clientId}`).pipe(
                     map(client => getClientSuccess({ client })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getClientFailure({ error }));
                     })
                 )
@@ -37,7 +37,7 @@ export class ClientEffects {
                 this.apiService.get<IClient[]>(`/client/by-zone/${action.zoneId}`).pipe(
                     map(clients => getClientByZoneIdSuccess({ clients: clients })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                         this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getClientByZoneIdFailure({ error }));
                     })
                 )
@@ -52,7 +52,7 @@ export class ClientEffects {
                 this.apiService.get<IClient[]>(`/client/by-contract-type/${action.contractTypeId}`).pipe(
                     map(clients => getClientByContractTypeIdSuccess({ clients: clients })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                         this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getClientByContractTypeIdFailure({ error }));
                     })
                 )
@@ -67,7 +67,7 @@ export class ClientEffects {
                 this.apiService.get<IClient[]>('/client').pipe(
                     map(clients => listAllClientsSuccess({ clients })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                         this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(listAllClientsFailure({ error }));
                     })
                 )
@@ -82,7 +82,7 @@ export class ClientEffects {
                 this.apiService.post<{ client: IClient; statusCode: number }>('/client', action.client).pipe(
                     map(response => createClientSuccess({ client: response.client, statusCode: response.statusCode })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                         this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createClientFailure({ error: error, statusCode: error.status }));
                     })
                 )
@@ -97,7 +97,7 @@ export class ClientEffects {
                 this.apiService.put<IClient>(`/client/${action.clientId}`, action.client).pipe(
                     map(client => updateClientSuccess({ client })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                         this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateClientFailure({ error }));
                     })
                 )
@@ -112,7 +112,7 @@ export class ClientEffects {
                 this.apiService.delete(`/client/${action.clientId}`).pipe(
                     map(() => deleteClientSuccess({ clientId: action.clientId })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                         this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(deleteClientFailure({ error }));
                     })
                 )
@@ -127,7 +127,7 @@ export class ClientEffects {
                 this.apiService.get<number>('/client/count').pipe(
                     map(count => loadClientsCountSuccess({ count })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                         this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(loadClientsCountFailure({ error }));
                     })
                 )

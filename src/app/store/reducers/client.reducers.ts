@@ -68,7 +68,7 @@ const reducer = createReducer(
   on(getClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get client by ZoneId
@@ -81,7 +81,7 @@ const reducer = createReducer(
   on(getClientByZoneIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get client by ZoneId
@@ -94,7 +94,7 @@ const reducer = createReducer(
   on(getClientByContractTypeIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all clients
@@ -105,7 +105,7 @@ const reducer = createReducer(
   on(listAllClientsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create client
@@ -121,7 +121,7 @@ const reducer = createReducer(
     ...state,
     isSaving: false,
     statusCode: statusCode,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update client
@@ -134,7 +134,7 @@ const reducer = createReducer(
   on(updateClientFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete client
@@ -145,7 +145,7 @@ const reducer = createReducer(
   on(deleteClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get client count
@@ -158,7 +158,7 @@ const reducer = createReducer(
   on(loadClientsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetClientActions, () => initialState)

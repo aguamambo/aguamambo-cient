@@ -64,7 +64,7 @@ const reducer = createReducer(
   on(getContractFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })), 
   
   // Get contract by ID
@@ -77,7 +77,7 @@ const reducer = createReducer(
   on(getContractByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all contracts
@@ -88,7 +88,7 @@ const reducer = createReducer(
   on(listAllContractsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create contract
@@ -99,7 +99,7 @@ const reducer = createReducer(
   on(createContractFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update contract
@@ -112,7 +112,7 @@ const reducer = createReducer(
   on(updateContractFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete contract
@@ -123,7 +123,7 @@ const reducer = createReducer(
   on(deleteContractFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get contracts count
@@ -136,7 +136,7 @@ const reducer = createReducer(
   on(loadContractsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetContractActions, () => initialState)

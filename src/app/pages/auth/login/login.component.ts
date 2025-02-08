@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
       this.store.dispatch(login({credentials: this.loginForm.value}));
        
     } else {
-      console.log('Formulário de login inválido');
+      
     }
   }
   

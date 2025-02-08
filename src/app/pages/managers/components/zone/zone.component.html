@@ -21,9 +21,15 @@
           </div>
         </div>
       </form>
-      <button (click)="submitForm()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-        {{ isEditing ? 'Actualizar Dados' : 'Adicionar Zona' }}
-      </button>
+      <div class="flex gap-6">
+        <button (click)="submitZoneForm()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          {{ isEditing ? 'Actualizar Dados' : 'Adicionar Zona' }}
+        </button>
+
+        <button (click)="eraseForm()" class="mt-4 px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-700 hover:text-light-mode">
+         Limpar
+        </button>
+      </div>
     </div>
   
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">

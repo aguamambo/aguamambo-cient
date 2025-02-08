@@ -21,7 +21,7 @@ export class EnterpriseEffects {
                 this.apiService.get<IEnterprise>(`/enterprise/${action.enterpriseId}`).pipe(
                     map(enterprise => getEnterpriseSuccess({ enterprise })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getEnterpriseFailure({ error }));
                     })
                 )
@@ -36,7 +36,7 @@ export class EnterpriseEffects {
                 this.apiService.get<IEnterprise[]>('/enterprise').pipe(
                     map(enterprises => listAllEnterprisesSuccess({ enterprises })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(listAllEnterprisesFailure({ error }));
                     })
                 )
@@ -51,7 +51,7 @@ export class EnterpriseEffects {
                 this.apiService.post<IEnterprise>('/enterprise', action.enterprise).pipe(
                     map(enterprise => createEnterpriseSuccess({ enterprise })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createEnterpriseFailure({ error }));
                     })
                 )
@@ -66,7 +66,7 @@ export class EnterpriseEffects {
                 this.apiService.put<IEnterprise>(`/enterprise/${action.enterpriseId}`, action.enterprise).pipe(
                     map(enterprise => updateEnterpriseSuccess({ enterprise })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateEnterpriseFailure({ error }));
                     })
                 )
@@ -81,7 +81,7 @@ export class EnterpriseEffects {
                 this.apiService.delete(`/enterprise/${action.enterpriseId}`).pipe(
                     map(() => deleteEnterpriseSuccess({ enterpriseId: action.enterpriseId })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(deleteEnterpriseFailure({ error }));
                     })
                 )
@@ -96,7 +96,7 @@ export class EnterpriseEffects {
                 this.apiService.get<number>('/enterprise/count').pipe(
                     map(count => loadEnterprisesCountSuccess({ count })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(loadEnterprisesCountFailure({ error }));
                     })
                 )

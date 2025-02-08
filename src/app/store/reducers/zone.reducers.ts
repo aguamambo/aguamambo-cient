@@ -64,7 +64,7 @@ const reducer = createReducer(
   on(getZoneFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
 // Get Zone by Enterprise ID
@@ -78,7 +78,7 @@ const reducer = createReducer(
   on(getZoneByEnterpriseIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all Zones
@@ -91,7 +91,7 @@ const reducer = createReducer(
   on(listAllZonesFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create Zone
@@ -102,7 +102,7 @@ const reducer = createReducer(
   on(createZoneFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update Zone
@@ -116,7 +116,7 @@ const reducer = createReducer(
   on(updateZoneFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete Zone
@@ -127,7 +127,7 @@ const reducer = createReducer(
   on(deleteZoneFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load Zones count
@@ -140,7 +140,7 @@ const reducer = createReducer(
   on(loadZonesCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetZonesActions, () => initialState)

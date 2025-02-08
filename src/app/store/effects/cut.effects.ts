@@ -21,7 +21,7 @@ export class CutEffects {
                 this.apiService.get<ICut>(`/cut/${action.cutId}`).pipe(
                     map(cut => getCutSuccess({ cut })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getCutFailure({ error }));
                     })
                 )
@@ -36,7 +36,7 @@ export class CutEffects {
                 this.apiService.get<ICut[]>(`/cut/by-client/${action.clientId}`).pipe(
                     map(cuts => getCutByClientIdSuccess({ cuts: cuts })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getCutByClientIdFailure({ error }));
                     })
                 )
@@ -51,7 +51,7 @@ export class CutEffects {
                 this.apiService.get<ICut[]>('/cut').pipe(
                     map(cuts => listAllCutsSuccess({ cuts })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(listAllCutsFailure({ error }));
                     })
                 )
@@ -66,7 +66,7 @@ export class CutEffects {
                 this.apiService.post<ICut>('/cut', action.cut).pipe(
                     map(cut => createCutSuccess({ cut })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createCutFailure({ error }));
                     })
                 )
@@ -81,7 +81,7 @@ export class CutEffects {
                 this.apiService.put<ICut>(`/cut/${action.cutId}`, action.cut).pipe(
                     map(cut => updateCutSuccess({ cut })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateCutFailure({ error }));
                     })
                 )
@@ -96,7 +96,7 @@ export class CutEffects {
                 this.apiService.delete(`/cut/${action.cutId}`).pipe(
                     map(() => deleteCutSuccess({ cutId: action.cutId })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(deleteCutFailure({ error }));
                     })
                 )
@@ -111,7 +111,7 @@ export class CutEffects {
                 this.apiService.get<number>('/cut/count').pipe(
                     map(count => loadCutsCountSuccess({ count })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(loadCutsCountFailure({ error }));
                     })
                 )

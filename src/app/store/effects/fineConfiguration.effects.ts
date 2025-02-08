@@ -21,7 +21,7 @@ export class FineConfigurationEffects {
                 this.apiService.get<IFineConfiguration>(`/fine-configuration/${action.fineConfigurationId}`).pipe(
                     map(fineConfiguration => getFineConfigurationSuccess({ fineConfiguration })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getFineConfigurationFailure({ error }));
                     })
                 )
@@ -36,7 +36,7 @@ export class FineConfigurationEffects {
                 this.apiService.get<IFineConfiguration[]>('/fine-configuration').pipe(
                     map(fineConfigurations => listAllFineConfigurationsSuccess({ fineConfigurations })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(listAllFineConfigurationsFailure({ error }));
                     })
                 )
@@ -51,7 +51,7 @@ export class FineConfigurationEffects {
                 this.apiService.post<IFineConfiguration>('/fine-configuration', action.fineConfiguration).pipe(
                     map(fineConfiguration => createFineConfigurationSuccess({ fineConfiguration })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createFineConfigurationFailure({ error }));
                     })
                 )
@@ -66,7 +66,7 @@ export class FineConfigurationEffects {
                 this.apiService.put<IFineConfiguration>(`/fine-configuration/${action.fineConfigurationId}`, action.fineConfiguration).pipe(
                     map(fineConfiguration => updateFineConfigurationSuccess({ fineConfiguration })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateFineConfigurationFailure({ error }));
                     })
                 )
@@ -81,7 +81,7 @@ export class FineConfigurationEffects {
                 this.apiService.delete(`/fine-configuration/${action.fineConfigurationId}`).pipe(
                     map(() => deleteFineConfigurationSuccess({ fineConfigurationId: action.fineConfigurationId })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(deleteFineConfigurationFailure({ error }));
                     })
                 )
@@ -96,7 +96,7 @@ export class FineConfigurationEffects {
                 this.apiService.get<IFineConfiguration>('/fine-configuration/last-active').pipe(
                     map(fineConfiguration => getLastActiveFineConfigurationSuccess({ fineConfiguration })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status);
+                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getLastActiveFineConfigurationFailure({ error }));
                     })
                 )

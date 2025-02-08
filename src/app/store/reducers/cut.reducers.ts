@@ -64,7 +64,7 @@ const reducer = createReducer(
   on(getCutFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })), 
   
   // Get cut by ID
@@ -77,7 +77,7 @@ const reducer = createReducer(
   on(getCutByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all cuts
@@ -88,7 +88,7 @@ const reducer = createReducer(
   on(listAllCutsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create cut
@@ -99,7 +99,7 @@ const reducer = createReducer(
   on(createCutFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update cut
@@ -112,7 +112,7 @@ const reducer = createReducer(
   on(updateCutFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete cut
@@ -123,7 +123,7 @@ const reducer = createReducer(
   on(deleteCutFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get cuts count
@@ -136,7 +136,7 @@ const reducer = createReducer(
   on(loadCutsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetCutActions, () => initialState)

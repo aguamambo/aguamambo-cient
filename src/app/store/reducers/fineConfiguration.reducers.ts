@@ -59,7 +59,7 @@ const reducer = createReducer(
   on(getFineConfigurationFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all fine configurations
@@ -73,7 +73,7 @@ const reducer = createReducer(
   on(listAllFineConfigurationsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create fine configuration
@@ -84,7 +84,7 @@ const reducer = createReducer(
   on(createFineConfigurationFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update fine configuration
@@ -98,7 +98,7 @@ const reducer = createReducer(
   on(updateFineConfigurationFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete fine configuration
@@ -109,7 +109,7 @@ const reducer = createReducer(
   on(deleteFineConfigurationFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get last active fine configuration
@@ -122,7 +122,7 @@ const reducer = createReducer(
   on(getLastActiveFineConfigurationFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetFineConfigurationActions, () => initialState)

@@ -68,7 +68,7 @@ const reducer = createReducer(
   on(getClientMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get clientMeter by ID
@@ -81,7 +81,7 @@ const reducer = createReducer(
   on(getClientMeterByClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all clientMeters
@@ -92,7 +92,7 @@ const reducer = createReducer(
   on(listAllClientMetersFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all clientMeters
@@ -103,7 +103,7 @@ const reducer = createReducer(
   on(listAllAvailableMetersFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create clientMeter
@@ -114,7 +114,7 @@ const reducer = createReducer(
   on(createClientMeterFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update clientMeter
@@ -127,7 +127,7 @@ const reducer = createReducer(
   on(updateClientMeterFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete clientMeter
@@ -138,7 +138,7 @@ const reducer = createReducer(
   on(deleteClientMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get clientMeter count
@@ -151,7 +151,7 @@ const reducer = createReducer(
   on(loadClientMetersCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetClientMetersActions, () => initialState)

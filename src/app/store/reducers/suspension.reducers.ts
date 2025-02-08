@@ -64,7 +64,7 @@ const reducer = createReducer(
   on(getSuspensionFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Get Suspension by ID
@@ -77,7 +77,7 @@ const reducer = createReducer(
   on(getSuspensionByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // List all Suspensions
@@ -90,7 +90,7 @@ const reducer = createReducer(
   on(listAllSuspensionsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Create Suspension
@@ -101,7 +101,7 @@ const reducer = createReducer(
   on(createSuspensionFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Update Suspension
@@ -115,7 +115,7 @@ const reducer = createReducer(
   on(updateSuspensionFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Delete Suspension
@@ -126,7 +126,7 @@ const reducer = createReducer(
   on(deleteSuspensionFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
 
   // Load Suspensions count
@@ -139,7 +139,7 @@ const reducer = createReducer(
   on(loadSuspensionsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error,
+    errorMessage: error.error,
   })),
   
   on(resetSuspensionActions, () => initialState)

@@ -21,7 +21,7 @@ export class RubricEffects {
         this.apiService.get<IRubric>(`/rubric/${action.rubricId}`).pipe(
           map(rubric => getRubricSuccess({ rubric })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getRubricFailure({ error }));
           })
         )
@@ -36,7 +36,7 @@ export class RubricEffects {
         this.apiService.get<IRubric[]>(`/rubric/by-meter/${action.meterId}`).pipe(
           map(rubrics => getRubricByMeterIdSuccess({ rubrics: rubrics })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getRubricByMeterIdFailure({ error }));
           })
         )
@@ -52,7 +52,7 @@ export class RubricEffects {
         this.apiService.get<IRubric[]>(`/rubric/by-client/${action.clientId}`).pipe(
           map(rubrics => getRubricByClientIdSuccess({ rubrics: rubrics })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getRubricByClientIdFailure({ error }));
           })
         )
@@ -67,7 +67,7 @@ export class RubricEffects {
         this.apiService.get<IRubric[]>('/rubric').pipe(
           map(rubrics => listAllRubricsSuccess({ rubrics })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(listAllRubricsFailure({ error }));
           })
         )
@@ -82,7 +82,7 @@ export class RubricEffects {
         this.apiService.post<IRubric>('/rubric', action.rubric).pipe(
           map(rubric => createRubricSuccess({ rubric })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(createRubricFailure({ error }));
           })
         )
@@ -97,7 +97,7 @@ export class RubricEffects {
         this.apiService.put<IRubric>(`/rubric/${action.rubricId}`, action.rubric).pipe(
           map(rubric => updateRubricSuccess({ rubric })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(updateRubricFailure({ error }));
           })
         )
@@ -112,7 +112,7 @@ export class RubricEffects {
         this.apiService.delete(`/rubric/${action.rubricId}`).pipe(
           map(() => deleteRubricSuccess({ rubricId: action.rubricId })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(deleteRubricFailure({ error }));
           })
         )
@@ -128,7 +128,7 @@ export class RubricEffects {
         this.apiService.get<number>('/rubric/count').pipe(
           map(count => loadRubricsCountSuccess({ count })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(loadRubricsCountFailure({ error }));
           })
         )
@@ -143,7 +143,7 @@ export class RubricEffects {
         this.apiService.get<IRubric>(`/rubric/client/${action.clientId}/last`).pipe(
           map(rubric => getLastRubricByClientSuccess({ rubric })),
           catchError(error => {
-            this.errorMessage.getErrorMessage(error.status);
+           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getLastRubricByClientFailure({ error }));
           })
         )

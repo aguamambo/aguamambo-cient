@@ -118,8 +118,6 @@ export class ClientComponent implements OnInit {
 
   saveClient(): void {
     const clientData = this.clientForm.value;
-
-    console.log(clientData);
     
     if (
         (this.checkIsNotNull(clientData.name)) && 

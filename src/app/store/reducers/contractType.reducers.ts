@@ -51,7 +51,7 @@ const reducer = createReducer(
     })),
     on(getContractTypeFailure, (state, { error }) => ({
         ...state,
-        errorMessage: error,
+        errorMessage: error.error,
         isLoading: false
     })),
 
@@ -62,7 +62,7 @@ const reducer = createReducer(
     ),
     on(listAllContractTypesFailure, (state, { error }) => ({
         ...state,
-        errorMessage: error,
+        errorMessage: error.error,
         isLoading: false
     })),
 
@@ -73,7 +73,7 @@ const reducer = createReducer(
     ),
     on(createContractTypeFailure, (state, { error }) => ({
         ...state,
-        errorMessage: error,
+        errorMessage: error.error,
         isSaving: false
     })),
 
@@ -84,7 +84,7 @@ const reducer = createReducer(
     ),
     on(updateContractTypeFailure, (state, { error }) => ({
         ...state,
-        errorMessage: error,
+        errorMessage: error.error,
         isSaving: false
     })),
 
@@ -95,7 +95,7 @@ const reducer = createReducer(
     ),
     on(deleteContractTypeFailure, (state, { error }) => ({
         ...state,
-        errorMessage: error,
+        errorMessage: error.error,
         isLoading: false
     })),
 
@@ -108,7 +108,7 @@ const reducer = createReducer(
     })),
     on(loadContractTypesCountFailure, (state, { error }) => ({
         ...state,
-        errorMessage: error,
+        errorMessage: error.error,
         isLoading: false
     })),
   
