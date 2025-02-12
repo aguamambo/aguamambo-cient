@@ -12,7 +12,7 @@ import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
 import { listAllEnterprises, listAllContractTypes, getZoneByEnterpriseId, getClientByZoneId, createContract, listAllClientMeters, listAllAvailableMeters, getZone } from 'src/app/store';
 import { selectSelectedClients, selectClientErrorMessage, selectClientSuccessMessage } from 'src/app/store/selectors/client.selectors';
-import { selectContractIsSaving, selectSelectedContract } from 'src/app/store/selectors/contract.selectors';
+import { selectContractErrorMessage, selectContractIsSaving, selectSelectedContract } from 'src/app/store/selectors/contract.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
 import { selectSelectedZone, selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
@@ -26,10 +26,10 @@ import { DialogService } from 'src/app/services/dialog.service';
   styleUrl: './contract.component.css'
 })
 export class ContractComponent implements OnInit, OnDestroy {
-  @Input() meter!: IClientMeter;  
-  @Input() client!: IClient;  
-  @Input() enterpriseId!: string;  
-  @Input() zoneId!: string;     
+  @Input() meter!: IClientMeter;
+  @Input() client!: IClient;
+  @Input() enterpriseId!: string;
+  @Input() zoneId!: string;
   @Output() contractSaved = new EventEmitter<any>();
 
   contractForm!: FormGroup;
@@ -41,44 +41,42 @@ export class ContractComponent implements OnInit, OnDestroy {
   successMessage$!: Observable<string | null>;
   clientData: IOption[] = [];
   enterpriseData: IOption[] = [];
-  zoneData: IOption[] = []; 
-  meterData: IOption[] = []; 
-  selectedZone!: IZone; 
-  clientsList: IClient[] = []; 
+  zoneData: IOption[] = [];
+  meterData: IOption[] = [];
+  selectedZone!: IZone;
+  clientsList: IClient[] = [];
   zoneList: IZone[] = [];
   meterList: IClientMeter[] = [];
   enterprisesList: IEnterprise[] = [];
-  getClients$ = this.store.pipe(select(selectSelectedClients));  
-  getContractTypes$ = this.store.pipe(select(selectSelectedContractTypes));
-  getZonesByEnterpriseId$ = this.store.pipe(select(selectSelectedZones));
-  getMeters$ = this.store.pipe(select(selectSelectedAvailableMeters));
-  getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
+  getClients$ = this._store.pipe(select(selectSelectedClients));
+  getContractTypes$ = this._store.pipe(select(selectSelectedContractTypes));
+  getZonesByEnterpriseId$ = this._store.pipe(select(selectSelectedZones));
+  getMeters$ = this._store.pipe(select(selectSelectedAvailableMeters));
+  getEnterprises$ = this._store.pipe(select(selectSelectedEnterprises));
   isDialogOpen: boolean = false;
-  dialogType: 'success' | 'error' = 'success'; 
-  dialogMessage = ''; 
+  dialogType: 'success' | 'error' = 'success';
+  dialogMessage = '';
   contractData: any;
 
   constructor(
-    private fb: FormBuilder,
-    private store: Store,
-    private generic: GenericConfig,
+    private _fb: FormBuilder,
+    private _store: Store,
     private _dialogService: DialogService,
     private auth: AuthService
   ) { }
 
   ngOnInit(): void {
     this.checkSession();
- 
-    this.contractForm = this.fb.group({
-      startDate: new FormControl(null),
-      endDate: new FormControl(null),
-      description: new FormControl(null),
-      balance: new FormControl(null),
+
+    this.contractForm = this._fb.group({
+      startDate: new FormControl(null, [Validators.required]), 
+      description: new FormControl(''),
+      balance: new FormControl(null, [Validators.required]),
       contractStatus: new FormControl(true),
-      clientId: new FormControl(null),
-      client: new FormControl(null),
-      meterId: new FormControl(null),
-      contractTypeId: new FormControl(null)
+      clientId: new FormControl(null, [Validators.required]),
+      client: new FormControl(null, [Validators.required]),
+      meterId: new FormControl(null, [Validators.required]),
+      contractTypeId: new FormControl(null, [Validators.required])
     });
 
     this.contractData = {
@@ -88,72 +86,62 @@ export class ContractComponent implements OnInit, OnDestroy {
       zoneId: this.zoneId
     };
 
-    console.log(this.contractData);
-
-
-    this.isContractSaving$ = this.store.select(selectContractIsSaving);
-    this.errorMessage$ = this.store.select(selectClientErrorMessage);
-    this.successMessage$ = this.store.select(selectClientSuccessMessage);
+    this.isContractSaving$ = this._store.select(selectContractIsSaving);
+    this.errorMessage$ = this._store.select(selectClientErrorMessage);
+    this.successMessage$ = this._store.select(selectClientSuccessMessage);
 
     this.loadData();
   }
 
   loadData() {
-    this.store.dispatch(listAllEnterprises());
-    this.store.dispatch(listAllContractTypes());
-    this.store.dispatch(listAllAvailableMeters());
-
-    // this.store.dispatch(getZone({zoneId: this.client.zoneId}))
-    // this.store.pipe(select(selectSelectedZone), filter((zone) => !!zone), first()).subscribe(zone => {
-    //   if (zone) {
-    //     this.selectedZone = zone
-    //   }
-    // })
+    this._store.dispatch(listAllEnterprises());
+    this._store.dispatch(listAllContractTypes());
+    this._store.dispatch(listAllAvailableMeters());
 
     this.getContractTypes$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
-        if (response) {
-            this.contractTypeList = response;
-            this.contractTypeData = [
-                { label: 'Seleccione...', value: '' },
-                ...response.map(contract => ({
-                    label: contract.designation,
-                    value: contract.contractTypeId
-                }))
-            ];
-        }
+      if (response) {
+        this.contractTypeList = response;
+        this.contractTypeData = [
+          { label: 'Seleccione...', value: '' },
+          ...response.map(contract => ({
+            label: contract.designation,
+            value: contract.contractTypeId
+          }))
+        ];
+      }
     });
 
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
-        if (enterprises) {
-            this.enterprisesList = enterprises;
-            this.enterpriseData = [ 
-                ...enterprises.map(Enterprise => ({
-                    label: Enterprise.name,
-                    value: Enterprise.enterpriseId
-                }))
-            ];
-        }
+      if (enterprises) {
+        this.enterprisesList = enterprises;
+        this.enterpriseData = [
+          ...enterprises.map(Enterprise => ({
+            label: Enterprise.name,
+            value: Enterprise.enterpriseId
+          }))
+        ];
+      }
     });
 
     // Adicionando a recuperação dos últimos clientes e contadores
     this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
-        if (clients && clients.length > 0) {
-            this.clientsList = clients;
-            this.clientData = [
-                { label: 'Seleccione...', value: '' },
-                ...clients.map(client => ({
-                    label: client.name,
-                    value: client.clientId
-                }))
-            ];
+      if (clients && clients.length > 0) {
+        this.clientsList = clients;
+        this.clientData = [
+          { label: 'Seleccione...', value: '' },
+          ...clients.map(client => ({
+            label: client.name,
+            value: client.clientId
+          }))
+        ];
 
-        }
+      }
     });
 
     this.getMeters$.pipe(takeUntil(this.destroy$)).subscribe(meters => {
       if (meters) {
         this.meterList = meters
-        this.meterData = [ 
+        this.meterData = [
           ...meters.map(meter => ({
             label: meter.meterId,
             value: meter.meterId
@@ -164,28 +152,26 @@ export class ContractComponent implements OnInit, OnDestroy {
     })
 
     this.getZonesByEnterpriseId$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
-        if (response) {
-            this.zoneList = response;
-            this.zoneData = [ 
-                ...response.map(zone => ({
-                    label: zone.designation,
-                    value: zone.zoneId
-                }))
-            ];
+      if (response) {
+        this.zoneList = response;
+        this.zoneData = [
+          ...response.map(zone => ({
+            label: zone.designation,
+            value: zone.zoneId
+          }))
+        ];
 
-             }
+      }
     });
-
- 
-}
+  }
 
   onValueSelected(option: IOption): void {
     if (option && option.value) {
-      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
+      this._store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
       this.getZonesByEnterpriseId$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
         if (response) {
           this.zoneList = response;
-          this.zoneData = [ 
+          this.zoneData = [
             ...response.map(zone => ({
               label: zone.designation,
               value: zone.zoneId
@@ -199,11 +185,11 @@ export class ContractComponent implements OnInit, OnDestroy {
   onEnterpriseSelect(option: IOption): void {
     if (option && option.value) {
       const selectedValue = option.value;
-      this.store.dispatch(getClientByZoneId({ zoneId: selectedValue }));
+      this._store.dispatch(getClientByZoneId({ zoneId: selectedValue }));
       this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
         if (clients) {
           this.clientsList = clients;
-          this.clientData = [ 
+          this.clientData = [
             ...clients.map(client => ({
               label: client.name,
               value: client.clientId
@@ -217,48 +203,58 @@ export class ContractComponent implements OnInit, OnDestroy {
   onCheckboxValueChange(controlName: string, isChecked: boolean) {
     if (isChecked) {
       this.contractForm.get(controlName)?.setValue(1);
-    }else  this.contractForm.get(controlName)?.setValue(0);
+    } else this.contractForm.get(controlName)?.setValue(0);
   }
 
- 
   saveContract(): void {
-    const contractData = this.contractForm.value;
- 
-     
-    if (contractData) {
 
-      this._dialogService.open({
-        title: 'Processando',
-        message: 'Aguarde um instante enquanto guarda ainformações de celebração do contracto.',
-        type: 'loading',
-        isProcessing: true,
-      });
-  
-      
-      this.store.dispatch(createContract({ contract: contractData }));
-      this.store.pipe(select(selectSelectedContract), filter((contract) => !!contract), first()) .subscribe({
-        next: (contract) => {
-          if (contract) {
+    if (this.contractForm.valid) {
+
+      const contractData = this.contractForm.value;
+
+      this._store.dispatch(createContract({ contract: contractData }));
+
+      this._store.pipe(select(selectContractErrorMessage)).subscribe(
+        error => {
+          if (error) {
             this._dialogService.open({
-              title: 'Sucesso',
-              message: 'Contracto criado com sucesso!',
-              type: 'success'
-            });
-            
+              title: 'Criação do Contracto',
+              type: 'error',
+              message: 'Um erro ocorreu ao criar o Contracto! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
+              isProcessing: false,
+              showConfirmButton: false,
+            })
+          } else {
+            this._store.pipe(select(selectSelectedContract), filter((fineConfiguration) => !!fineConfiguration))
+              .subscribe((fineConfiguration) => {
+                if (fineConfiguration) {
+                  this._dialogService.open({
+                    title: 'Criação do Contracto',
+                    type: 'success',
+                    message: 'Contracto criado com sucesso!',
+                    isProcessing: false,
+                    showConfirmButton: false,
+                  })
+                  this.eraseForm()
+                }
+              });
           }
-        }, 
-        error: (error) => {
-          this._dialogService.open({
-            title: 'Erro',
-            message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
-            type: 'error',
-            showConfirmButton: true, 
-            cancelText: 'Cancelar',
-          });
-        }
-      })         
-      this.contractSaved.emit();  
+
+        })
+      this.contractSaved.emit();
+    } else {
+      this._dialogService.open({
+        title: 'Validação de Dados',
+        type: 'info',
+        message: 'Por favor verifique se os campos estão devidadmente preenchidos e volte a submeter.',
+        isProcessing: false,
+        showConfirmButton: false,
+      })
     }
+  }
+
+  eraseForm() {
+    this.contractForm.reset();
   }
 
   onClientSelect(option: IOption): void {
@@ -282,10 +278,9 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.isDialogOpen = true;
   }
 
- 
   closeDialog(): void {
     this.isDialogOpen = false;
     this.contractForm.reset()
   }
- 
+
 }

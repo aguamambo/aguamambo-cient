@@ -39,7 +39,6 @@ export class CreateContractComponent {
       if (this.currentStep === 1) {
         this.clientComponent.saveClient();
       } else if (this.currentStep === 2) {
-        console.log(this.savedClient);
         if (this.savedClient) {
           
           this.meterComponent.saveMeter(this.savedClient.clientId);
@@ -56,8 +55,6 @@ export class CreateContractComponent {
         this.buttonDisabled = false;
       }, 200);
   }
-  
-
 
   previousStep() {
     if (this.currentStep > 1) {
