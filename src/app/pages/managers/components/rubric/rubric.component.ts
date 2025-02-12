@@ -80,6 +80,7 @@ export class RubricComponent implements OnInit {
                 message: 'Um erro ocorreu ao actualizar a Rúbrica! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedRubrics), filter((rubric) => !!rubric))
@@ -110,6 +111,7 @@ export class RubricComponent implements OnInit {
                 message: 'Um erro ocorreu ao criar a Rúbrica! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedRubric), filter((rubric) => !!rubric))

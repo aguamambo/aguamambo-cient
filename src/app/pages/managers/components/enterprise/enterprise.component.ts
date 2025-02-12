@@ -82,6 +82,7 @@ export class EnterpriseComponent implements OnInit {
                 message: 'Um erro ocorreu ao actualizar a Empresa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedEnterprises), filter((rubric) => !!rubric))
@@ -106,12 +107,14 @@ export class EnterpriseComponent implements OnInit {
         this._store.pipe(select(selectEnterpriseErrorMessage)).subscribe(
           error => {
             if (error) {
+              console.log(error);
               this._dialogService.open({
                 title: 'Criação da Empresa',
                 type: 'error',
                 message: 'Um erro ocorreu ao criar a Empresa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedEnterprises), filter((enterprise) => !!enterprise))

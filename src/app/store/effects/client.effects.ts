@@ -81,8 +81,7 @@ export class ClientEffects {
             exhaustMap(action =>
                 this.apiService.post<{ client: IClient; statusCode: number }>('/client', action.client).pipe(
                     map(response => createClientSuccess({ client: response.client, statusCode: response.statusCode })),
-                    catchError(error => {
-                         this.errorMessage.getErrorMessage(error.status, error.error);
+                    catchError(error => { 
                         return of(createClientFailure({ error: error, statusCode: error.status }));
                     })
                 )
@@ -96,8 +95,7 @@ export class ClientEffects {
             exhaustMap(action =>
                 this.apiService.put<IClient>(`/client/${action.clientId}`, action.client).pipe(
                     map(client => updateClientSuccess({ client })),
-                    catchError(error => {
-                         this.errorMessage.getErrorMessage(error.status, error.error);
+                    catchError(error => { 
                         return of(updateClientFailure({ error }));
                     })
                 )

@@ -217,6 +217,8 @@ export class ContractComponent implements OnInit, OnDestroy {
       this._store.pipe(select(selectContractErrorMessage)).subscribe(
         error => {
           if (error) {
+            
+            
             this._dialogService.open({
               title: 'Criação do Contracto',
               type: 'error',

@@ -12,7 +12,7 @@ import { IOption } from 'src/app/models/option';
 import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
 import { selectContractIsLoading, selectSelectedContracts } from 'src/app/store/selectors/contract.selectors';
 import { IContract } from 'src/app/models/contract';
-import { selectPaymentMethods, selectReceiptIsSaving, selectSelectedReceipt, selectSelectedReceiptFile } from 'src/app/store/selectors/receipt.selectors';
+import { selectPaymentMethods, selectReceiptErrorMessage, selectReceiptIsSaving, selectSelectedReceipt, selectSelectedReceiptFile } from 'src/app/store/selectors/receipt.selectors';
 import { DialogService } from 'src/app/services/dialog.service';
 
 
@@ -125,9 +125,9 @@ export class RegisterReceiptComponent implements OnInit {
   onClientSelected(event: { value: string; label: string }) {
     this.store.pipe(select(resetContractActions))
     this.store.pipe(select(resetInvoiceActions))
-    
+
     this.form.get('clientId')?.setValue(event.value);
-    this.store.dispatch(getContractByClientId({ clientId: event.value })); 
+    this.store.dispatch(getContractByClientId({ clientId: event.value }));
     this.store.pipe(select(selectSelectedContracts), takeUntil(this.unsubscribe$)).subscribe(contracts => {
       if (contracts && contracts.length > 0) {
         this.contractList = contracts;
@@ -229,51 +229,80 @@ export class RegisterReceiptComponent implements OnInit {
       });
 
       this.store.dispatch(createReceipt({ receipt: this.form.value }))
-      this.store.pipe(
-        select(selectSelectedReceipt),
-        filter((receipt) => !!receipt),
-        first()
-      ).subscribe({
-        next: (receipt) => {
-          if (receipt) {
-            this._dialogService.open({
-              title: 'Sucesso',
-              message: 'Pagamento feito com sucesso!',
-              type: 'success'
-            });
-            this._dialogService.close(true);
-            this._dialogService.open({
-              title: 'Recibo',
-              message: 'Carregando dados do Recibo.',
-              type: 'loading',
-              isProcessing: true,
-            });
 
-            this.store.dispatch(getReceiptFile({ receiptId: receipt.receiptID }))
-            this.invoicesToBePaid = []
-          }
+      this.store.pipe(select(selectReceiptErrorMessage)).subscribe(error => {
+        if (error) {
+          this._dialogService.open({
+            title: 'Pagamento da Factura',
+            type: 'error',
+            message: 'Um erro ocorreu ao pagar a Factura! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
+            isProcessing: false,
+            showConfirmButton: false,
+            errorDetails: error
+          })
+        } else {
+          this.store.pipe(
+            select(selectSelectedReceipt),
+            filter((receipt) => !!receipt),
+            first()
+          ).subscribe({
+            next: (receipt) => {
+              if (receipt) {
+                this._dialogService.open({
+                  title: 'Sucesso',
+                  message: 'Pagamento feito com sucesso!',
+                  type: 'success'
+                });
+                this._dialogService.close(true);
+                this._dialogService.open({
+                  title: 'Recibo',
+                  message: 'Carregando dados do Recibo.',
+                  type: 'loading',
+                  isProcessing: true,
+                });
+                this.store.dispatch(getReceiptFile({ receiptId: receipt.receiptID }))
+                this.invoicesToBePaid = []
+              }
+            }
+
+          })
+
+          this.store.pipe(select(selectReceiptErrorMessage)).subscribe(error => {
+            if (error) {
+              this._dialogService.open({
+                title: 'Dados do Recibo',
+                type: 'error',
+                message: 'Um erro ocorreu ao carregar o Recibo!',
+                isProcessing: false,
+                showConfirmButton: false,
+                errorDetails: error
+              })
+            } else {
+              this.store
+                .pipe(
+                  select(selectSelectedReceiptFile),
+                  filter((file) => !!file),
+                  first()
+                )
+                .subscribe(file => {
+                  if (file) {
+                    this.handleBase64File(file.base64);
+                    this.onReset()
+                  }
+                });
+            }
+          })
         }
-
       })
 
-      this.store
-                    .pipe(
-                      select(selectSelectedReceiptFile),
-                      filter((file) => !!file),
-                      first()
-                    )
-                    .subscribe({
-                      next: (file) => {
-                        if (file) {
-                          this.handleBase64File(file.base64);
-                          this.onReset()
-                        }
-                      },
-                      error: () => {
-                         
-                      },
-                    });
-
+    } else {
+      this._dialogService.open({
+        title: 'Validação de Dados',
+        type: 'info',
+        message: 'Por favor verifique se os campos estão devidadmente preenchidos e volte a submeter.',
+        isProcessing: false,
+        showConfirmButton: false,
+      })
     }
   }
   handleBase64File(base64String: string): void {
@@ -281,20 +310,20 @@ export class RegisterReceiptComponent implements OnInit {
     this.openPdfFromBase64(cleanBase64);
 
   }
-  
+
   onReset(): void {
     this.store.dispatch(resetReceiptActions());
     this.store.dispatch(resetClientActions());
-    this.store.dispatch(resetContractActions()); 
+    this.store.dispatch(resetContractActions());
     this.store.dispatch(resetClientMetersActions());
   }
 
   openPdfFromBase64(base64: string): void {
-    try{
-      
+    try {
+
       const blob = this.base64ToBlob(base64, 'application/pdf');
       const url = URL.createObjectURL(blob);
-      const pdfWindow = window.open('','_blank');
+      const pdfWindow = window.open('', '_blank');
       if (pdfWindow) {
         pdfWindow.document.write(
           `
@@ -327,12 +356,12 @@ export class RegisterReceiptComponent implements OnInit {
         )
         this._dialogService.close(true)
       }
-      else{
+      else {
         this._dialogService.open({
           title: 'Erro ao carregar a factura',
           message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
           type: 'error',
-          showConfirmButton: true, 
+          showConfirmButton: true,
           cancelText: 'Cancelar',
         });
       }
@@ -342,12 +371,12 @@ export class RegisterReceiptComponent implements OnInit {
         title: 'Erro ao carregar a factura',
         message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
         type: 'error',
-        showConfirmButton: true, 
+        showConfirmButton: true,
         cancelText: 'Cancelar',
       });
     }
   }
-  
+
   private base64ToBlob(base64: string, mimeType: string = 'application/octet-stream'): Blob {
     const binaryString = atob(base64);
     const length = binaryString.length;

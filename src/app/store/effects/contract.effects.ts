@@ -66,7 +66,6 @@ export class ContractEffects {
                 this.apiService.post<IContract>('/contract', action.contract).pipe(
                     map(contract => createContractSuccess({ contract })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createContractFailure({ error }));
                     })
                 )
@@ -81,7 +80,6 @@ export class ContractEffects {
                 this.apiService.put<IContract>(`/contract/${action.contractId}`, action.contract).pipe(
                     map(contract => updateContractSuccess({ contract })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateContractFailure({ error }));
                     })
                 )

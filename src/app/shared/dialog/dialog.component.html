@@ -1,61 +1,80 @@
 <div *ngIf="isDialogVisible" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative">
-    <!-- Close Button -->
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative">
+    <!-- Botão de Fechar -->
     <button 
       (click)="onClose()" 
       class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" 
-      aria-label="Close dialog"
+      aria-label="Fechar diálogo"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M10 9.293l5.146-5.147a.5.5 0 01.708.708L10.707 10l5.147 5.146a.5.5 0 01-.708.708L10 10.707l-5.146 5.147a.5.5 0 01-.708-.708L9.293 10 4.146 4.854a.5.5 0 11.708-.708L10 9.293z" clip-rule="evenodd" />
       </svg>
     </button>
-
-    <!-- Content Section -->
+ 
     <div class="py-4 mt-4">
-      <!-- Loading Spinner -->
+ 
+      <!-- Estado de carregamento -->
       <ng-container *ngIf="isLoading">
         <div class="flex flex-col items-center justify-center">
           <div class="animate-spin h-8 w-8 border-t-2 border-b-2 border-gray-500 rounded-full"></div>
           <p class="text-sm text-gray-600 mt-2">Processando...</p>
         </div>
       </ng-container>
-
-      <!-- Success Message -->
-      <ng-container *ngIf="!isLoading && config?.type === 'success'">
-        <div class="flex flex-col items-center justify-center text-green-500">
-          <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor">
-            <path d="M421-311.46 690.54-581l-34.85-34.23L421-380.15 302.54-498.61l-33.85 34.23L421-311.46ZM480.07-100q-78.22 0-147.4-29.92t-120.99-81.71q-51.81-51.79-81.75-120.94Q100-401.71 100-479.93q0-78.84 29.92-148.21t81.71-120.68q51.79-51.31 120.94-81.25Q401.71-860 479.93-860q78.84 0 148.21 29.92t120.68 81.21q51.31 51.29 81.25 120.63Q860-558.9 860-480.07q0 78.22-29.92 147.4t-81.21 120.99q-51.29 51.81-120.63 81.75Q558.9-100 480.07-100Zm-.07-45.39q139.69 0 237.15-97.76 97.46-97.77 97.46-236.85 0-139.69-97.46-237.15-97.46-97.46-237.15-97.46-139.08 0-236.85 97.46-97.76 97.46-97.76 237.15 0 139.08 97.76 236.85 97.77 97.76 236.85 97.76ZM480-480Z"/></svg>
-          <span class="text-2xl font-medium text-gray-800 mb-3">Sucesso</span>
-          <p class="text-base text-gray-600 mt-2">
-            {{ config.message || 'Operation completed successfully!' }}
-          </p>
-        </div>
-      </ng-container>
-
-      <!-- Error Message -->
+ 
+      <!-- Exibição de erro -->
       <ng-container *ngIf="!isLoading && config?.type === 'error'">
         <div class="flex flex-col items-center justify-center text-red-500">
-          <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="currentColor"><path d="M480-290.77q13.73 0 23.02-9.29t9.29-23.02q0-13.73-9.29-23.02-9.29-9.28-23.02-9.28t-23.02 9.28q-9.29 9.29-9.29 23.02t9.29 23.02q9.29 9.29 23.02 9.29Zm-30-146.15h60v-240h-60v240ZM480.07-100q-78.84 0-148.21-29.92t-120.68-81.21q-51.31-51.29-81.25-120.63Q100-401.1 100-479.93q0-78.84 29.92-148.21t81.21-120.68q51.29-51.31 120.63-81.25Q401.1-860 479.93-860q78.84 0 148.21 29.92t120.68 81.21q51.31 51.29 81.25 120.63Q860-558.9 860-480.07q0 78.84-29.92 148.21t-81.21 120.68q-51.29 51.31-120.63 81.25Q558.9-100 480.07-100Zm-.07-60q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="currentColor">
+            <path d="M480-290.77q13.73 0 23.02-9.29t9.29-23.02q0-13.73-9.29-23.02-9.29-9.28-23.02-9.28t-23.02 9.28q-9.29 9.29-9.29 23.02t9.29 23.02q9.29 9.29 23.02 9.29Zm-30-146.15h60v-240h-60v240ZM480.07-100q-78.84 0-148.21-29.92t-120.68-81.21q-51.31-51.29-81.25-120.63Q100-401.1 100-479.93q0-78.84 29.92-148.21t81.21-120.68q51.29-51.31 120.63-81.25Q401.1-860 479.93-860q78.84 0 148.21 29.92t120.68 81.21q51.31 51.29 81.25 120.63Q860-558.9 860-480.07q0 78.84-29.92 148.21t-81.21 120.68q-51.29 51.31-120.63 81.25Q558.9-100 480.07-100Zm0-320Z"/>
+          </svg>
           <span class="text-2xl font-medium text-gray-800 mb-3">Erro</span>
           <p class="text-base text-gray-600 mt-2">
-            {{ config.message || 'An error occurred. Please try again!' }}
+            {{ config.message || 'Ocorreu um erro. Por favor, tente novamente!' }}
           </p>
+        </div>
+
+        <!-- Botão para exibir detalhes do erro -->
+        <div class="flex flex-col items-center gap-4 w-full mt-4">
+          <div class="flex gap-3 cursor-pointer" (click)="toggleErrorDetails()">
+            <span>Ver Detalhes</span>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+              [ngClass]="{ 'rotate-180': isDetailsVisible }" class="transition-transform duration-300 fill-blue-700">
+              <path d="M480-371.92 267.69-584.23 296-612.54l184 183.77 184-183.77 28.31 28.31L480-371.92Z" />
+            </svg>
+          </div>
+ 
+          <!-- Exibição dos detalhes do erro -->
+          <div *ngIf="isDetailsVisible" class="py-4 px-6 bg-stone-100 w-full max-w-lg h-[250px] overflow-y-auto rounded-lg shadow-md">
+            <p class="text-red-600 text-sm text-justify">
+              <span class="text-gray-800 font-semibold">Excepção Lançada:</span> {{ exceptionMessage }}
+            </p>
+          </div>
         </div>
       </ng-container>
 
-      <!-- Info Message -->
       <ng-container *ngIf="!isLoading && config?.type === 'info'">
         <div class="flex flex-col items-center justify-center text-orange-500">
           <svg xmlns="http://www.w3.org/2000/svg" height="50px" viewBox="0 -960 960 960" width="50px" fill="currentColor">
             <path d="M74.62-140 480-840l405.38 700H74.62ZM178-200h604L480-720 178-200Zm302-47.69q13.73 0 23.02-9.29t9.29-23.02q0-13.73-9.29-23.02T480-312.31q-13.73 0-23.02 9.29T447.69-280q0 13.73 9.29 23.02t23.02 9.29Zm-30-104.62h60v-200h-60v200ZM480-460Z"/>
           </svg>
           <span class="text-2xl font-medium text-gray-800 mb-3">Aviso</span>
-          <p class="text-base text-gray-600 mt-2">
+          <p class="text-center text-base text-gray-600 mt-2">
             {{ config.message || 'Information provided successfully!' }}
           </p>
         </div>
       </ng-container>
+
+      <ng-container *ngIf="!isLoading && config?.type === 'success'">
+        <div class="flex flex-col items-center justify-center text-green-500">
+          <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor">
+            <path d="M421-311.46 690.54-581l-34.85-34.23L421-380.15 302.54-498.61l-33.85 34.23L421-311.46ZM480.07-100q-78.22 0-147.4-29.92t-120.99-81.71q-51.81-51.79-81.75-120.94Q100-401.71 100-479.93q0-78.84 29.92-148.21t81.71-120.68q51.79-51.31 120.94-81.25Q401.71-860 479.93-860q78.84 0 148.21 29.92t120.68 81.21q51.31 51.29 81.25 120.63Q860-558.9 860-480.07q0 78.22-29.92 147.4t-81.21 120.99q-51.29 51.81-120.63 81.75Q558.9-100 480.07-100Zm-.07-45.39q139.69 0 237.15-97.76 97.46-97.77 97.46-236.85 0-139.69-97.46-237.15-97.46-97.46-237.15-97.46-139.08 0-236.85 97.46-97.76 97.46-97.76 237.15 0 139.08 97.76 236.85 97.77 97.76 236.85 97.76ZM480-480Z"/></svg>
+          <span class="text-2xl font-medium text-gray-800 mb-3">Sucesso</span>
+          <p class="text-center text-base text-gray-600 mt-2">
+            {{ config.message || 'Operation completed successfully!' }}
+          </p>
+        </div>
+      </ng-container>
+
     </div>
   </div>
 </div>

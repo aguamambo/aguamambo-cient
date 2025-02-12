@@ -9,7 +9,8 @@ interface DialogConfig {
   isProcessing?: boolean; 
   showConfirmButton?: boolean;
   type?: 'loading' | 'success' | 'error' | 'info';  
-  icon?: string;  
+  icon?: string;
+  errorDetails?:  string | Record<string, string>;
 }
 
 @Injectable({

@@ -77,6 +77,7 @@ export class FineComponent implements OnInit {
                 message: 'Um erro ocorreu ao actualizar a Multa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedFineConfigurations), filter((fineConfiguration) => !!fineConfiguration))
@@ -107,6 +108,7 @@ export class FineComponent implements OnInit {
                 message: 'Um erro ocorreu ao criar a Multa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedFineConfiguration), filter((fineConfiguration) => !!fineConfiguration))

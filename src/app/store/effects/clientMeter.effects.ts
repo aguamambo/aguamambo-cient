@@ -68,7 +68,6 @@ export class ClientMeterEffects {
                 this.apiService.post<IClientMeter>('/client-meter', action.clientMeter).pipe(
                     map(clientMeter => createClientMeterSuccess({ clientMeter })),
                     catchError(error => {
-                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createClientMeterFailure({ error }));
                     })
                 )
@@ -83,7 +82,6 @@ export class ClientMeterEffects {
                 this.apiService.put<IClientMeter>(`/client-meter/${action.meterId}`, action.meter).pipe(
                     map(clientMeter => updateClientMeterSuccess({ clientMeter })),
                     catchError(error => {
-                       this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateClientMeterFailure({ error }));
                     })
                 )

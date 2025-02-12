@@ -109,6 +109,7 @@ export class InvoicePaymentComponent implements OnInit {
                 message: 'Um erro ocorreu ao actualizar a Factura! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedInvoices), filter((invoice) => !!invoice))
@@ -139,6 +140,7 @@ export class InvoicePaymentComponent implements OnInit {
                 message: 'Um erro ocorreu ao criar a Factura! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedInvoice), filter((invoice) => !!invoice))

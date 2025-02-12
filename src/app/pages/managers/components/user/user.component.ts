@@ -122,6 +122,7 @@ export class UserComponent implements OnInit {
                   message: 'Um erro ocorreu ao actualizar o Utilizador! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                   isProcessing: false,
                   showConfirmButton: false,
+                  errorDetails: error
                 })
               } else {
                 this._store.pipe(select(selectSelectedUsers), filter((user) => !!user))
@@ -152,6 +153,7 @@ export class UserComponent implements OnInit {
                   message: 'Um erro ocorreu ao criar o Utilizador! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                   isProcessing: false,
                   showConfirmButton: false,
+                  errorDetails: error
                 })
               } else {
                 this._store.pipe(select(selectSelectedUser), filter((user) => !!user))

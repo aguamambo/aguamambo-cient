@@ -9,12 +9,16 @@ import { DialogService } from 'src/app/services/dialog.service';
 export class DialogComponent implements OnInit {
   isDialogVisible = false;
   isLoading = false;
+  isDetailsVisible = false; 
+  exceptionMessage = "";
+  
   config: {
     type?: 'loading' | 'success' | 'error' | 'info';
     message?: string;
     showConfirmButton?: boolean;
     confirmText?: string;
     cancelText?: string;
+    errorDetails?: string | Record<string, string>;
   } = {};
 
   constructor(private dialogService: DialogService) {}
@@ -31,17 +35,34 @@ export class DialogComponent implements OnInit {
     this.dialogService.getDialogConfig().subscribe((config) => {
       if (config) {
         this.config = config;
+        if (config.errorDetails) {
+          this.setErrorMessage(config.errorDetails);
+        }
       }
     });
   }
+  
+  setErrorMessage(error: string | Record<string, string>): void {
+    if (typeof error === 'string') {
+      this.exceptionMessage = error;
+    } else if (typeof error === 'object' && error !== null) {
+      this.exceptionMessage = Object.values(error).join(', ');
+    } else {
+      this.exceptionMessage = 'Ocorreu um erro inesperado.';
+    }
+  }
 
   showDialogWithDelay(): void {
-    this.isLoading = true; // Show loading spinner
+    this.isLoading = true;
     this.isDialogVisible = true;
 
     setTimeout(() => {
-      this.isLoading = false; // Hide loading spinner
-    }, 5000); // Delay for 5 seconds
+      this.isLoading = false;
+    }, 5000); 
+  }
+
+  toggleErrorDetails(): void {
+    this.isDetailsVisible = !this.isDetailsVisible;
   }
 
   onClose(): void {

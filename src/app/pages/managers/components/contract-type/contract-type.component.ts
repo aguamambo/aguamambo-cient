@@ -101,6 +101,7 @@ export class ContractTypeComponent implements OnInit {
                 message: 'Um erro ocorreu ao actualizar o Contacto! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedContractTypes), filter((contractType) => !!contractType))
@@ -131,6 +132,7 @@ export class ContractTypeComponent implements OnInit {
                 message: 'Um erro ocorreu ao criar o Contacto! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedContractTypes), filter((contractType) => !!contractType))

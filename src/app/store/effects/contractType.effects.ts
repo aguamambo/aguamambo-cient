@@ -51,7 +51,6 @@ export class ContractTypeEffects {
                 this.apiService.post<IContractType>('/contract-type', action.contractType).pipe(
                     map(contractType => createContractTypeSuccess({ contractType })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(createContractTypeFailure({ error }));
                     })
                 )
@@ -66,7 +65,6 @@ export class ContractTypeEffects {
                 this.apiService.put<IContractType>(`/contract-type/${action.contractTypeId}`, action.contractType).pipe(
                     map(contractType => updateContractTypeSuccess({ contractType })),
                     catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(updateContractTypeFailure({ error }));
                     })
                 )

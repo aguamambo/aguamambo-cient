@@ -112,6 +112,7 @@ export class ZoneComponent implements OnInit {
                 message: 'Um erro ocorreu ao actualizar a Zona! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedZones), filter((zone) => !!zone))
@@ -142,6 +143,7 @@ export class ZoneComponent implements OnInit {
                 message: 'Um erro ocorreu ao criar a Zona! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
+                errorDetails: error
               })
             } else {
               this._store.pipe(select(selectSelectedZone), filter((zone) => !!zone))
