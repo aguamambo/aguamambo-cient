@@ -66,10 +66,28 @@ export class DialogComponent implements OnInit {
   }
 
   onClose(): void {
+    this.resetDialog();
     this.dialogService.close(true);
   }
-
+  
   onCancel(): void {
+    this.resetDialog();
     this.dialogService.close(false);
+  }
+  
+  
+  private resetDialog(): void {
+    this.isDialogVisible = false;
+    this.isLoading = false;
+    this.isDetailsVisible = false;
+    this.exceptionMessage = '';
+    this.config = {
+      type: undefined,
+      message: '',
+      showConfirmButton: false,
+      confirmText: '',
+      cancelText: '',
+      errorDetails: ''
+    };
   }
 }
