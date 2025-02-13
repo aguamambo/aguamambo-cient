@@ -71,8 +71,8 @@ export class ContractComponent implements OnInit, OnDestroy {
     this.contractForm = this._fb.group({
       startDate: new FormControl(null, [Validators.required]), 
       description: new FormControl(''),
-      balance: new FormControl(null, [Validators.required]),
-      contractStatus: new FormControl(true),
+      balance: new FormControl(0),
+      contractStatus: new FormControl(1),
       clientId: new FormControl(null, [Validators.required]),
       client: new FormControl(null, [Validators.required]),
       meterId: new FormControl(null, [Validators.required]),

@@ -134,11 +134,12 @@ export class ClientComponent implements OnInit {
         next: (client) => {
           if (client) {
             this._dialogService.open({
-              title: 'Sucesso',
+              title: 'Criação do Cliente',
+              type: 'success',
               message: 'Cliente criado com sucesso!',
-              type: 'success'
-            });
-            
+              isProcessing: false,
+              showConfirmButton: false,
+            })
           }
           this.clientSaved.emit(client);
           this.clientForm.reset();
