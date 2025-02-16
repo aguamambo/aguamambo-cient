@@ -81,6 +81,7 @@ export class RegisterCutComponent  implements OnInit {
   }
 
   loadData(): void {
+    this._dialogService.reset()
    this.monthsData =  this.generic.generateMonths();
    this.store.dispatch(listAllEnterprises());
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
@@ -189,6 +190,7 @@ export class RegisterCutComponent  implements OnInit {
   }
 
   saveCut(): void {
+    this._dialogService.reset()
     if (this.registCutForm.valid) {
 
       this._dialogService.open({
@@ -236,6 +238,7 @@ export class RegisterCutComponent  implements OnInit {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this._dialogService.reset()
   }
 
 }

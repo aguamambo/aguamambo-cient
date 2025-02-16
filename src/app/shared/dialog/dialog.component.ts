@@ -75,7 +75,6 @@ export class DialogComponent implements OnInit {
     this.dialogService.close(false);
   }
   
-  
   private resetDialog(): void {
     this.isDialogVisible = false;
     this.isLoading = false;

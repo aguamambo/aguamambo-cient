@@ -1,3 +1,4 @@
+import { DialogService } from 'src/app/services/dialog.service';
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
@@ -46,7 +47,8 @@ export class RegisterSuspensionComponent  implements OnInit {
   user: string = '';
   year: number = 0;
 
-  constructor(private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
+  constructor(
+    private _dialogService: DialogService, private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
     this.isCustomersLoading$ = this.store.select(selectClientIsLoading);
     this.isSuspensionSaving$ = this.store.select(selectSuspensionIsSaving);
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
@@ -72,6 +74,7 @@ export class RegisterSuspensionComponent  implements OnInit {
   }
 
   loadData(): void {
+    this._dialogService.reset()
    this.monthsData =  this.generic.generateMonths();
    this.store.dispatch(listAllEnterprises());
     this.getEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
@@ -178,6 +181,7 @@ onMeterSeclected(option: IOption) {
   }
 
   saveSuspension(): void {
+    this._dialogService.reset()
     if (this.registSuspensionForm.valid) {
       const formData = this.registSuspensionForm.value;
       this.store.dispatch(createSuspension({suspension: formData}))

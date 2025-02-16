@@ -83,6 +83,7 @@ export class InvoicePaymentComponent implements OnInit {
   }
 
   loadInvoicePayments(): void {
+    this._dialogService.reset()
     this._store.dispatch(listAllInvoices())
     this.getInvoices$.pipe(takeUntil(this.destroy$)).subscribe(invoicePayment => {
       if (invoicePayment) {
@@ -93,7 +94,7 @@ export class InvoicePaymentComponent implements OnInit {
 
 
   submitInvoiceForm(): void {
-
+    this._dialogService.reset()
     if (this.invoicePaymentForm.valid) {
 
       const payload = this.invoicePaymentForm.value;

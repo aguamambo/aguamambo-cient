@@ -85,6 +85,7 @@ export class RegisterReceiptComponent implements OnInit {
 
 
   getData() {
+    this._dialogService.reset()
 
     this.store.dispatch(listAllClients());
     this.store.dispatch(getReceiptPaymentMethods());
@@ -219,6 +220,7 @@ export class RegisterReceiptComponent implements OnInit {
   }
 
   onSubmit() {
+    this._dialogService.reset()
     if (this.form.valid) {
 
       this._dialogService.open({

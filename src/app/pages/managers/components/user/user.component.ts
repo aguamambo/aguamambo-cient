@@ -79,6 +79,7 @@ export class UserComponent implements OnInit {
   }
 
   loadUsers(): void {
+    this._dialogService.reset()
      this._store.dispatch(listAllUsers());
      this._store.dispatch(listAllRoles());
 
@@ -106,7 +107,7 @@ export class UserComponent implements OnInit {
   }
   
   submitUserForm(): void {  
-    
+    this._dialogService.reset()
       if (this.userForm.valid) {
   
         const payload = this.userForm.value;
@@ -128,8 +129,8 @@ export class UserComponent implements OnInit {
                 this._store.pipe(select(selectSelectedUsers), filter((user) => !!user))
                   .subscribe((user) => {
                     if (user) {
-                      this.userForm.reset();
                       this.isEditing = false;
+                      this.userForm.reset();
                       this._dialogService.open({
                         title: 'Actualizacao da Utilizador',
                         type: 'success',

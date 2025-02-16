@@ -100,6 +100,7 @@ export class RegisterReadingComponent implements OnInit {
 
 
   loadData(): void {
+    this._dialogService.reset()
     this.generateMonths();
     this.store.dispatch(listAllEnterprises());
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
@@ -228,7 +229,7 @@ export class RegisterReadingComponent implements OnInit {
   }
 
   saveReading(): void {
- 
+    this._dialogService.reset()
     if (this.validFields) {
       this._dialogService.open({
         title: 'Processando',

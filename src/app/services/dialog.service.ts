@@ -6,11 +6,11 @@ interface DialogConfig {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  isProcessing?: boolean; 
+  isProcessing?: boolean;
   showConfirmButton?: boolean;
-  type?: 'loading' | 'success' | 'error' | 'info';  
+  type?: 'loading' | 'success' | 'error' | 'info';
   icon?: string;
-  errorDetails?:  string | Record<string, string>;
+  errorDetails?: string | Record<string, string>;
 }
 
 @Injectable({
@@ -45,4 +45,11 @@ export class DialogService {
   getDialogConfig(): Observable<DialogConfig | null> {
     return this.dialogConfig$.asObservable();
   }
+
+  reset(): void {
+    this.dialogVisibility$.next(false);
+    this.dialogConfig$.next(null);
+    this.dialogResult$ = new Subject<boolean>();
+  }
+
 }

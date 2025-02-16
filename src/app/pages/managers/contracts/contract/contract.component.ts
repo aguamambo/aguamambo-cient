@@ -94,6 +94,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
+    this._dialogService.reset()
     this._store.dispatch(listAllEnterprises());
     this._store.dispatch(listAllContractTypes());
     this._store.dispatch(listAllAvailableMeters());
@@ -207,18 +208,15 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
 
   saveContract(): void {
-
+    this._dialogService.reset()
     if (this.contractForm.valid) {
 
       const contractData = this.contractForm.value;
-
       this._store.dispatch(createContract({ contract: contractData }));
 
       this._store.pipe(select(selectContractErrorMessage)).subscribe(
         error => {
           if (error) {
-            
-            
             this._dialogService.open({
               title: 'Criação do Contracto',
               type: 'error',
@@ -256,6 +254,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   }
 
   eraseForm() {
+    this._dialogService.reset()
     this.contractForm.reset();
   }
 

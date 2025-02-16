@@ -52,6 +52,7 @@ export class FineComponent implements OnInit {
   }
 
   loadData(): void {
+    this._dialogService.reset()
     this._store.dispatch(listAllFineConfigurations())
     this.getFineConfigurations$.pipe(takeUntil(this.destroy$)).subscribe(fineConfigurations => {
       if (fineConfigurations) {
@@ -61,7 +62,7 @@ export class FineComponent implements OnInit {
   }
 
   submitFineConfigurationForm(): void {
-
+    this._dialogService.reset()
     if (this.fineForm.valid) {
 
       const payload = this.fineForm.value;
@@ -142,6 +143,7 @@ export class FineComponent implements OnInit {
   }
 
   eraseForm() {
+    this._dialogService.reset()
     this.fineForm.reset();
   }
 

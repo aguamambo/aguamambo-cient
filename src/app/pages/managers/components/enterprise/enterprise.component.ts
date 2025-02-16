@@ -56,6 +56,7 @@ export class EnterpriseComponent implements OnInit {
   }
 
   loadEnterprises(): void {
+    this._dialogService.reset()
     this._store.dispatch(listAllEnterprises());
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
       if (enterprises) {
@@ -66,9 +67,8 @@ export class EnterpriseComponent implements OnInit {
   }
 
   submitEnterpriseForm(): void {
-
+    this._dialogService.reset()
     if (this.enterpriseForm.valid) {
-
       const payload = this.enterpriseForm.value;
 
       if (this.isEditing) {
@@ -88,7 +88,6 @@ export class EnterpriseComponent implements OnInit {
               this._store.pipe(select(selectSelectedEnterprises), filter((rubric) => !!rubric))
                 .subscribe((rubric) => {
                   if (rubric) {
-                    this.eraseForm();
                     this.isEditing = false;
                     this._dialogService.open({
                       title: 'Actualizacao da Empresa',
@@ -97,6 +96,7 @@ export class EnterpriseComponent implements OnInit {
                       isProcessing: false,
                       showConfirmButton: false,
                     })
+                    this.eraseForm();
                   }
                 });
             }
@@ -148,6 +148,7 @@ export class EnterpriseComponent implements OnInit {
   }
 
   eraseForm() {
+    this._dialogService.reset()
     this.enterpriseForm.reset();
   }
 

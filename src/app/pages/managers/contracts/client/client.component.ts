@@ -78,6 +78,7 @@ export class ClientComponent implements OnInit {
   }
 
   loadData() {
+    this._dialogService.reset()
     this.monthsData = this.generic.generateMonths()
 
     this.store.dispatch(listAllZones());
@@ -117,6 +118,7 @@ export class ClientComponent implements OnInit {
   }
 
   saveClient(): void {
+    this._dialogService.reset()
     const clientData = this.clientForm.value;
     
     if (

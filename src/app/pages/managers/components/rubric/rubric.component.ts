@@ -55,6 +55,7 @@ export class RubricComponent implements OnInit {
   }
 
   loadRubrics(): void {
+    this._dialogService.reset()
     this._store.dispatch(listAllRubrics())
     this.getRubrics$.pipe(takeUntil(this.destroy$)).subscribe(rubrics => {
       if (rubrics) {
@@ -64,7 +65,7 @@ export class RubricComponent implements OnInit {
   }
 
   submitRubricForm(): void {
-
+    this._dialogService.reset()
     if (this.rubricForm.valid) {
 
       const payload = this.rubricForm.value;

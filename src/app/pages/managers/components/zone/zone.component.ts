@@ -65,6 +65,7 @@ export class ZoneComponent implements OnInit {
   }
 
   loadData(): void {
+    this._dialogService.reset()
     this._store.dispatch(listAllZones());
     this._store.dispatch(listAllEnterprises());
 
@@ -96,7 +97,7 @@ export class ZoneComponent implements OnInit {
   }
 
   submitZoneForm(): void {
-
+    this._dialogService.reset()
     if (this.zoneForm.valid) {
 
       const payload = this.zoneForm.value;

@@ -58,34 +58,22 @@ export class ContractTypeComponent implements OnInit {
   }
 
   loadContractTypes(): void {
+    this._dialogService.reset()
     this._store.dispatch(listAllContractTypes());
     this.getContractTypes$.pipe(takeUntil(this.destroy$)).subscribe((contractTypes) => {
       if (contractTypes) {
         this.contractTypes = contractTypes
       }
     })
-  }
-
-  submitForm(): void {
-    if (this.contractTypeForm.valid) {
-      const payload = this.contractTypeForm.value;
-
-      if (this.isEditing) {
-        this._store.dispatch(updateContractType({ contractTypeId: this.contractType.contractTypeId, contractType: payload }))
-        this.isEditing = false;
-      } else {
-        this._store.dispatch(createContractType({ contractType: payload }))
-      }
-      this._store.dispatch(listAllContractTypes())
-      this.eraseForm()
-    }
-  }
+  } 
 
   eraseForm() {
     this.contractTypeForm.reset();
+    this._dialogService.reset()
   }
-  submitContractTypeForm(): void {
 
+  submitContractTypeForm(): void {
+    this._dialogService.reset()
     if (this.contractTypeForm.valid) {
 
       const payload = this.contractTypeForm.value;
