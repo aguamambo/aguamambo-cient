@@ -20,7 +20,7 @@ export class MeterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private _dialogService: DialogService, 
+    private _dialogService: DialogService,
     private store: Store
   ) { }
 
@@ -31,48 +31,45 @@ export class MeterComponent implements OnInit {
     });
   }
 
-  saveMeter(clientId: string): void {
-    const meterData = { ...this.meterForm.value, clientId: clientId };
+  saveMeter(): void {
+   const meterData = this.meterForm.value;
+     
     const validFields = this.checkIsNotNull(meterData.brand) && this.checkIsNotNull(meterData.cubicMeters);
-
-    if (validFields) {
+  
+     
       this.store.dispatch(createClientMeter({ clientMeter: meterData }));
-      this.store.pipe((
-        select(selectSelectedClientMeter)),
+      this.store.pipe(
+        select(selectSelectedClientMeter),
         filter((meter) => !!meter),
         first()
-      )
-        .subscribe({
-          next: (meter) => {
-            if (meter) {
-              this._dialogService.open({
-                title: 'Sucesso',
-                message: 'Contador criado com sucesso!',
-                type: 'success'
-              });
-              this.meterSaved.emit(meter)
-            }
-          },
-          error: (error) => {
+      ).subscribe({
+        next: (meter) => {
+          if (meter) {
             this._dialogService.open({
-              title: 'Erro',
-              message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
-              type: 'error',
-              showConfirmButton: true,
-              cancelText: 'Cancelar',
+              title: 'Sucesso',
+              message: 'Contador criado com sucesso!',
+              type: 'success'
             });
+            this.meterSaved.emit(meter);
           }
-
-        })
-    }
-    this.meterSaved.emit();
+        },
+        error: (error) => {
+          this._dialogService.open({
+            title: 'Erro',
+            message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
+            type: 'error',
+            showConfirmButton: true,
+            cancelText: 'Cancelar',
+          });
+        }
+      });
+    
   }
-
 
   checkIsNotNull(field: string): boolean {
-    return field !== null
+    return field !== null && field !== '';
   }
-
+  
   onNumberInputChange(inputElement: HTMLInputElement): void {
     inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
   }

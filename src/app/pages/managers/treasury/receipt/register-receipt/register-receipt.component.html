@@ -17,6 +17,28 @@
       </div>
     </ng-container>
 
+    <div class="flex flex-col sm:flex-row w-full p-4 gap-4 items-center ">
+      <div class="w-full">
+        <app-autocomplete-input
+          label="Empresa" 
+          [dataSource]="enterpriseData"
+          (valueSelected)="onValueSelected($event)">
+        </app-autocomplete-input>
+      </div>
+      
+
+      <div class="w-full">
+        <app-autocomplete-input label="Zona" [dataSource]="zoneData"
+        (valueSelected)="onEnterpriseSelect($event)">
+        </app-autocomplete-input>
+      </div>
+      <div class="w-full">
+        <app-autocomplete-input label="Cliente" [dataSource]="clientData"
+        (valueSelected)="onClientSelected($event)">
+        </app-autocomplete-input>
+      </div>
+    </div>
+
     <div class="flex gap-4 p-6 shadow-md rounded-lg">
       <div class="flex flex-col w-1/3 gap-3 px-3">
         <label class="font-semibold text-sm">Ano Económico</label>
@@ -30,15 +52,6 @@
         <span
           class="w-full p-2 border rounded-lg border-none bg-gray-100 text-gray-700 dark:bg-slate-500 dark:text-light-mode">{{currentDate}}</span>
 
-      </div>
-
-
-
-      <div class="flex flex-col w-1/2 gap-1 px-3">
-        <label class="font-semibold text-sm">Cliente</label>
-        <app-autocomplete-input placeholder="Selecione o cliente" [dataSource]="clientData"
-          (valueSelected)="onClientSelected($event)" formControlName="clientId">
-        </app-autocomplete-input>
       </div>
 
       <div class="flex flex-col w-1/3 gap-1 px-3">

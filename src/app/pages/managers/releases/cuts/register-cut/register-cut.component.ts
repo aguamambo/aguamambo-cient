@@ -155,14 +155,15 @@ export class RegisterCutComponent  implements OnInit {
             this.clientMetersData = [ 
               ...meters.map(meter => ({ label: meter.meterId || '', value: meter.meterId || '' }))
             ];
-            this.counter = meters[0].meterId
-             
+            this.counter = meters[0].meterId 
+            this.registCutForm.get('meterId')?.setValue( this.counter)   
           }
         }
         
       );
     }
-  }
+  } 
+  
   isFormValid(): boolean {
     const result =  Object.values(this.registCutForm.value).every(value => value !== null && value !== undefined);
     

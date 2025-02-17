@@ -34,7 +34,7 @@ export class ListContractsComponent {
       { key: 'meterId', label: 'Contador' },
       { key: 'contractTypeId', label: 'Tipo de Contrato' },
       { key: 'description', label: 'Descrição' },
-      { key: 'contractStatus', label: 'Estado do Contrato' },
+      { key: 'contractStatusDesc', label: 'Estado do Contrato' },
       { key: 'balance', label: 'Saldo' },
     ];
   }
@@ -50,6 +50,7 @@ export class ListContractsComponent {
         this.contractsList = contracts;
         this.contractsData = contracts.map(contract => ({
           ...contract,
+          contractStatusDesc: contract.contractStatus == 1 ? 'Activo' : 'Inactivo',
           startDate: this.formatDate(contract.startDate),
           endDate: this.formatDate(contract.endDate)
         }));

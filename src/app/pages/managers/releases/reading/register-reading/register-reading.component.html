@@ -20,14 +20,14 @@
           <app-autocomplete-input
             label="Empresa" 
             [dataSource]="enterpriseData"
-            (valueSelected)="onValueSelected($event)">
+            (valueSelected)="onEnterpriseSelected($event)">
           </app-autocomplete-input>
         </div>
         
 
         <div class="w-full">
           <app-autocomplete-input label="Zona" [dataSource]="zoneData"
-          (valueSelected)="onEnterpriseSelect($event)">
+          (valueSelected)="onZoneSelect($event)">
           </app-autocomplete-input>
         </div>
         <div class="w-full">

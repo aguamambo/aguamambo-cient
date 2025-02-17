@@ -20,7 +20,8 @@ export class CreateContractComponent {
 
   selectedEnterpriseId: string = ''
   selectedZoneId: string = ''
-  savedClient!: IClient;
+  savedClient: IClient | null = null;
+
   savedMeter!: IClientMeter;
 
   @ViewChild(ClientComponent) clientComponent!: ClientComponent;
@@ -32,29 +33,26 @@ export class CreateContractComponent {
   clientId = '';
 
   nextStep() {
-      if (this.buttonDisabled) return;
+  if (this.buttonDisabled) return;
 
-      this.buttonDisabled = true;
+  this.buttonDisabled = true;
 
-      if (this.currentStep === 1) {
-        this.clientComponent.saveClient();
-      } else if (this.currentStep === 2) {
-        if (this.savedClient) {
-          
-          this.meterComponent.saveMeter(this.savedClient.clientId);
-        }
-      } else if (this.currentStep === 3) { 
-        this.contractComponent.saveContract();
-      }
-  
-      if (this.currentStep < 3) {
-        this.currentStep++;
-      }
-
-      setTimeout(() => {
-        this.buttonDisabled = false;
-      }, 200);
+  if (this.currentStep === 1) {
+    this.clientComponent.saveClient();
+  } else if (this.currentStep === 2) {
+      this.meterComponent.saveMeter(); 
+  } else if (this.currentStep === 3) {
+    this.contractComponent.saveContract();
   }
+
+  if (this.currentStep < 3) {
+    this.currentStep++;
+  }
+
+  setTimeout(() => {
+    this.buttonDisabled = false;
+  }, 200);
+}
 
   previousStep() {
     if (this.currentStep > 1) {
@@ -62,11 +60,13 @@ export class CreateContractComponent {
     }
   }
 
-  onClientSaved(client: IClient) {    
+  onClientSaved(client: IClient) {
     if (client && client.clientId && !this.isClientSaved) {
       this.isClientSaved = true;
       this.clientId = client.clientId;
-      this.savedClient = client;  
+      this.savedClient = client;
+      console.log(this.savedClient);
+
       this.successMessage = "Cliente salvo com sucesso!";
       this.nextStep();
     }
@@ -76,7 +76,7 @@ export class CreateContractComponent {
     if (!this.isMeterSaved) {
       if (meter) {
         this.isMeterSaved = true;
-        this.savedMeter = meter;  
+        this.savedMeter = meter;
         this.successMessage = "Medidor salvo com sucesso!";
         this.nextStep();
       }

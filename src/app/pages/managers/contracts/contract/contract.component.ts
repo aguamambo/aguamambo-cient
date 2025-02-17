@@ -27,7 +27,7 @@ import { DialogService } from 'src/app/services/dialog.service';
 })
 export class ContractComponent implements OnInit, OnDestroy {
   @Input() meter!: IClientMeter;
-  @Input() client!: IClient;
+  @Input() client: IClient | null = null;
   @Input() enterpriseId!: string;
   @Input() zoneId!: string;
   @Output() contractSaved = new EventEmitter<any>();
@@ -97,7 +97,6 @@ export class ContractComponent implements OnInit, OnDestroy {
     this._dialogService.reset()
     this._store.dispatch(listAllEnterprises());
     this._store.dispatch(listAllContractTypes());
-    this._store.dispatch(listAllAvailableMeters());
 
     this.getContractTypes$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
       if (response) {
@@ -260,6 +259,7 @@ export class ContractComponent implements OnInit, OnDestroy {
 
   onClientSelect(option: IOption): void {
     this.contractForm.get('client')?.setValue(option.value);
+    this._store.dispatch(listAllAvailableMeters());
   }
 
   ngOnDestroy(): void {

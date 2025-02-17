@@ -14,7 +14,7 @@ import { IReading } from "src/app/models/reading";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
-import { IAppState, createInvoice, createReading, getClientMeterByClient, getInvoiceByReadingId, getLastReadingByClient, getLastReadingByMeter, getWaterBillByReadingId, listAllEnterprises, resetClientMetersActions, resetEnterpriseActions } from 'src/app/store';
+import { IAppState, createInvoice, createReading, getClientMeterByClient, getInvoiceByReadingId, getLastReadingByClient, getLastReadingByMeter, getWaterBillByReadingId, listAllEnterprises, resetClientMetersActions, resetEnterpriseActions, resetInvoiceActions } from 'src/app/store';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectClientMeterIsLoading, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
@@ -30,6 +30,8 @@ export class RegisterReadingComponent implements OnInit {
   registReadingForm!: FormGroup;
   lastReading: number = 0;
   counter: string = '';
+  selectedEnterprize: string = '';
+  selectedZone: string = '';
   readingId: string | null = null;
   fileUrl: SafeUrl | null = null;
   clientId: string | null = null;
@@ -140,9 +142,10 @@ export class RegisterReadingComponent implements OnInit {
     return result
   }
 
-  onValueSelected(option: IOption): void {
+  onEnterpriseSelected(option: IOption): void {
     if (option && option.value) {
       this.counter = ''
+      this.selectedEnterprize = option.value
       this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
       this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe(
         (zones) => {
@@ -161,9 +164,10 @@ export class RegisterReadingComponent implements OnInit {
     }
   }
   
-  onEnterpriseSelect(event: { value: string; label: string }): void {
+  onZoneSelect(event: { value: string; label: string }): void {
     if (event && event.value) {
       this.counter = '' 
+      this.selectedZone = event.value
       this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
       this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
         (clients) => {
@@ -180,6 +184,15 @@ export class RegisterReadingComponent implements OnInit {
         }
       );
     }
+  }
+
+  getClientsByZone(event: { value: string; label: string }){
+    this.onZoneSelect(event)
+  }
+  
+  getZonesByEnterpriseId(event: { value: string; label: string }){
+    this.onEnterpriseSelected(event)
+    this.getClientsByZone({ value: this.selectedZone, label: '' })
   }
   
 
@@ -239,8 +252,10 @@ export class RegisterReadingComponent implements OnInit {
       });
   
       const formData = this.registReadingForm.value;
-  
+      
       this.store.dispatch(createReading({ reading: formData }));
+
+      this.store.dispatch(resetInvoiceActions());
   
       this.getCreatedReading$
         .pipe(filter((reading) => !!reading), first())
@@ -254,8 +269,8 @@ export class RegisterReadingComponent implements OnInit {
                 message: 'Leitura salva com sucesso!',
                 type: 'success'
               });
-              
               this.store.dispatch(createInvoice({ payload }));
+              this.resetFields()
             }
   
             this.store
@@ -338,7 +353,36 @@ export class RegisterReadingComponent implements OnInit {
     this.store.dispatch(resetClientActions());
     this.store.dispatch(resetZonesActions());
     this.store.dispatch(resetEnterpriseActions());
+    this.store.dispatch(resetInvoiceActions());
     this.store.dispatch(resetClientMetersActions());
+  }
+
+  resetFields(){
+    
+    this.lastReading = 0;
+    this.counter = '';
+    this.readingId = null;
+    this.clientId = null;
+    this.zoneData  = [{ label: 'Seleccione...', value: '' }];
+    this.clientMetersData  = [];
+    this.enterpriseData  = [{ label: 'Seleccione...', value: '' }]; 
+    this.clientData = [
+      { label: 'Seleccione...', value: '' }
+    ];
+    this.monthsData  = [];
+    this.zoneList  = [];
+    this.enterprisesList  = [];
+    this.clientsList  = [];
+    this.readingsList  = [];
+    this.isDialogOpen  = false;
+    this.validFields  = false;
+    this.registReadingForm.get('currentReading')?.reset()
+    this.loadData()
+    const option: IOption = {
+      label: '',
+      value: this.selectedEnterprize
+    }
+    this.getZonesByEnterpriseId(option)
   }
 
   openPdfFromBase64(base64: string): void {
