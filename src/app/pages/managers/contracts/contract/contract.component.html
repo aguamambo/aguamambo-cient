@@ -47,8 +47,14 @@
             <app-date-picker formControlName="startDate"></app-date-picker>
           </div> 
           <div class="w-full">
-            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Tipo de Contrato</label>
-            <app-custom-select formControlName="contractTypeId" [options]="contractTypeData"></app-custom-select>
+            <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">
+              Tipo de Contrato
+            </label>
+            <app-custom-select 
+              formControlName="contractTypeId" 
+              [options]="contractTypeData" 
+              [selectedValue]="selectedContractType">
+            </app-custom-select>
           </div>
         </div>
 

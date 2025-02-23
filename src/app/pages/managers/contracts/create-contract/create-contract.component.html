@@ -1,39 +1,64 @@
 <div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 ">
 
-    <app-breadcrumb title="Celebração do Contrato" [breadcrumbItems]="['Dashboard', 'Contratos']">
+    <app-breadcrumb title="Cliente & Contrato" [breadcrumbItems]="['Dashboard', 'Cliente & Contrato']">
     </app-breadcrumb>
     <div class="flex items-center justify-between w-full">
         <div class="flex items-center justify-center space-x-8 w-full">
 
-            <div class="flex gap-4 relative">
+            <!-- <div class="flex gap-4 relative items-center justify-center">
                 <div class="w-8 h-8 flex items-center justify-center rounded-full font-semibold text-white" [ngClass]="{
               'bg-blue-700': currentStep === 1,
               'bg-gray-300 text-gray-700': currentStep !== 1
             }">
                     1
                 </div>
-                <p class="mt-2 text-center text-gray-700">Cliente</p>
-            </div>
+                <span class="text-center text-gray-700">Adição do Cliente</span>
+            </div> 
 
             <div [ngClass]="{'bg-blue-700': currentStep > 1, 'bg-gray-300': currentStep <= 1}" class="h-1 w-20"></div>
 
             <div class="flex gap-4 relative">
                 <div class="w-8 h-8 flex items-center justify-center rounded-full font-semibold text-white"
-                    [ngClass]="{'bg-blue-700': currentStep === 2, 'bg-gray-300 text-gray-700': currentStep !== 2}">
-                    2
+                    [ngClass]="{'bg-blue-700': currentStep === 2,'bg-gray-300 text-gray-700': currentStep !== 2}">
+                   2
                 </div>
-                <p class="mt-2 text-center text-gray-700">Contador</p>
-            </div>
+                <p class="text-center text-gray-700">Celebração do Contrato</p>
+            </div> -->
 
-            <div [ngClass]="{'bg-blue-700': currentStep > 2, 'bg-gray-300': currentStep <= 2}" class="h-1 w-20"></div>
-
-            <div class="flex gap-4 relative">
-                <div class="w-8 h-8 flex items-center justify-center rounded-full font-semibold text-white"
-                    [ngClass]="{'bg-blue-700': currentStep === 3,'bg-gray-300 text-gray-700': currentStep !== 3}">
-                    3
+            <div class="flex items-center justify-center w-full p-6">
+                 
+                <div class="flex flex-col items-center">
+                    <div class="w-10 h-10 flex items-center justify-center rounded-full font-semibold transition-all duration-300 border-2"
+                        [ngClass]="{
+                            'bg-blue-700 text-white border-blue-700': currentStep > 1,  
+                            'bg-white text-blue-700 border-blue-700': currentStep === 1,
+                            'bg-gray-300 text-gray-700 border-gray-300': currentStep < 1 
+                        }">
+                        <span *ngIf="currentStep > 1">✔</span>  
+                        <span *ngIf="currentStep === 1">1</span>  
+                    </div>
+                    <span class="text-sm font-medium mt-2 text-gray-700">Adição do Cliente</span>
                 </div>
-                <p class="mt-2 text-center text-gray-700">Celebração do Contrato</p>
+             
+                <div class="flex-1 h-1 mx-2 transition-all duration-300"
+                    [ngClass]="{ 'bg-blue-700': currentStep > 1, 'bg-gray-300': currentStep <= 1 }"></div>
+             
+                <div class="flex flex-col items-center">
+                    <div class="w-10 h-10 flex items-center justify-center rounded-full font-semibold transition-all duration-300 border-2"
+                        [ngClass]="{
+                            'bg-blue-700 text-white border-blue-700': currentStep > 2,  
+                            'bg-white text-blue-700 border-blue-700': currentStep === 2,
+                            'bg-gray-300 text-gray-700 border-gray-300': currentStep < 2
+                        }">
+                        <span *ngIf="currentStep > 2">✔</span>
+                        <span *ngIf="currentStep === 2">2</span>
+                    </div>
+                    <span class="text-sm font-medium mt-2 text-gray-700">Celebração do Contrato</span>
+                </div>
+             
             </div>
+            
+            
         </div>
     </div>
 
@@ -42,14 +67,9 @@
             <app-client (clientSaved)="onClientSaved($event)"></app-client>
         </ng-container>
     }
+    
     @if (currentStep === 2) {
-        <ng-container>
-            <app-meter (meterSaved)="onMeterSaved($event)"></app-meter>
-        </ng-container>
-    }
-    @if (currentStep === 3) {
         <app-contract
-            [meter]="savedMeter"
             [client]="savedClient"
             [enterpriseId]="selectedEnterpriseId"
             [zoneId]="selectedZoneId"
@@ -64,7 +84,7 @@
             Voltar
         </button>
         <button (click)="nextStep()" class="px-4 py-2 bg-blue-700 text-white rounded-md">
-          {{currentStep === 3 ? 'Submeter': 'Próximo' }}  
+          {{currentStep === 2 ? 'Submeter': 'Próximo' }}  
         </button>
 
     </div>

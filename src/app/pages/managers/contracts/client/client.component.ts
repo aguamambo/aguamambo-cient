@@ -1,16 +1,18 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { Subject, Observable, takeUntil, filter, first } from 'rxjs';
+import { Subject, Observable, takeUntil, filter, first, switchMap, EMPTY } from 'rxjs';
 import { GenericConfig } from 'src/app/core/config/generic.config';
 import { IClient } from 'src/app/models/client';
+import { IClientMeter } from 'src/app/models/clientMeter';
 import { IContractType } from 'src/app/models/contractType';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
-import { listAllZones, listAllContractTypes, createClient} from 'src/app/store';
+import { listAllZones, listAllContractTypes, createClient, createClientMeter} from 'src/app/store';
 import { selectSelectedClient, selectClientIsSaving, selectClientErrorMessage, selectClientSuccessMessage, selectClientStatusCode } from 'src/app/store/selectors/client.selectors';
+import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedZones, selectZoneIsLoading } from 'src/app/store/selectors/zone.selectors';
 
@@ -21,7 +23,8 @@ import { selectSelectedZones, selectZoneIsLoading } from 'src/app/store/selector
 })
 export class ClientComponent implements OnInit {
   @Output() clientSaved = new EventEmitter<any>();
-
+  @Output() meterSaved = new EventEmitter<IClientMeter>();
+  
   clientForm!: FormGroup;
   meterForm!: FormGroup;
   destroy$ = new Subject<void>();
@@ -41,6 +44,7 @@ export class ClientComponent implements OnInit {
   year: number = 0
   monthsData: IOption[] = [];
   user: string = '';
+  defaultBrand: string = 'Agua Mambo';
   selectedZoneId: string = '';
   selectedEnterpriseId: string = '';
   isAccordionOpen = false;
@@ -118,49 +122,80 @@ export class ClientComponent implements OnInit {
   }
 
   saveClient(): void {
-    this._dialogService.reset()
+    this._dialogService.reset();
     const clientData = this.clientForm.value;
-    
-    if (
-        (this.checkIsNotNull(clientData.name)) && 
-        (this.checkIsNotNull(clientData.phoneNumber)) && 
-        (this.checkIsNotNull(clientData.address)) && 
-        (this.checkIsNotNull(clientData.zoneId))) {  
-      this.store.dispatch(createClient({ client: clientData }));
-      this.store.pipe( 
-        select(selectSelectedClient),
-        filter(client => !!client),
-        first()
-      )
-      .subscribe({
-        next: (client) => {
-          if (client) {
-            this._dialogService.open({
-              title: 'Criação do Cliente',
-              type: 'success',
-              message: 'Cliente criado com sucesso!',
-              isProcessing: false,
-              showConfirmButton: false,
-            })
-          }
-          this.clientSaved.emit(client);
-          this.clientForm.reset();
-        }, 
-        error: (error) => {
-          this._dialogService.open({
-            title: 'Erro',
-            message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
-            type: 'error',
-            showConfirmButton: true, 
-            cancelText: 'Cancelar',
-          });
-        }
+    const clientMeter = { brand: this.defaultBrand, cubicMeters: 0 };
   
-      });
-    } else {
-      this.clientSaved.emit();  
+    if (!this.isValidClientData(clientData)) {
+      this.clientSaved.emit();
+      return;
     }
+  
+    this.store.dispatch(createClient({ client: clientData }));
+    
+    this.store.dispatch(createClientMeter({ clientMeter }));
+
+    this.store.pipe(
+      select(selectSelectedClient),
+      filter(client => !!client),
+      first(),
+      switchMap(client => {
+        if (!client) return EMPTY;
+  
+        this._dialogService.open({
+          title: 'Criação do Cliente',
+          type: 'success',
+          message: 'Cliente criado com sucesso',
+          isProcessing: false,
+          showConfirmButton: false,
+        })
+  
+        this.clientSaved.emit(client);
+  
+       
+        return this.store.pipe(
+          select(selectSelectedClientMeter),
+          filter(meter => !!meter),
+          first()
+        );
+      })
+    ).subscribe({
+      next: meter => {
+        if (!meter) return;
+  
+        this._dialogService.open({
+          title: 'Sucesso',
+          message: 'Contador criado com sucesso!',
+          type: 'success',
+        });
+  
+        this.meterSaved.emit(meter);
+        this.clientForm.reset();
+      },
+      error: error => this.showErrorDialog(error)
+    });
   }
+  
+  /**
+   * Valida se os dados do cliente estão completos
+   */
+  private isValidClientData(clientData: any): boolean {
+    return ['name', 'phoneNumber', 'address', 'zoneId'].every(field => this.checkIsNotNull(clientData[field]));
+  }
+  
+  /**
+   * Exibe um diálogo de erro
+   */
+  private showErrorDialog(error: any): void {
+    this._dialogService.open({
+      title: 'Erro',
+      message: error?.message || 'Ocorreu um erro inesperado. Por favor, contacte a equipa técnica para suporte.',
+      type: 'error',
+      showConfirmButton: true,
+      cancelText: 'Cancelar',
+    });
+  }
+  
 
   checkIsNotNull(field: string) : boolean{
     return field !== null

@@ -23,7 +23,7 @@ export const selectContractSuccessMessage = createSelector(
   (state) => state.successMessage
 );
 
-export const selectError = createSelector(
+export const selectContractError = createSelector(
   selectContractState,
   (state) => state.error
 );

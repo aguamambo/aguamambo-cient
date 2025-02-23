@@ -5,8 +5,8 @@ import { CreateContractComponent } from "./create-contract/create-contract.compo
 import { authGuard } from "src/app/core/guards/auth.guard";
 
 const routes: Routes = [
-  { path: 'contracts/list-contracts', component: ListContractsComponent ,canActivate: [authGuard]  },
-  { path: 'contracts/create-contract', component: CreateContractComponent ,canActivate: [authGuard]  }
+  { path: 'contracts/list-contracts', component: ListContractsComponent  },
+  { path: 'contracts/create-contract', component: CreateContractComponent  }
 ]
 
 @NgModule({

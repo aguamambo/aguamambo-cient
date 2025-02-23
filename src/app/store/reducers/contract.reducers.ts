@@ -65,6 +65,7 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error.error,
+    error: error
   })), 
   
   // Get contract by ID
@@ -78,6 +79,7 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error.error,
+    error: error
   })),
 
   // List all contracts
@@ -89,6 +91,7 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error.error,
+    error: error
   })),
 
   // Create contract
@@ -100,6 +103,7 @@ const reducer = createReducer(
     ...state,
     isSaving: false,
     errorMessage: error.error,
+    error: error
   })),
 
   // Update contract
@@ -113,6 +117,7 @@ const reducer = createReducer(
     ...state,
     isSaving: false,
     errorMessage: error.error,
+    error: error
   })),
 
   // Delete contract
@@ -124,6 +129,7 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error.error,
+    error: error
   })),
 
   // Get contracts count
@@ -137,6 +143,7 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     errorMessage: error.error,
+    error: error
   })),
   
   on(resetContractActions, () => initialState)

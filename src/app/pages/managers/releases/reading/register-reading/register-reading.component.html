@@ -1,98 +1,108 @@
 <div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
   <app-breadcrumb title="Registar Nova Leitura" [breadcrumbItems]="['Dashboard', 'Registar Leitura']"></app-breadcrumb>
 
-  <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[60vh] h-full rounded-lg shadow-md p-4">
-    <ng-container *ngIf="(isZonesLoading$ | async) || (isEnterprisesLoading$ | async) || (isClientLoading$ | async) ||  (isMeterLoading$ | async)">
+  <div class="bg-light-mode dark:bg-deep-dark min-h-[40vh] w-full  rounded-lg shadow-md p-4">
+    <ng-container
+      *ngIf="(isZonesLoading$ | async) || (isEnterprisesLoading$ | async) || (isClientLoading$ | async) ||  (isMeterLoading$ | async)">
       <div class="flex flex-col justify-center my-4 gap-1">
         <app-loading-spinner></app-loading-spinner>
         <span class="flex justify-center text-sm">
-           
-            Carregando dados
-           
+
+          Carregando dados
+
         </span>
       </div>
     </ng-container>
+    <div class="grid md:grid-cols-4 h-full">
 
-    <form [formGroup]="registReadingForm" class=" py-4 dark:bg-deep-dark ">
-
-      <div class="flex flex-col sm:flex-row w-full p-4 gap-4 items-center ">
-        <div class="w-full">
-          <app-autocomplete-input
-            label="Empresa" 
-            [dataSource]="enterpriseData"
-            (valueSelected)="onEnterpriseSelected($event)">
-          </app-autocomplete-input>
-        </div>
-        
-
-        <div class="w-full">
-          <app-autocomplete-input label="Zona" [dataSource]="zoneData"
-          (valueSelected)="onZoneSelect($event)">
-          </app-autocomplete-input>
-        </div>
-        <div class="w-full">
-          <app-autocomplete-input label="Cliente" [dataSource]="clientData"
-          (valueSelected)="onClientSelect($event)">
-          </app-autocomplete-input>
+      <div class="flex flex-col gap-4 w-full ">
+        <span class="text-lg font-medium py-3">
+          Carregar ficheiro de Leituras
+        </span>
+        <div class="w-full bg-stone-100">
+          <app-upload-file></app-upload-file>
         </div>
       </div>
-
-
-      <div class="flex flex-col sm:grid sm:grid-cols-3 w-full p-4 gap-4 items-center">
-
-         
-
-        <div class="w-full">
-          <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
-          <span
-            class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{getCurrentYear()}}
+      <div class="col-span-3">
+        <form [formGroup]="registReadingForm" class=" py-4 dark:bg-deep-dark ">
+          <span class="text-lg font-medium p-3">
+            Preencher dados da Leitura
           </span>
-        </div>
+          <div class="flex flex-col sm:flex-row w-full p-4 gap-4 items-center ">
+            <div class="w-full">
+              <app-autocomplete-input label="Empresa" [dataSource]="enterpriseData"
+                (valueSelected)="onEnterpriseSelected($event)">
+              </app-autocomplete-input>
+            </div>
 
-        <div class="w-full">
-          <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-          <app-autocomplete-input
-              [dataSource]="clientMetersData"
-              [placeholder]="counter"
-          (valueSelected)="onMeterSeclected($event)"> 
-          </app-autocomplete-input>
+
+            <div class="w-full">
+              <app-autocomplete-input label="Zona" [dataSource]="zoneData" (valueSelected)="onZoneSelect($event)">
+              </app-autocomplete-input>
+            </div>
+            <div class="w-full">
+              <app-autocomplete-input label="Cliente" [dataSource]="clientData"
+                (valueSelected)="onClientSelect($event)">
+              </app-autocomplete-input>
+            </div>
+          </div>
+
+
+          <div class="flex flex-col sm:grid sm:grid-cols-3 w-full p-4 gap-4 items-center">
+
+
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
+              <span
+                class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{getCurrentYear()}}
+              </span>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
+              <app-autocomplete-input [dataSource]="clientMetersData" [placeholder]="counter"
+                (valueSelected)="onMeterSeclected($event)">
+              </app-autocomplete-input>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>
+              <span
+                class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{lastReading}}
+              </span>
+            </div>
+
+          </div>
+
+          <div class="flex flex-col sm:grid sm:grid-cols-3 w-full p-4 gap-4 items-center">
+            <div class="w-full">
+              <app-custom-drop-down formControlName="readingMonth" label="Mês" [options]="monthsData"
+                (selectionChange)="onMonthSelect($event)">
+              </app-custom-drop-down>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Actual</label>
+              <input type="text" formControlName="currentReading" #currentReading
+                (input)="onNumberInputChange(currentReading, 'currentReading')"
+                class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
+
+            </div>
+
+          </div>
+
+        </form>
+
+        <div *ngIf="validFields" class="w-full flex items-center justify-end p-4">
+          <button (click)="saveReading()"
+            class="w-full md:w-1/4 bg-blue-600 py-2 text-light-mode rounded-full sm:rounded-lg">
+            Submeter
+          </button>
+        </div>
       </div>
 
-        <div class="w-full">
-          <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>
-          <span
-            class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{lastReading}}
-          </span>
-        </div>
-       
-      </div>
-
-      <div class="flex flex-col sm:grid sm:grid-cols-3 w-full p-4 gap-4 items-center">
-        <div class="w-full">
-          <app-custom-drop-down formControlName="readingMonth" label="Mês" [options]="monthsData"
-            (selectionChange)="onMonthSelect($event)">
-          </app-custom-drop-down>
-        </div>
-
-        <div class="w-full">
-          <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Actual</label>
-          <input type="text" formControlName="currentReading" #currentReading
-            (input)="onNumberInputChange(currentReading, 'currentReading')"
-            class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-
-        </div>
-        
-      </div>
-
-    </form>
-    
-    <div *ngIf="validFields" class="w-full flex items-center justify-end p-4">
-      <button 
-        (click)="saveReading()" 
-        class="w-full md:w-1/4 bg-blue-600 py-2 text-light-mode rounded-full sm:rounded-lg">
-        Submeter
-      </button>
     </div>
   </div>
-  
-</div> 
+
+</div>

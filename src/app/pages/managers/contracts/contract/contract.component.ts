@@ -12,7 +12,7 @@ import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
 import { listAllEnterprises, listAllContractTypes, getZoneByEnterpriseId, getClientByZoneId, createContract, listAllClientMeters, listAllAvailableMeters, getZone } from 'src/app/store';
 import { selectSelectedClients, selectClientErrorMessage, selectClientSuccessMessage } from 'src/app/store/selectors/client.selectors';
-import { selectContractErrorMessage, selectContractIsSaving, selectSelectedContract } from 'src/app/store/selectors/contract.selectors';
+import { selectContractError, selectContractErrorMessage, selectContractIsSaving, selectSelectedContract } from 'src/app/store/selectors/contract.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
 import { selectSelectedZone, selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
@@ -56,6 +56,7 @@ export class ContractComponent implements OnInit, OnDestroy {
   isDialogOpen: boolean = false;
   dialogType: 'success' | 'error' = 'success';
   dialogMessage = '';
+  selectedContractType = '';
   contractData: any;
 
   constructor(
@@ -108,6 +109,10 @@ export class ContractComponent implements OnInit, OnDestroy {
             value: contract.contractTypeId
           }))
         ];
+        const lastContractType = this.contractTypeList[0]?.contractTypeId || '';
+ 
+        this.contractForm.get('contractTypeId')?.setValue(lastContractType);
+        this.selectedContractType = lastContractType;
       }
     });
 
@@ -122,8 +127,7 @@ export class ContractComponent implements OnInit, OnDestroy {
         ];
       }
     });
-
-    // Adicionando a recuperação dos últimos clientes e contadores
+ 
     this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
       if (clients && clients.length > 0) {
         this.clientsList = clients;
@@ -213,7 +217,7 @@ export class ContractComponent implements OnInit, OnDestroy {
       const contractData = this.contractForm.value;
       this._store.dispatch(createContract({ contract: contractData }));
 
-      this._store.pipe(select(selectContractErrorMessage)).subscribe(
+      this._store.pipe(select(selectContractError)).subscribe(
         error => {
           if (error) {
             this._dialogService.open({

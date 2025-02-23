@@ -22,6 +22,8 @@ import { TabItemComponent } from './components/tab-item/tab-item.component';
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component'; 
 import { DialogComponent } from './dialog/dialog.component';
 import { SearchInputComponent } from './search-input/search-input.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
+import { UploadFileComponent } from './upload-file/upload-file.component';
 
 @NgModule({
   declarations: [ 
@@ -44,7 +46,9 @@ import { SearchInputComponent } from './search-input/search-input.component';
     TabItemComponent, 
     PdfViewerComponent,  
     DialogComponent, 
-    SearchInputComponent
+    SearchInputComponent, 
+    LineChartComponent, 
+    UploadFileComponent
   ],
   imports: [
     CommonModule,
@@ -72,7 +76,9 @@ import { SearchInputComponent } from './search-input/search-input.component';
     TabItemComponent,
     PdfViewerComponent,  
     DialogComponent,
-    SearchInputComponent
+    SearchInputComponent,
+    LineChartComponent,
+    UploadFileComponent
   ]
 })
 export class SharedModule { }

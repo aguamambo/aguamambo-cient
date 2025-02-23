@@ -1,7 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { ClientComponent } from "../client/client.component";
 import { ContractComponent } from "../contract/contract.component";
-import { MeterComponent } from "../meter/meter.component";
 import { IClient } from "src/app/models/client";
 import { IClientMeter } from "src/app/models/clientMeter";
 
@@ -22,10 +21,8 @@ export class CreateContractComponent {
   selectedZoneId: string = ''
   savedClient: IClient | null = null;
 
-  savedMeter!: IClientMeter;
 
   @ViewChild(ClientComponent) clientComponent!: ClientComponent;
-  @ViewChild(MeterComponent) meterComponent!: MeterComponent;
   @ViewChild(ContractComponent) contractComponent!: ContractComponent;
 
   currentStep = 1;
@@ -40,12 +37,10 @@ export class CreateContractComponent {
   if (this.currentStep === 1) {
     this.clientComponent.saveClient();
   } else if (this.currentStep === 2) {
-      this.meterComponent.saveMeter(); 
-  } else if (this.currentStep === 3) {
     this.contractComponent.saveContract();
   }
 
-  if (this.currentStep < 3) {
+  if (this.currentStep < 2) {
     this.currentStep++;
   }
 
@@ -65,21 +60,9 @@ export class CreateContractComponent {
       this.isClientSaved = true;
       this.clientId = client.clientId;
       this.savedClient = client;
-      console.log(this.savedClient);
 
       this.successMessage = "Cliente salvo com sucesso!";
       this.nextStep();
-    }
-  }
-
-  onMeterSaved(meter: IClientMeter) {
-    if (!this.isMeterSaved) {
-      if (meter) {
-        this.isMeterSaved = true;
-        this.savedMeter = meter;
-        this.successMessage = "Medidor salvo com sucesso!";
-        this.nextStep();
-      }
     }
   }
 
