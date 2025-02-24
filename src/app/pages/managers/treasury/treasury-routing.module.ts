@@ -6,9 +6,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { authGuard } from 'src/app/core/guards/auth.guard';
 
 const routes: Routes = [ 
-  { path: 'invoices/list', component: ListInvoiceComponent   },
-  { path: 'receipts/list', component: ListReceiptComponent   },
-  { path: 'payments/invoice-payment', component: RegisterReceiptComponent   }
+  { path: 'invoices/list', component: ListInvoiceComponent, canActivate: [authGuard]   },
+  { path: 'receipts/list', component: ListReceiptComponent, canActivate: [authGuard]   },
+  { path: 'payments/invoice-payment', component: RegisterReceiptComponent, canActivate: [authGuard]   }
 ];
 
 @NgModule({

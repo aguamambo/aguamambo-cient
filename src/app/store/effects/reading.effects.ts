@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { exhaustMap, map, catchError, of, tap } from "rxjs";
+import { exhaustMap, map, catchError, of, tap, switchMap } from "rxjs";
 import { IReading } from "src/app/models/reading";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess, getReadingByStatus, getReadingByStatusFailure, getReadingByStatusSuccess, updateBulkReadings, updateBulkReadingsFailure, updateBulkReadingsSuccess } from "../actions";
+import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess, getReadingByStatus, getReadingByStatusFailure, getReadingByStatusSuccess, updateBulkReadings, updateBulkReadingsFailure, updateBulkReadingsSuccess, uploadFile, uploadFileFailure, uploadFileSuccess } from "../actions";
 import { Router } from "@angular/router";
 import { PdfService } from "src/app/services/pdf.service";
 
@@ -78,6 +78,19 @@ export class ReadingEffects {
     )
   );
 
+  uploadFile$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(uploadFile),
+      switchMap(action =>
+        this.apiService.upload(action.file, '/reading/upload').pipe(
+          map(response => response === true ? uploadFileSuccess() : uploadFileFailure({ error: 'Unexpected response' })),
+          catchError(error => of(uploadFileFailure({ error: error.message })))
+        )
+      )
+    )
+  );
+
+
   listAllReadings$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listAllReadings),
@@ -97,8 +110,8 @@ export class ReadingEffects {
     this.actions$.pipe(
       ofType(createReading),
       exhaustMap(action =>
-        this.apiService.post<IReading>('/reading', action.reading).pipe(  
-          map(reading => createReadingSuccess({reading: reading})),
+        this.apiService.post<IReading>('/reading', action.reading).pipe(
+          map(reading => createReadingSuccess({ reading: reading })),
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status, error.error);
             return of(createReadingFailure({ error: error, statusCode: error.status }));
@@ -107,7 +120,7 @@ export class ReadingEffects {
       )
     )
   );
- 
+
   updateReading$ = createEffect(() =>
     this.actions$.pipe(
       ofType(updateReading),
@@ -200,15 +213,15 @@ export class ReadingEffects {
 
   refreshListAfterCreateOrUpdate$ = createEffect(() =>
     this.actions$.pipe(
-        ofType(createReadingSuccess, updateReadingSuccess),
-        map(() => listAllReadings())
+      ofType(createReadingSuccess, updateReadingSuccess),
+      map(() => listAllReadings())
     )
   );
 
   refreshListAfterUpdateBulk$ = createEffect(() =>
     this.actions$.pipe(
-        ofType( updateBulkReadingsSuccess),
-        map(() => getReadingByStatus({state: 'PENDING'}))
+      ofType(updateBulkReadingsSuccess),
+      map(() => getReadingByStatus({ state: 'PENDING' }))
     )
   );
 }

@@ -18,6 +18,21 @@ export const getReadingFailure = createAction(
   props<{ error: any }>()
 );
 
+// upload File
+export const uploadFile = createAction(
+  '[Reading] upload Reading File',
+  props<{ file: File }>()
+);
+
+export const uploadFileSuccess = createAction(
+  '[Reading] upload Reading File Success'
+);
+
+export const uploadFileFailure = createAction(
+  '[Reading] upload Reading File Failure',
+  props<{ error: any }>()
+);
+
 // GET readings/{id}
 export const getReadingByMeterId = createAction(
   '[Reading] Load Reading',

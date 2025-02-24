@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -31,7 +32,14 @@ export class ApiService {
     public delete<T>(url: string) {
         return this.http.delete<T>(this.normalizeUrl(url));
     }
- 
+
+    public upload(file: File, url: string): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+    
+        return this.http.post(this.normalizeUrl(url), formData);
+    }
+    
     private normalizeUrl(url: string): string { 
         if (/^https?:\/\//.test(url)) {
             return url;

@@ -39,6 +39,9 @@ import {
   updateBulkReadingsFailure,
   updateBulkReadingsSuccess,
   resetReadingActions,
+  uploadFile,
+  uploadFileFailure,
+  uploadFileSuccess,
 } from '../actions/reading.actions';
 import { Update } from '@ngrx/entity';
 
@@ -138,6 +141,10 @@ const reducer = createReducer(
     isLoading: false,
     errorMessage: error.error,
   })),
+
+  on(uploadFile, state => ({ ...state, loading: true, error: null })),
+  on(uploadFileSuccess, state => ({ ...state, loading: false })),
+  on(uploadFileFailure, (state, { error }) => ({ ...state, loading: false, error })),
 
   // Create reading
   on(createReading, (state) => ({ ...state, isSaving: true })),
