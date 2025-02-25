@@ -31,7 +31,7 @@ onUpload(): void {
   if (this.selectedFile) {
     this._dialogService.open({
       title: 'Processando',
-      message: 'Aguarde um instante enquanto carrega o ficheiro da leitura.',
+      message: 'Aguarde um instante enquanto carrega o ficheiro da leituras.',
       type: 'loading',
       isProcessing: true,
     });
@@ -55,14 +55,14 @@ private simulateProgress(): void {
     if (uploaded) {
       this._dialogService.open({
         title: 'Sucesso',
-        message: 'Ficheiro submetido com sucesso!',
+        message: 'Ficheiro de Leituras submetido com sucesso!',
         type: 'success'
       });
       this.selectedFile = null
     } else {
       this._dialogService.open({
         title: 'Erro',
-        message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
+        message: 'Ocorreu um erro inesperado ao submeter o ficheiro de leituras. Por favor contacte a equipa tecnica para o suporte.',
         type: 'error',
         showConfirmButton: false, 
         cancelText: 'Cancelar',
