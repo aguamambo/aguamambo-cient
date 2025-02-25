@@ -77,19 +77,22 @@ export class ReadingEffects {
       )
     )
   );
+ 
 
   uploadFile$ = createEffect(() =>
     this.actions$.pipe(
       ofType(uploadFile),
-      switchMap(action =>
-        this.apiService.upload(action.file, '/reading/upload').pipe(
-          map(response => response === true ? uploadFileSuccess() : uploadFileFailure({ error: 'Unexpected response' })),
-          catchError(error => of(uploadFileFailure({ error: error.message })))
+      exhaustMap((action) =>
+        this.apiService.upload<boolean>(action.file, '/reading/upload').pipe(
+          map(uploaded => uploadFileSuccess({uploaded})),
+          catchError(error => {
+            this.errorMessage.getErrorMessage(error.status, error.error);
+            return of(uploadFileFailure({ error }));
+          })
         )
       )
     )
   );
-
 
   listAllReadings$ = createEffect(() =>
     this.actions$.pipe(

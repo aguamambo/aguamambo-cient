@@ -48,6 +48,7 @@ import { Update } from '@ngrx/entity';
 export interface IReadingState extends EntityState<IReading> {
   isLoading: boolean;
   isSaving: boolean;
+  fileUploaded: boolean;
   errorMessage: string;
   successMessage: string;
   readingId: string;
@@ -64,6 +65,7 @@ export const adapter: EntityAdapter<IReading> = createEntityAdapter<IReading>();
 export const initialState: IReadingState = adapter.getInitialState({
   isLoading: false,
   isSaving: false,
+  fileUploaded: false,
   errorMessage: '',
   statusCode: 0,
   successMessage: '',
@@ -141,11 +143,7 @@ const reducer = createReducer(
     isLoading: false,
     errorMessage: error.error,
   })),
-
-  on(uploadFile, state => ({ ...state, loading: true, error: null })),
-  on(uploadFileSuccess, state => ({ ...state, loading: false })),
-  on(uploadFileFailure, (state, { error }) => ({ ...state, loading: false, error })),
-
+ 
   // Create reading
   on(createReading, (state) => ({ ...state, isSaving: true })),
   on(createReadingSuccess, (state, { reading }) => ({
@@ -158,6 +156,21 @@ const reducer = createReducer(
     ...state,
     isSaving: false,
     statusCode: statusCode,
+    errorMessage: error.error,
+  })),
+
+  // Create reading
+  on(uploadFile, (state) => ({ ...state, isSaving: true })),
+  on(uploadFileSuccess, (state, { uploaded }) => ({
+    ...state,
+    isSaving: false,
+    fileUploaded: uploaded,
+    successMessage: 'Reading created successfully!'
+  })),
+  on(uploadFileFailure, (state, { error}) => ({
+    ...state,
+    isSaving: false,
+    statusCode: error.status,
     errorMessage: error.error,
   })),
 

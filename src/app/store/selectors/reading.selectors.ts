@@ -23,6 +23,11 @@ export const selectReadingIsLoading = createSelector(
   (state) => state.isLoading
 );
 
+export const selectUploadedReadingFile = createSelector(
+  selectReadingState,
+  (state) => state.fileUploaded
+);
+
 export const selectReadingStatusCode = createSelector(
   selectReadingState,
   (state) => state.statusCode

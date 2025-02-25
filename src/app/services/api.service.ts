@@ -33,11 +33,11 @@ export class ApiService {
         return this.http.delete<T>(this.normalizeUrl(url));
     }
 
-    public upload(file: File, url: string): Observable<any> {
+    public upload<T>(file: File, url: string) {
         const formData = new FormData();
         formData.append('file', file);
     
-        return this.http.post(this.normalizeUrl(url), formData);
+        return this.http.post<T>(this.normalizeUrl(url), formData);
     }
     
     private normalizeUrl(url: string): string { 

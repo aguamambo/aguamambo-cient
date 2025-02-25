@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
+import { DialogService } from 'src/app/services/dialog.service';
 import { UploadFileService } from 'src/app/services/upload-file.service';
 import { IAppState, uploadFile } from 'src/app/store';
+import { selectUploadedReadingFile } from 'src/app/store/selectors/reading.selectors';
 
 @Component({
   selector: 'app-upload-file',
@@ -12,8 +14,10 @@ export class UploadFileComponent {
   selectedFile: File | null = null;
   isDragging = false;
   uploadProgress = 0; 
+
+  
  
-constructor(private _store: Store<IAppState>) {
+constructor(private _store: Store<IAppState>,private _dialogService: DialogService) {
   
 }
 onFileSelected(event: any) {
@@ -25,6 +29,12 @@ onFileSelected(event: any) {
 
 onUpload(): void {
   if (this.selectedFile) {
+    this._dialogService.open({
+      title: 'Processando',
+      message: 'Aguarde um instante enquanto carrega o ficheiro da leitura.',
+      type: 'loading',
+      isProcessing: true,
+    });
     this._store.dispatch(uploadFile({ file: this.selectedFile }));
     this.simulateProgress();
   }
@@ -41,7 +51,24 @@ private simulateProgress(): void {
     }
   }, 500);
 
-  
+  this._store.pipe(select(selectUploadedReadingFile)).subscribe((uploaded) => {
+    if (uploaded) {
+      this._dialogService.open({
+        title: 'Sucesso',
+        message: 'Ficheiro submetido com sucesso!',
+        type: 'success'
+      });
+      this.selectedFile = null
+    } else {
+      this._dialogService.open({
+        title: 'Erro',
+        message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
+        type: 'error',
+        showConfirmButton: false, 
+        cancelText: 'Cancelar',
+      });
+    }
+  })
 }
 
   onDragOver(event: DragEvent): void {

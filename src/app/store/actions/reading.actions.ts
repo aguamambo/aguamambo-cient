@@ -25,7 +25,8 @@ export const uploadFile = createAction(
 );
 
 export const uploadFileSuccess = createAction(
-  '[Reading] upload Reading File Success'
+  '[Reading] upload Reading File Success',
+  props<{uploaded: boolean}>()
 );
 
 export const uploadFileFailure = createAction(
