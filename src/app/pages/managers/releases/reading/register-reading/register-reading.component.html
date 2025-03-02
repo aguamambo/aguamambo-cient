@@ -13,29 +13,58 @@
         </span>
       </div>
     </ng-container>
-    <div class="grid md:grid-cols-4 h-full">
+    <!-- Checkbox for Mode Selection -->
+    <div class="flex items-center gap-2">
+      <input type="checkbox" id="uploadFileCheckbox" [(ngModel)]="isFileUploadSelected" />
+      <label for="uploadFileCheckbox" class="text-sm text-blue-800 dark:text-light-mode">
+        Carregar ficheiro em vez de preencher os dados manualmente
+      </label>
+    </div> 
+    <div class="w-full h-full " [ngClass]="isFileUploadSelected ? 'grid grid-cols-2' : 'grid md:grid-cols-4'">
+      <div class="flex gap-4 w-full">
 
-      <div class="flex flex-col gap-4 w-full ">
-        <span class="text-lg font-medium py-3">
-          Carregar ficheiro de Leituras
-        </span>
-        <div class="w-full bg-stone-100">
-          <app-upload-file></app-upload-file>
+
+        <!-- Year and Month Selection (Always Visible) -->
+        <div class="flex flex-col sm:flex-row w-full px-4 gap-4 items-center py-2">
+          <form [formGroup]="registReadingForm" class="flex flex-col gap-4 w-full px-4 dark:bg-deep-dark">
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
+              <app-custom-drop-down formControlName="readingYear" [options]="yearsData"
+                (selectionChange)="onYearSelect($event)">
+              </app-custom-drop-down>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Mês</label>
+              <app-custom-drop-down formControlName="readingMonth" [options]="monthsData"
+                (selectionChange)="onMonthSelect($event)">
+              </app-custom-drop-down>
+            </div>
+          </form>
+        </div>
+
+      </div>
+      <!-- File Upload Mode -->
+      <div *ngIf="isFileUploadSelected" class="flex flex-col gap-4 w-full">
+        <span class="text-lg font-medium p-3">Carregar ficheiro de Leituras</span>
+        <div class="px-16 w-full bg-stone-100">
+          <app-upload-file [selectedMonth]="selectedMonth" [selectedYear]="selectedYear">
+          </app-upload-file>
         </div>
       </div>
-      <div class="col-span-3">
-        <form [formGroup]="registReadingForm" class=" py-4 dark:bg-deep-dark ">
-          <span class="text-lg font-medium p-3">
-            Preencher dados da Leitura
-          </span>
-          <div class="flex flex-col sm:flex-row w-full p-4 gap-4 items-center ">
+
+      <!-- Manual Input Mode -->
+      <div *ngIf="!isFileUploadSelected" class="col-span-3">
+        <form [formGroup]="registReadingForm" class="py-4 dark:bg-deep-dark">
+          <span class="text-lg font-medium p-3">Preencher dados da Leitura</span>
+
+          <div class="flex flex-col sm:flex-row w-full p-4 gap-4 items-center">
             <div class="w-full">
               <app-autocomplete-input label="Empresa" [dataSource]="enterpriseData"
                 (valueSelected)="onEnterpriseSelected($event)">
               </app-autocomplete-input>
             </div>
-
-
             <div class="w-full">
               <app-autocomplete-input label="Zona" [dataSource]="zoneData" (valueSelected)="onZoneSelect($event)">
               </app-autocomplete-input>
@@ -47,51 +76,29 @@
             </div>
           </div>
 
-
           <div class="flex flex-col sm:grid sm:grid-cols-3 w-full p-4 gap-4 items-center">
-
-
-
-            <div class="w-full">
-              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
-              <span
-                class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{getCurrentYear()}}
-              </span>
-            </div>
-
             <div class="w-full">
               <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
               <app-autocomplete-input [dataSource]="clientMetersData" [placeholder]="counter"
-                (valueSelected)="onMeterSeclected($event)">
+                (valueSelected)="onMeterSelected($event)">
               </app-autocomplete-input>
             </div>
 
             <div class="w-full">
               <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>
-              <span
-                class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{lastReading}}
+              <span class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg 
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">
+                {{ lastReading }}
               </span>
-            </div>
-
-          </div>
-
-          <div class="flex flex-col sm:grid sm:grid-cols-3 w-full p-4 gap-4 items-center">
-            <div class="w-full">
-              <app-custom-drop-down formControlName="readingMonth" label="Mês" [options]="monthsData"
-                (selectionChange)="onMonthSelect($event)">
-              </app-custom-drop-down>
             </div>
 
             <div class="w-full">
               <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Actual</label>
               <input type="text" formControlName="currentReading" #currentReading
-                (input)="onNumberInputChange(currentReading, 'currentReading')"
-                class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-
+                (input)="onNumberInputChange(currentReading, 'currentReading')" class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg 
+                            focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
             </div>
-
           </div>
-
         </form>
 
         <div *ngIf="validFields" class="w-full flex items-center justify-end p-4">
@@ -101,8 +108,8 @@
           </button>
         </div>
       </div>
-
     </div>
+
   </div>
 
 </div>

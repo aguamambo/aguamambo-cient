@@ -8,10 +8,11 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router); 
   const token = localStorage.getItem('token');
    
-  if (token && !jwtHelper.isTokenExpired(token)) {
+  // if (token && !jwtHelper.isTokenExpired(token)) {
+  //   return true;  
+  // }
+  
+  // router.navigate(['/auth/login']);
+  // return false;
     return true;  
-  }
-
-  router.navigate(['/auth/login']);
-  return false;
 };

@@ -33,9 +33,11 @@ export class ApiService {
         return this.http.delete<T>(this.normalizeUrl(url));
     }
 
-    public upload<T>(file: File, url: string) {
+    public upload<T>(payload: { readingMonth: number; readingYear: number; file: File }, url: string) {
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', payload.file);
+        formData.append('readingMonth', payload.readingMonth.toString());
+        formData.append('readingYear', payload.readingYear.toString());
     
         return this.http.post<T>(this.normalizeUrl(url), formData);
     }

@@ -21,7 +21,13 @@ export const getReadingFailure = createAction(
 // upload File
 export const uploadFile = createAction(
   '[Reading] upload Reading File',
-  props<{ file: File }>()
+  props<{ 
+   payload :{
+      readingMonth: number,
+      readingYear : number,
+      file: File
+    }  
+  }>()
 );
 
 export const uploadFileSuccess = createAction(

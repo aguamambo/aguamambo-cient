@@ -83,7 +83,7 @@ export class ReadingEffects {
     this.actions$.pipe(
       ofType(uploadFile),
       exhaustMap((action) =>
-        this.apiService.upload<boolean>(action.file, '/reading/upload').pipe(
+        this.apiService.upload<boolean>(action.payload, '/reading/upload').pipe(
           map(uploaded => uploadFileSuccess({uploaded})),
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status, error.error);

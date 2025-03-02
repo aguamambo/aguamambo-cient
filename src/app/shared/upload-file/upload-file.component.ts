@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { DialogService } from 'src/app/services/dialog.service';
 import { UploadFileService } from 'src/app/services/upload-file.service';
@@ -15,7 +15,8 @@ export class UploadFileComponent {
   isDragging = false;
   uploadProgress = 0; 
 
-  
+  @Input() selectedMonth!: string;
+  @Input() selectedYear!: string;
  
 constructor(private _store: Store<IAppState>,private _dialogService: DialogService) {
   
@@ -35,7 +36,14 @@ onUpload(): void {
       type: 'loading',
       isProcessing: true,
     });
-    this._store.dispatch(uploadFile({ file: this.selectedFile }));
+
+    const payload = {
+      readingMonth: +this.selectedMonth,
+      readingYear: +this.selectedYear,
+      file: this.selectedFile
+    } 
+    
+    this._store.dispatch(uploadFile({ payload: payload }));
     this.simulateProgress();
   }
 }

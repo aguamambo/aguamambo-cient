@@ -48,7 +48,14 @@ export class RegisterReadingComponent implements OnInit {
   validFields: boolean = false;
   dialogType: 'success' | 'error' = 'success';
   dialogMessage = '';
+  selectedMonth = '';
   pdfUrl: SafeResourceUrl | null = null;
+  currentYear: number = new Date().getFullYear();
+  selectedYear: string = '';
+  enableSelection: boolean = false;
+  years: number[] = [];
+  yearsData: { label: string; value: string }[] = [];
+  isFileUploadSelected: boolean = false;
 
   isZonesLoading$: Observable<boolean>;
   isEnterprisesLoading$: Observable<boolean>;
@@ -87,6 +94,8 @@ export class RegisterReadingComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.auth.checkSession();
+    this.generateYearsList();
+    
     this.initForm();
     this.loadData();
   }
@@ -119,6 +128,27 @@ export class RegisterReadingComponent implements OnInit {
       }
     });
 
+  }
+
+  generateYearsList(): void {
+    const currentYear = this.getCurrentYear();
+    for (let i = 0; i < 10; i++) {
+      this.yearsData.push({ label: `${currentYear - i}`, value: (currentYear - i).toString() });
+    }
+  }
+
+  toggleSelection(): void {
+    this.enableSelection = !this.enableSelection;
+
+    if (!this.enableSelection) {
+      // Se desmarcar, mantém o ano atual no form
+      this.registReadingForm.get('readingYear')?.setValue(this.getCurrentYear());
+    }
+  }
+
+  onYearSelect(event: any): void {
+    this.registReadingForm.get('readingYear')?.setValue(event.value);
+    this.selectedYear = event.value
   }
   
   getReadingByMeter(counter: string){
@@ -218,7 +248,7 @@ export class RegisterReadingComponent implements OnInit {
     }
   }
   
-  onMeterSeclected(option: IOption) {
+  onMeterSelected(option: IOption) {
     if (option && option.value) {
       this.lastReading = 0
       this.counter = option.value
@@ -457,6 +487,7 @@ export class RegisterReadingComponent implements OnInit {
 
   onMonthSelect(selectedOption: { value: string; label: string }) {
     this.registReadingForm.get('readingMonth')?.setValue(selectedOption.value)
+    this.selectedMonth =  selectedOption.value
   }
 
   ngOnDestroy(): void {
@@ -480,7 +511,7 @@ export class RegisterReadingComponent implements OnInit {
       { value: '12', label: 'Dezembro' }
     ];
   }
-
+ 
   checkSession() {
     if (!this.auth.authenticated()) {
       this.auth.logout()
