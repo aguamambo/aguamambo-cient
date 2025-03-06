@@ -24,6 +24,9 @@ import {
   getZoneByEnterpriseIdFailure,
   getZoneByEnterpriseIdSuccess,
   resetZonesActions,
+  getZoneByClientId,
+  getZoneByClientIdFailure,
+  getZoneByClientIdSuccess,
 } from '../actions/zone.actions';
 import { Update } from '@ngrx/entity';
 
@@ -76,6 +79,20 @@ const reducer = createReducer(
   })),
   
   on(getZoneByEnterpriseIdFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error.error,
+  })),
+
+// Get Zone by Client ID
+  on(getZoneByClientId, (state) => ({ ...state, isLoading: true })),
+  on(getZoneByClientIdSuccess, (state, { zone }) => ({
+    ...state,
+    selectedZone: zone,
+    isLoading: false,
+  })),
+  
+  on(getZoneByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error.error,

@@ -4,7 +4,7 @@ import { exhaustMap, map, catchError, of } from "rxjs";
 import { IZone } from "src/app/models/zone";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getZone, getZoneSuccess, getZoneFailure, listAllZones, listAllZonesSuccess, listAllZonesFailure, createZone, createZoneSuccess, createZoneFailure, updateZone, updateZoneSuccess, updateZoneFailure, deleteZone, deleteZoneSuccess, deleteZoneFailure, loadZonesCount, loadZonesCountSuccess, loadZonesCountFailure, getZoneByEnterpriseId, getZoneByEnterpriseIdFailure, getZoneByEnterpriseIdSuccess } from "../actions";
+import { getZone, getZoneSuccess, getZoneFailure, listAllZones, listAllZonesSuccess, listAllZonesFailure, createZone, createZoneSuccess, createZoneFailure, updateZone, updateZoneSuccess, updateZoneFailure, deleteZone, deleteZoneSuccess, deleteZoneFailure, loadZonesCount, loadZonesCountSuccess, loadZonesCountFailure, getZoneByEnterpriseId, getZoneByEnterpriseIdFailure, getZoneByEnterpriseIdSuccess, getZoneByClientId, getZoneByClientIdFailure, getZoneByClientIdSuccess } from "../actions";
 
 @Injectable()
 export class ZoneEffects {
@@ -23,6 +23,21 @@ export class ZoneEffects {
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getZoneFailure({ error }));
+          })
+        )
+      )
+    )
+  );
+
+  getZoneByClientId$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(getZoneByClientId),
+      exhaustMap(action =>
+        this.apiService.get<IZone>(`/zone/by-client/${action.clientId}`).pipe(
+          map(zone => getZoneByClientIdSuccess({ zone })),
+          catchError(error => {
+            this.errorMessage.getErrorMessage(error.status, error.error);
+            return of(getZoneByClientIdFailure({ error }));
           })
         )
       )

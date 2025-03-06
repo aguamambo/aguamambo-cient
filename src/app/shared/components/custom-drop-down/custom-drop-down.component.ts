@@ -26,38 +26,41 @@ export class CustomDropDownComponent implements OnInit, ControlValueAccessor {
   private onTouched: any = () => {};
 
   ngOnInit(): void {
-    this.initializeFirstOption();
-  }
- 
-  private initializeFirstOption(): void {
-    if (this.options.length > 0) {
-      const firstOption = this.options[0];
-      this.selectedValue = firstOption.value;
-      this.selectedLabel = firstOption.label;
-      this.onChange(firstOption.value);
-      this.selectionChange.emit(firstOption);
-    }
+    // No need to call setDefaultSelection here, it is handled by writeValue.
   }
 
   toggleDropdown(): void {
     this.isOpen = !this.isOpen;
   }
 
-  selectOption(option: { value: string; label: string }): void {
+  selectOption(option: { value: string; label: string }, emitChange: boolean = true): void {
     this.selectedValue = option.value;
     this.selectedLabel = option.label;
     this.isOpen = false;
-    this.onChange(option.value);
-    this.selectionChange.emit(option);
+
+    if (emitChange) {
+      this.onChange(option.value);
+      this.selectionChange.emit(option);
+    }
   }
 
   writeValue(value: any): void {
     if (value) {
       const selectedOption = this.options.find(option => option.value === value);
       if (selectedOption) {
-        this.selectedValue = selectedOption.value;
-        this.selectedLabel = selectedOption.label;
+        this.selectOption(selectedOption, false);
+      } else {
+        this.setDefaultSelection();
       }
+    } else {
+      this.setDefaultSelection();
+    }
+  }
+
+  private setDefaultSelection(): void {
+    if (this.options.length > 0) {
+      const firstOption = this.options[0];
+      this.selectOption(firstOption, false);
     }
   }
 

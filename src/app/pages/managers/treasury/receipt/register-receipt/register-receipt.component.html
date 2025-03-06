@@ -22,14 +22,14 @@
         <app-autocomplete-input
           label="Empresa" 
           [dataSource]="enterpriseData"
-          (valueSelected)="onValueSelected($event)">
+          (valueSelected)="onEnterpriseSelected($event)">
         </app-autocomplete-input>
       </div>
       
 
       <div class="w-full">
         <app-autocomplete-input label="Zona" [dataSource]="zoneData"
-        (valueSelected)="onEnterpriseSelect($event)">
+        (valueSelected)="onZoneSelected($event)">
         </app-autocomplete-input>
       </div>
       <div class="w-full">
@@ -80,7 +80,7 @@
       </app-table>
     </div>
 
-    <div class="p-6" *ngIf="invoicesToBePaid.length > 0">
+    <div class="p-6" *ngIf="showInvoicesToBePaid">
       <label class="font-semibold text-lg mb-2 block py-1 px-3">
         Faturas a Serem Pagas
       </label>
@@ -91,9 +91,27 @@
 
     <div class="flex justify-between items-center p-6 gap-3 shadow-md rounded-lg">
       <div class="w-1/5">
-        <label class="font-semibold text-sm"></label>
-        <app-custom-drop-down label="Método de Pagamento" [options]="paymentMethods"
-          (selectionChange)="onPaymentMethodSelected($event)" formControlName="paymentMethod"></app-custom-drop-down>
+        <div class="w-full">
+          <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Métodos de Pagamentos</label>
+          <div class="relative">
+            <div (click)="toggleDropdown()"
+              class="flex items-center justify-between border border-gray-300 text-gray-900 dark:text-light-mode bg-light-mode dark:bg-slate-500 px-4 py-2 rounded-lg cursor-pointer">
+              <span>{{ selectedLabel}}</span>
+              <svg class="fill-current h-8 w-8 rounded-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M5.2 7.2L10 12l4.8-4.8H5.2z" />
+              </svg>
+            </div>
+        
+            <div *ngIf="isOpen" class="absolute mt-1 w-full rounded-xl bg-light-mode dark:bg-slate-500 z-50 shadow-lg">
+              <ul class="overflow-auto max-h-40 rounded-xl">
+                <li *ngFor="let option of paymentMethods" (click)="onPaymentMethodSelected(option)"
+                  class="px-4 py-2 hover:bg-deep-dark hover:text-light-mode text-gray-900 dark:text-light-mode cursor-pointer">
+                  {{ option.label }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>        
       </div>
 
       <div class="flex flex-col">

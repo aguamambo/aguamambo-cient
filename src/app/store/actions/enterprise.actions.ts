@@ -49,6 +49,22 @@ export const createEnterpriseFailure = createAction(
   props<{ error: any }>()
 );
 
+// POST enterprises by zoneId
+export const getEnterpriseByZoneId = createAction(
+  '[Enterprise] Get Enterprise By Zone Id',
+  props<{ zoneId: string }>()
+);
+
+export const getEnterpriseByZoneIdSuccess = createAction(
+  '[Enterprise] Get Enterprise By Zone Id Success',
+  props<{ enterprise: IEnterprise }>()
+);
+
+export const getEnterpriseByZoneIdFailure = createAction(
+  '[Enterprise] Get Enterprise By Zone Id Failure',
+  props<{ error: any }>()
+);
+
 // PUT enterprises/{id}
 export const updateEnterprise = createAction(
   '[Enterprise] Update Enterprise',

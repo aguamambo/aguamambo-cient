@@ -6,7 +6,7 @@ import { IInvoice } from './../../../../../models/invoice';
 import { Component, OnInit } from '@angular/core';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
-import { createReceipt, getClientByZoneId, getContractByClientId, getInvoiceByClientId, getInvoiceByMeter, getInvoiceByStatus, getReceiptFile, getReceiptPaymentMethods, getZoneByEnterpriseId, listAllClients, listAllEnterprises, resetClientActions, resetClientMetersActions, resetContractActions, resetInvoiceActions, resetReceiptActions } from 'src/app/store';
+import { createReceipt, getClientByZoneId, getContractByClientId, getEnterpriseByZoneId, getInvoiceByClientId, getInvoiceByMeter, getInvoiceByStatus, getReceiptFile, getReceiptPaymentMethods, getZoneByClientId, getZoneByEnterpriseId, listAllClients, listAllEnterprises, listAllZones, resetClientActions, resetClientMetersActions, resetContractActions, resetInvoiceActions, resetReceiptActions } from 'src/app/store';
 import { IClient } from 'src/app/models/client';
 import { IOption } from 'src/app/models/option';
 import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
@@ -14,8 +14,8 @@ import { selectContractIsLoading, selectSelectedContracts } from 'src/app/store/
 import { IContract } from 'src/app/models/contract';
 import { selectPaymentMethods, selectReceiptErrorMessage, selectReceiptIsSaving, selectSelectedReceipt, selectSelectedReceiptFile } from 'src/app/store/selectors/receipt.selectors';
 import { DialogService } from 'src/app/services/dialog.service';
-import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
-import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
+import { selectSelectedZone, selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
+import { selectSelectedEnterprise, selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
 import { IZone } from 'src/app/models/zone';
 import { IEnterprise } from 'src/app/models/enterprise';
 
@@ -47,21 +47,27 @@ export class RegisterReceiptComponent implements OnInit {
   clientsList: IClient[] = [];
   invoicesToBePaid: IInvoice[] = [];
   isDialogOpen: boolean = false;
+  isOpen: boolean = false;
   dialogType: 'success' | 'error' = 'success';
-    dialogMessage = '';
+  dialogMessage = '';
+  selectedLabel = '';
   counter: string = 'Selecione...';
   invoiceColumns: { key: keyof IInvoice; label: string }[] = [];
   customerBalance: number = 0;
   enablePaymentButton: boolean = false;
+  showInvoicesToBePaid: boolean = false
   valorPago: number = 0;
   outstandingAmount: number = 0;
   zoneData: IOption[] = [];
-enterpriseData: IOption[] = []; 
-enterprisesList: IEnterprise[] = [];
-zoneList: IZone[] = [];
-getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
+  enterpriseData: IOption[] = [];
+  enterprisesList: IEnterprise[] = [];
+  zoneList: IZone[] = [];
+  clientList: IClient[] = [];
+
+  getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
+
   constructor(private fb: FormBuilder,
     private _dialogService: DialogService, private store: Store, private generic: GenericConfig, private auth: AuthService) {
     this.form = this.fb.group({
@@ -72,8 +78,8 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
       purpose: [''],
       clientId: ['', Validators.required],
 
-    }); 
-    
+    });
+
     this.isClientLoading$ = this.store.pipe(select(selectClientIsLoading))
     this.isInvoiceLoading$ = this.store.pipe(select(selectInvoiceIsLoading))
     this.isContractLoading$ = this.store.pipe(select(selectContractIsLoading))
@@ -99,8 +105,10 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
 
 
   getData() {
-    this._dialogService.reset()
+    this._dialogService.reset();
     this.store.dispatch(listAllEnterprises());
+    this.store.dispatch(getReceiptPaymentMethods());
+
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
       if (enterprises) {
         this.enterprisesList = enterprises;
@@ -111,11 +119,8 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
             value: enterprise.enterpriseId
           }))
         ];
-
       }
     });
-    this.store.dispatch(listAllClients());
-    this.store.dispatch(getReceiptPaymentMethods());
 
     this.getClients$.pipe(takeUntil(this.destroy$)).subscribe(clients => {
       if (clients) {
@@ -130,18 +135,38 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
       }
     });
 
-    this.getPaymentMethods$.pipe(takeUntil(this.destroy$)).subscribe(paymentMethods => {
-      if (paymentMethods) {
-        this.paymentMethods = [
+    this.store.pipe(select(selectSelectedZones)).subscribe(zones => {
+      if (zones) {
+        this.zoneList = zones;
+        this.zoneData = [
           { label: 'Seleccione...', value: '' },
-          ...paymentMethods.map(paymentMethod => ({
-            label: paymentMethod,
-            value: paymentMethod
+          ...zones.map(zone => ({
+            label: zone.designation,
+            value: zone.zoneId
           }))
         ];
       }
-    })
+    });
+
+    this.getPaymentMethods$.pipe(takeUntil(this.destroy$)).subscribe(paymentMethods => {
+      if (paymentMethods) {
+        this.paymentMethods = [
+          ...paymentMethods.map(paymentMethod => ({
+            label: paymentMethod,
+            value: paymentMethod,
+          })),
+        ];
+
+        const mpesaOption = this.paymentMethods.find(method => method.value === 'MPESA');
+        if (mpesaOption) {
+          this.selectedLabel = mpesaOption.value
+          this.form.get('paymentMethod')?.setValue(mpesaOption.value);
+        }
+      }
+    });
+
   }
+
   filterInvoices(searchTerm: string): void {
     const searchTermLower = searchTerm.toLowerCase();
     this.filteredInvoices = this.invoicesData.filter(invoice =>
@@ -150,7 +175,7 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
       )
     );
   }
-  onClientSelected(event: { value: string; label: string }) {
+  onClientSelect(event: { value: string; label: string }) {
     this.store.pipe(select(resetContractActions))
     this.store.pipe(select(resetInvoiceActions))
 
@@ -186,26 +211,7 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
         }
       });
     }
-  }
-
-  addInvoiceTosPayment(invoice: IInvoice) {
-    if (!this.invoicesToBePaid.includes(invoice)) {
-      this.invoicesToBePaid.push(invoice);
-      this.form.patchValue({
-        invoiceIds: this.invoicesToBePaid.map(invoice => invoice.invoiceId)
-      });
-      this.calculateOutstandingAmount();
-    }
-  }
-
-  removeInvoiceFrsomPayment(invoice: any) {
-    const index = this.invoicesToBePaid.indexOf(invoice);
-    if (index > -1) {
-      this.invoicesToBePaid.splice(index, 1);
-      this.invoicesData.push(invoice);
-      this.calculateOutstandingAmount();
-    }
-  }
+  } 
 
   addInvoiceToPayment(invoice: IInvoice) {
     if (!this.invoicesToBePaid.includes(invoice)) {
@@ -214,6 +220,9 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
       this.form.patchValue({
         invoiceIds: this.invoicesToBePaid.map(invoice => invoice.invoiceId)
       });
+
+      this.showInvoicesToBePaid = this.invoicesToBePaid.length > 0
+
       this.calculateOutstandingAmount();
     }
   }
@@ -234,6 +243,8 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
         invoiceIds.splice(invoiceIndex, 1);
 
         this.form.controls['invoiceIds'].setValue([...invoiceIds]);
+
+        
       }
 
       this.calculateOutstandingAmount();
@@ -340,56 +351,95 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
     this.openPdfFromBase64(cleanBase64);
 
   }
-
-   onValueSelected(option: IOption): void {
-      if (option && option.value) {
-        this.counter = ''
-        this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
-        this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe(
-          (zones) => {
-            if (zones) {
-              this.zoneList = zones;
-              this.zoneData = [
-                { label: 'Seleccione...', value: '' },
-                ...zones.map(zone => ({ label: zone.designation, value: zone.zoneId }))
-              ];
-            }
-          },
-          () => {
-            this.openDialog('error', 'Erro ao carregar zonas.');
+  toggleDropdown(): void {
+    this.isOpen = !this.isOpen;
+  }
+  onValueSelected(option: IOption): void {
+    if (option && option.value) {
+      this.counter = ''
+      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
+      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe(
+        (zones) => {
+          if (zones) {
+            this.zoneList = zones;
+            this.zoneData = [ 
+              ...zones.map(zone => ({ label: zone.designation, value: zone.zoneId }))
+            ];
           }
-        );
-      }
+        },
+        () => {
+          this.openDialog('error', 'Erro ao carregar zonas.');
+        }
+      );
     }
+  }
 
-    openDialog(type: 'success' | 'error', message: string): void {
-      this.dialogType = type;
-      this.dialogMessage = message;
-      this.isDialogOpen = true;
+  openDialog(type: 'success' | 'error', message: string): void {
+    this.dialogType = type;
+    this.dialogMessage = message;
+    this.isDialogOpen = true;
+  }
+
+  onEnterpriseSelected(option: IOption): void {
+    if (option && option.value) {
+      this.counter = '';
+ 
+      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
+      this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(
+        (zones) => {
+          if (zones) {
+            this.zoneList = zones;
+            this.zoneData = [ 
+              ...zones.map(zone => ({ label: zone.designation, value: zone.zoneId }))
+            ];
+          }
+        }
+      );
     }
+  }
+
+  onZoneSelected(event: { value: string; label: string }): void {
+    if (event && event.value) {
+      this.counter = '';
   
-    
-    onEnterpriseSelect(event: { value: string; label: string }): void {
-      if (event && event.value) {
-        this.counter = '' 
-        this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
-        this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
-          (clients) => {
-            if (clients) {
-              this.clientsList = clients;
-              this.clientData = [
-                { label: 'Seleccione...', value: '' },
-                ...clients.map(client => ({ label: client.name, value: client.clientId }))
-              ];
-            }
-          },
-          () => {
-            this.openDialog('error', 'Erro ao carregar clientes.');
+      this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
+      this.store.pipe(select(selectSelectedClients), filter((clients) => !!clients), first()).subscribe(
+        (clients) => {
+          if (clients) {
+            this.clientList = clients;
+            this.clientData = [ 
+              ...clients.map(client => ({ label: client.name, value: client.clientId }))
+            ];
           }
-        );
-      }
+        }
+      );
     }
-    
+  }
+
+
+  onClientSelected(event: { value: string; label: string }) {
+    if (event && event.value) {
+      this.store.pipe(select(resetContractActions));
+      this.store.pipe(select(resetInvoiceActions));
+
+      this.form.get('clientId')?.setValue(event.value);
+      this.store.dispatch(getContractByClientId({ clientId: event.value }));
+      this.store.pipe(select(selectSelectedContracts), takeUntil(this.unsubscribe$)).subscribe(contracts => {
+        if (contracts && contracts.length > 0) {
+          this.contractList = contracts;
+          const firstContract = { value: contracts[0].contractId, label: contracts[0].meterId };
+          this.counter = firstContract.label;
+          this.contractsData = contracts.map(contract => ({
+            label: contract.meterId,
+            value: contract.contractId,
+          }));
+          this.onContractSelected(firstContract);
+        }
+      });
+
+       
+    }
+  }
 
   onReset(): void {
     this.store.dispatch(resetReceiptActions());
@@ -468,10 +518,11 @@ getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   }
 
 
-
   calculateOutstandingAmount() {
     const totalInvoices = this.invoicesToBePaid.reduce((total, invoice) => total + invoice.totalAmount, 0);
     this.outstandingAmount = totalInvoices - this.customerBalance - this.valorPago;
+
+  this.showInvoicesToBePaid = this.invoicesToBePaid.length > 0
   }
 
   formatCurrency(amount: number | null): string {

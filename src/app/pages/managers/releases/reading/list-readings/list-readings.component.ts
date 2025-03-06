@@ -34,7 +34,8 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   selectedReading!: IReading;
   selectedBulkStatus: any;
-  setState: string = ""
+  setState: string = ''
+  selectedZoneId: string = '';
 
   isReadingsLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
@@ -237,20 +238,35 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   onEnterpriseSelect(event: { value: string }): void {
     if (event?.value) {
-      this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
-      this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
-        if (clients) {
-          this.clientData = [
+      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: event.value }));
+      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
+        if (zones) {
+          this.zoneData = [
             { label: 'Seleccione...', value: '' },
-            ...clients.map(client => ({
-              label: client.name,
-              value: client.clientId
+            ...zones.map(zone => ({
+              label: zone.designation,
+              value: zone.zoneId
             }))
           ];
         }
       });
     }
   }
+  
+  onZoneSelect(event: { value: string }): void {
+    if (event?.value) {
+      this.selectedZoneId = event.value
+      this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
+      this.filterPendingReadingsByZone(event.value);
+    }
+  }
+  
+  filterPendingReadingsByZone(zoneId: string): void {
+    this.filteredReadings = this.readingsData.filter(
+      reading => reading.state === 'PENDENTE'
+    );
+  }
+  
 
   getCurrentYear(): number {
     return new Date().getFullYear();

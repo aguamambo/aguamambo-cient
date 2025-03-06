@@ -4,7 +4,7 @@ import { exhaustMap, map, catchError, of } from "rxjs";
 import { IEnterprise } from "src/app/models/enterprise";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getEnterprise, getEnterpriseSuccess, getEnterpriseFailure, listAllEnterprises, listAllEnterprisesSuccess, listAllEnterprisesFailure, createEnterprise, createEnterpriseSuccess, createEnterpriseFailure, updateEnterprise, updateEnterpriseSuccess, updateEnterpriseFailure, deleteEnterprise, deleteEnterpriseSuccess, deleteEnterpriseFailure, loadEnterprisesCount, loadEnterprisesCountSuccess, loadEnterprisesCountFailure } from "../actions";
+import { getEnterprise, getEnterpriseSuccess, getEnterpriseFailure, listAllEnterprises, listAllEnterprisesSuccess, listAllEnterprisesFailure, createEnterprise, createEnterpriseSuccess, createEnterpriseFailure, updateEnterprise, updateEnterpriseSuccess, updateEnterpriseFailure, deleteEnterprise, deleteEnterpriseSuccess, deleteEnterpriseFailure, loadEnterprisesCount, loadEnterprisesCountSuccess, loadEnterprisesCountFailure, getEnterpriseByZoneId, getEnterpriseByZoneIdFailure, getEnterpriseByZoneIdSuccess } from "../actions";
 
 @Injectable()
 export class EnterpriseEffects {
@@ -23,6 +23,21 @@ export class EnterpriseEffects {
                     catchError(error => {
                        this.errorMessage.getErrorMessage(error.status, error.error);
                         return of(getEnterpriseFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
+
+    getEnterpriseByZoneId$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getEnterpriseByZoneId),
+            exhaustMap(action =>
+                this.apiService.get<IEnterprise>(`/enterprise/enterprise/${action.zoneId}`).pipe(
+                    map(enterprise => getEnterpriseByZoneIdSuccess({ enterprise })),
+                    catchError(error => {
+                       this.errorMessage.getErrorMessage(error.status, error.error);
+                        return of(getEnterpriseByZoneIdFailure({ error }));
                     })
                 )
             )

@@ -21,7 +21,10 @@ import {
   loadEnterprisesCount,
   loadEnterprisesCountSuccess,
   loadEnterprisesCountFailure,
-  resetEnterpriseActions
+  resetEnterpriseActions,
+  getEnterpriseByZoneId,
+  getEnterpriseByZoneIdFailure,
+  getEnterpriseByZoneIdSuccess
 } from "../actions/enterprise.actions";
 import { Update } from "@ngrx/entity";
 
@@ -59,6 +62,19 @@ const reducer = createReducer(
     isLoading: false,
   })),
   on(getEnterpriseFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error.error,
+  })),
+
+  // Get enterprise by ID
+  on(getEnterpriseByZoneId, (state) => ({ ...state, isLoading: true })),
+  on(getEnterpriseByZoneIdSuccess, (state, { enterprise }) => ({
+    ...state,
+    selectedEnterprise: enterprise,
+    isLoading: false,
+  })),
+  on(getEnterpriseByZoneIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error.error,

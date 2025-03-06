@@ -34,6 +34,22 @@ export const getZoneByEnterpriseIdFailure = createAction(
   props<{ error: any }>()
 );
 
+// GET zones/{clientId}
+export const getZoneByClientId = createAction(
+  '[Zone] Load Zone By Client Id',
+  props<{ clientId: string }>()
+);
+
+export const getZoneByClientIdSuccess = createAction(
+  '[Zone] Load Zone By Client Id Success',
+  props<{ zone: IZone }>()
+);
+
+export const getZoneByClientIdFailure = createAction(
+  '[Zone] Load Zone By Client Id Failure',
+  props<{ error: any }>()
+);
+
 // GET zones
 export const listAllZones = createAction(
   '[Zone] Load Zones'
