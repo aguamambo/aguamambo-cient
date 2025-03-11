@@ -28,6 +28,11 @@ export const selectUploadedReadingFile = createSelector(
   (state) => state.fileUploaded
 );
 
+export const selectExportedReadingFile = createSelector(
+  selectReadingState,
+  (state) => state.fileContent
+);
+
 export const selectReadingStatusCode = createSelector(
   selectReadingState,
   (state) => state.statusCode

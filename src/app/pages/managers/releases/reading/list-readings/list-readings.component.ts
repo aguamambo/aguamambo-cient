@@ -1,3 +1,4 @@
+import { FileHandlerService } from './../../../../../services/file-handler.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
@@ -6,7 +7,7 @@ import { delay, filter, first, takeUntil } from 'rxjs/operators';
 import { IOption } from 'src/app/models/option';
 import { IReading } from 'src/app/models/reading';
 import { IZone } from 'src/app/models/zone';
-import { getClientByZoneId, getZoneByEnterpriseId, IAppState, listAllReadings, updateReading } from 'src/app/store';
+import { exportReadingsByZone, getClientByZoneId, getReadingByStateZone, getZoneByEnterpriseId, IAppState, listAllReadings, listAllZones, updateReading } from 'src/app/store';
 import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
@@ -21,7 +22,11 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   readingForm: FormGroup;
   readingsList: IReading[] = [];
   readingsData: IReading[] = [];
-  filteredReadings: IReading[] = [];
+  selectedReadings: any[] = [];
+  filteredReadings: IReading[] = []; 
+  selectedZone: string = '';
+  selectedState: string = '';
+
   monthsData: IOption[] = [];
   statusData: IOption[] = [];
   counter: string = '';
@@ -46,8 +51,9 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
   getReadingsByCustomerId$ = this.store.pipe(select(selectSelectedReading));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeter));
+  readingColumnsWithCheckbox: ({ key: keyof IReading ; label: string; })[];
 
-  constructor(private fb: FormBuilder, private store: Store<IAppState>) {
+  constructor(private fb: FormBuilder, private store: Store<IAppState>, private fileService: FileHandlerService) {
     this.readingForm = this.fb.group({
       readingMonth: ['', Validators.required],
       currentReading: ['', Validators.required],
@@ -75,6 +81,11 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       { key: 'userChanged', label: 'Alterado por' },
       { key: 'userCreated', label: 'Criado por' }
     ];
+
+    this.readingColumnsWithCheckbox = [
+      { key: 'checkbox', label: '' },
+      ...this.readingColumns,
+    ];
   }
 
   ngOnInit(): void {
@@ -93,7 +104,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     ];
 
     this.store.dispatch(listAllReadings());
-
+    
     this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe(readings => {
       if (readings) {
         this.readingsList = readings;
@@ -103,7 +114,20 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
           updatedAt: this.formatDate(reading.updatedAt),
           state: this.translateState(reading.state)
         }));
+        
+        this.filteredReadings = [...this.readingsData]
+      }
+    });
 
+    this.store.dispatch(listAllZones());
+    this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(zones => {
+      if (zones) {
+        this.zones = zones;
+        this.zoneData = zones.map(zone => ({
+           label: zone.designation.toUpperCase(),
+           value: zone.zoneId
+        }));
+        
         this.filteredReadings = [...this.readingsData]
       }
     });
@@ -122,6 +146,10 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     }
   }
 
+  exportExcel() {
+    this.store.dispatch(exportReadingsByZone({zoneId: this.selectedZoneId}))
+  }
+  
   private setFormControlState(isEnabled: boolean): void {
     const method = isEnabled ? 'enable' : 'disable';
     this.readingForm.controls['readingYear'][method]();
@@ -167,6 +195,52 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     }
   }
 
+  filterByZone(event: {value: string, label: string}) {
+    this.selectedZoneId = event.value;
+    this.applyFilters();
+  }
+
+  filterByState(event: {value: string, label: string}) {
+    this.selectedState =event.value;
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    const payload = {
+      zoneId: this.selectedZoneId,
+      state: this.selectedState
+    }
+
+    console.log('Payload::> ', payload);
+    
+
+    if (this.selectedZoneId && this.selectedState) {
+      this.store.dispatch(getReadingByStateZone({payload}))
+  
+      this.store.pipe(select(selectSelectedReadings), filter((readings) => !!readings), first()).subscribe((readings) => {
+        if (readings) {
+          this.filteredReadings = readings
+          this.readingsList = readings
+        }
+      }) 
+    }
+
+  }
+
+  toggleSelection(reading: any) {
+    const index = this.selectedReadings.findIndex(item => item.id === reading.id);
+    if (index > -1) {
+        this.selectedReadings.splice(index, 1);
+    } else {
+        this.selectedReadings.push(reading);
+    }
+}
+
+  resetFilters() {
+    this.selectedZone = '';
+    this.selectedState = '';
+    this.filteredReadings = [...this.readingsList];
+  }
   applyBulkStatusChange(): void {
     if (this.selectedBulkStatus) { 
       this.readingsList = this.readingsList.map((reading) => {  

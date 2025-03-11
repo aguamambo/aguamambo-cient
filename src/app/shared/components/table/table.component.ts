@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 interface RowData {
@@ -11,16 +11,20 @@ interface RowData {
   styleUrl: './table.component.css'
 })
 export class  TableComponent<T> {
-  @Input() data: T[] = []; // Use T[] here, instead of RowData[]
-  @Input() columns: { key: keyof T; label: string }[] = [];
+  @Input() data: T[] = [];
+  @Input() columns: { label: string;  key: keyof T}[] = [];
   @Input() pageSize: number = 5;
-
-  totalCountRecords: number = 0;
-
+  @Input() customColumn!: TemplateRef<any>; 
   @Input() set totalCount(value: number) {
     this.totalCountRecords = value;
     this.totalPages = Math.ceil(this.totalCountRecords / this.pageSize);
   }
+  @Output() pageSizeChange = new EventEmitter<number>();
+  @Output() pageChange = new EventEmitter<number>();
+  @Output() rowClick = new EventEmitter<T>();
+
+  totalCountRecords: number = 0;
+
 
   get totalCount(): number {
     return this.totalCountRecords;
@@ -28,10 +32,7 @@ export class  TableComponent<T> {
 
   currentPage: number = 1;
   totalPages: number = 0;
-  @Output() pageSizeChange = new EventEmitter<number>();
-  @Output() pageChange = new EventEmitter<number>();
-  @Output() rowClick = new EventEmitter<T>();
-  sortColumn: keyof T | null = null;  
+  sortColumn: keyof T | 'checkbox' | null = null;
   sortDirection: 'asc' | 'desc' = 'asc'; 
   
   getPaginatedData(): T[] {

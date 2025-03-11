@@ -12,4 +12,5 @@ export interface IReading {
   meterId: string;
   userChanged: string;
   userCreated: string; 
+  checkbox: string
 }

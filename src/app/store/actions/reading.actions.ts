@@ -119,6 +119,22 @@ export const updateReadingFailure = createAction(
   props<{ error: any }>()
 );
 
+// Export Readings to Excel
+export const exportReadingsByZone = createAction(
+  '[Reading] Export Readings By Zone ',
+  props<{ zoneId: string}>()
+);
+
+export const exportReadingsByZoneSuccess = createAction(
+  '[Reading] Export Readings By Zone Success',
+  props<{ fileContent: string }>()
+);
+
+export const exportReadingsByZoneFailure = createAction(
+  '[Reading] Export Readings By Zone Failure',
+  props<{ error: any }>()
+);
+
 // PUT readings/bulk
 export const updateBulkReadings = createAction(
   '[Reading] Update Bulk Readings',
@@ -164,6 +180,22 @@ export const getLastReadingByMeterSuccess = createAction(
 
 export const getLastReadingByMeterFailure = createAction(
   '[Reading] Load Last Reading By Meter Failure',
+  props<{ error: any }>()
+);
+ 
+
+export const getReadingByStateZone = createAction(
+  '[Reading] Get Reading By State Zone',
+  props<{ payload: {zoneId: string, state: string} }>()
+);
+
+export const getReadingByStateZoneSuccess = createAction(
+  '[Reading] Get Reading By State Zone Success',
+  props<{ readings: IReading[] }>()
+);
+
+export const getReadingByStateZoneFailure = createAction(
+  '[Reading] Get Reading By State Zone Failure',
   props<{ error: any }>()
 );
 

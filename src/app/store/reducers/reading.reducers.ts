@@ -42,6 +42,12 @@ import {
   uploadFile,
   uploadFileFailure,
   uploadFileSuccess,
+  exportReadingsByZone,
+  exportReadingsByZoneFailure,
+  exportReadingsByZoneSuccess,
+  getReadingByStateZone,
+  getReadingByStateZoneFailure,
+  getReadingByStateZoneSuccess,
 } from '../actions/reading.actions';
 import { Update } from '@ngrx/entity';
 
@@ -49,6 +55,7 @@ export interface IReadingState extends EntityState<IReading> {
   isLoading: boolean;
   isSaving: boolean;
   fileUploaded: boolean;
+  fileContent: string;
   errorMessage: string;
   successMessage: string;
   readingId: string;
@@ -70,6 +77,7 @@ export const initialState: IReadingState = adapter.getInitialState({
   statusCode: 0,
   successMessage: '',
   readingId: '',
+  fileContent: '',
   error: null,
   selectedReading: null,
   selectedReadings: [],   
@@ -173,6 +181,20 @@ const reducer = createReducer(
     statusCode: error.status,
     errorMessage: error.error,
   })),
+ 
+  on(exportReadingsByZone, (state) => ({ ...state, isSaving: true })),
+  on(exportReadingsByZoneSuccess, (state, { fileContent }) => ({
+    ...state,
+    isSaving: false,
+    fileContent: fileContent,
+    successMessage: 'Reading created successfully!'
+  })),
+  on(exportReadingsByZoneFailure, (state, { error}) => ({
+    ...state,
+    isSaving: false,
+    statusCode: error.status,
+    errorMessage: error.error,
+  })),
 
   // Update reading
   on(updateReading, (state) => ({ ...state, isSaving: true })),
@@ -219,6 +241,19 @@ const reducer = createReducer(
     isLoading: false,
   })),
   on(getLastReadingByMeterFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error.error,
+  })),
+
+  // Load last reading by meter
+  on(getReadingByStateZone, (state) => ({ ...state, isLoading: true })),
+  on(getReadingByStateZoneSuccess, (state, { readings }) => ({
+    ...state,
+    selectedReadings: readings,
+    isLoading: false,
+  })),
+  on(getReadingByStateZoneFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error.error,

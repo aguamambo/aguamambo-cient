@@ -4,7 +4,7 @@ import { exhaustMap, map, catchError, of, tap, switchMap } from "rxjs";
 import { IReading } from "src/app/models/reading";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess, getReadingByStatus, getReadingByStatusFailure, getReadingByStatusSuccess, updateBulkReadings, updateBulkReadingsFailure, updateBulkReadingsSuccess, uploadFile, uploadFileFailure, uploadFileSuccess } from "../actions";
+import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess, getReadingByStatus, getReadingByStatusFailure, getReadingByStatusSuccess, updateBulkReadings, updateBulkReadingsFailure, updateBulkReadingsSuccess, uploadFile, uploadFileFailure, uploadFileSuccess, exportReadingsByZone, exportReadingsByZoneFailure, exportReadingsByZoneSuccess, getReadingByStateZone, getReadingByStateZoneFailure, getReadingByStateZoneSuccess } from "../actions";
 import { Router } from "@angular/router";
 import { PdfService } from "src/app/services/pdf.service";
 
@@ -88,6 +88,21 @@ export class ReadingEffects {
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status, error.error);
             return of(uploadFileFailure({ error }));
+          })
+        )
+      )
+    )
+  );
+
+  exportReadingsByZone$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(exportReadingsByZone),
+      exhaustMap((action) =>
+        this.apiService.get<string>(`reading/export/last-readings/by-zone?zoneId=${action.zoneId}`).pipe(
+          map(fileContent => exportReadingsByZoneSuccess({fileContent})),
+          catchError(error => {
+            this.errorMessage.getErrorMessage(error.status, error.error);
+            return of(exportReadingsByZoneFailure({ error }));
           })
         )
       )
@@ -178,6 +193,21 @@ export class ReadingEffects {
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getLastReadingByMeterFailure({ error }));
+          })
+        )
+      )
+    )
+  );
+
+  getReadingByStateZone$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(getReadingByStateZone),
+      exhaustMap(action =>
+        this.apiService.get<IReading[]>(`/reading/by-state-zone?zoneId=${action.payload.zoneId}&state=${action.payload.state}`).pipe(
+          map(readings => getReadingByStateZoneSuccess({ readings })),
+          catchError(error => {
+            this.errorMessage.getErrorMessage(error.status, error.error);
+            return of(getReadingByStateZoneFailure({ error }));
           })
         )
       )

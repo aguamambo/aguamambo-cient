@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { DialogService } from 'src/app/services/dialog.service';
-import { UploadFileService } from 'src/app/services/upload-file.service';
+import { FileHandlerService } from 'src/app/services/file-handler.service';
 import { IAppState, uploadFile } from 'src/app/store';
 import { selectUploadedReadingFile } from 'src/app/store/selectors/reading.selectors';
 
