@@ -82,6 +82,11 @@ export class ListCutsComponent implements OnInit, OnDestroy {
     });
   }
 
+  cancel() {
+    this.isEditing= false; 
+  }
+
+
   submitForm(): void {
     if (this.cutForm.valid && this.isEditing) {
       const payload = this.cutForm.value;

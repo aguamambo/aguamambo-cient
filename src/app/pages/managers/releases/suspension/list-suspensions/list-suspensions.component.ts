@@ -96,6 +96,10 @@ export class ListSuspensionsComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  
+  cancel() {
+    this.isEditing= false; 
+  }
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);

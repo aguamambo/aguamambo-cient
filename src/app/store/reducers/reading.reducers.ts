@@ -48,6 +48,9 @@ import {
   getReadingByStateZone,
   getReadingByStateZoneFailure,
   getReadingByStateZoneSuccess,
+  getReadingByZone,
+  getReadingByZoneFailure,
+  getReadingByZoneSuccess,
 } from '../actions/reading.actions';
 import { Update } from '@ngrx/entity';
 
@@ -183,12 +186,15 @@ const reducer = createReducer(
   })),
  
   on(exportReadingsByZone, (state) => ({ ...state, isSaving: true })),
-  on(exportReadingsByZoneSuccess, (state, { fileContent }) => ({
-    ...state,
-    isSaving: false,
-    fileContent: fileContent,
-    successMessage: 'Reading created successfully!'
-  })),
+  on(exportReadingsByZoneSuccess, (state, { fileContent }) => {
+    console.log('File Content:', fileContent); // Log the file content
+    return {
+      ...state,
+      isSaving: false,
+      fileContent: fileContent,
+      successMessage: 'Reading created successfully!'
+    };
+  }),
   on(exportReadingsByZoneFailure, (state, { error}) => ({
     ...state,
     isSaving: false,
@@ -254,6 +260,19 @@ const reducer = createReducer(
     isLoading: false,
   })),
   on(getReadingByStateZoneFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error.error,
+  })),
+
+  // Load last reading by meter
+  on(getReadingByZone, (state) => ({ ...state, isLoading: true })),
+  on(getReadingByZoneSuccess, (state, { readings }) => ({
+    ...state,
+    selectedReadings: readings,
+    isLoading: false,
+  })),
+  on(getReadingByZoneFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error.error,

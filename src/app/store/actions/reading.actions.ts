@@ -199,6 +199,21 @@ export const getReadingByStateZoneFailure = createAction(
   props<{ error: any }>()
 );
 
+export const getReadingByZone = createAction(
+  '[Reading] Get Reading By Zone',
+  props<{ payload: {zoneId: string} }>()
+);
+
+export const getReadingByZoneSuccess = createAction(
+  '[Reading] Get Reading By Zone Success',
+  props<{ readings: IReading[] }>()
+);
+
+export const getReadingByZoneFailure = createAction(
+  '[Reading] Get Reading By Zone Failure',
+  props<{ error: any }>()
+);
+
 // GET readings/count
 export const loadReadingsCount = createAction(
   '[Reading] Load Readings Count'

@@ -1,50 +1,58 @@
 <div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
     <app-breadcrumb title="Lista de Suspensões" [breadcrumbItems]="['Dashboard', 'Listar Suspensões']"></app-breadcrumb>
-    
+
     <ng-container *ngIf="(isSuspensionsLoading$ | async) || (isSuspensionSaving$ | async)">
         <div class="flex flex-col justify-center my-4 gap-1">
-          <app-loading-spinner></app-loading-spinner>
-          <span class="flex justify-center text-sm">
-            <ng-container *ngIf="(isSuspensionSaving$ | async); else loadingData">
-              Salvando a suspensão
-            </ng-container>
-            <ng-template #loadingData>
-              Carregando dados
-            </ng-template>
-          </span>
+            <app-loading-spinner></app-loading-spinner>
+            <span class="flex justify-center text-sm">
+                <ng-container *ngIf="(isSuspensionSaving$ | async); else loadingData">
+                    Salvando a suspensão
+                </ng-container>
+                <ng-template #loadingData>
+                    Carregando dados
+                </ng-template>
+            </span>
         </div>
     </ng-container>
 
     <div *ngIf="isEditing" class="py-4 dark:bg-deep-dark w-full mt-4">
         <form [formGroup]="suspensionForm" class="p-4">
-             
+
             <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
                 <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Motivo da Suspensão</label>
-                    <input formControlName="suspensionReason" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Motivo da
+                        Suspensão</label>
+                    <input formControlName="suspensionReason"
+                        class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
                 </div>
 
                 <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data de Início</label>
-                    <input type="date" formControlName="startDate" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
+                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data de
+                        Início</label>
+                    <input type="date" formControlName="startDate"
+                        class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
                 </div>
                 <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Observações</label>
-                    <textarea
-                        formControlName="notes"
+                    <label
+                        class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Observações</label>
+                    <textarea formControlName="notes"
                         class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text">
                     </textarea>
                 </div>
             </div>
         </form>
-        <div class="flex mt-4 p-6">
-            <button
-                type="button"
-                (click)="submitForm()" 
+
+        <div class="flex mt-4 p-6 gap-6 justify-end">
+            <button type="button" (click)="cancel()"
+                class="px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-700 hover:text-white disabled:opacity-50 cursor-pointer">
+                Cancelar
+            </button>
+            <button type="button" (click)="submitForm()"
                 class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer">
                 Atualizar Suspensão
             </button>
         </div>
+
     </div>
 
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
@@ -52,16 +60,13 @@
 
         <div *ngIf="suspensionsList.length > 0" class="grid grid-cols-2 px-6  w-full">
 
-            <app-search-input  (searchChange)="filterSuspensions($event)"></app-search-input>
+            <app-search-input (searchChange)="filterSuspensions($event)"></app-search-input>
         </div>
 
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="suspensionsList.length > 0; else noData">
-                <app-table
-                    [data]="filteredSuspensions"
-                    [columns]="suspensionColumns"
-                    [totalCount]="filteredSuspensions.length"
-                    (rowClick)="editSuspension($event)">
+                <app-table [data]="filteredSuspensions" [columns]="suspensionColumns"
+                    [totalCount]="filteredSuspensions.length" (rowClick)="editSuspension($event)">
                 </app-table>
             </ng-container>
             <ng-template #noData>

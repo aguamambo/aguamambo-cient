@@ -3,15 +3,18 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, pipe } from 'rxjs';
-import { delay, filter, first, takeUntil } from 'rxjs/operators';
+import { delay, filter, first, take, takeUntil } from 'rxjs/operators';
 import { IOption } from 'src/app/models/option';
 import { IReading } from 'src/app/models/reading';
+import * as XLSX from 'xlsx';
+import * as JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import { IZone } from 'src/app/models/zone';
-import { exportReadingsByZone, getClientByZoneId, getReadingByStateZone, getZoneByEnterpriseId, IAppState, listAllReadings, listAllZones, updateReading } from 'src/app/store';
+import { exportReadingsByZone, getClientByZoneId, getReadingByStateZone, getReadingByZone, getZoneByEnterpriseId, IAppState, listAllReadings, listAllZones, resetReadingActions, updateReading } from 'src/app/store';
 import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
-import { selectReadingIsLoading, selectReadingIsSaving, selectSelectedReading, selectSelectedReadings } from 'src/app/store/selectors/reading.selectors';
+import { selectExportedReadingFile, selectReadingIsLoading, selectReadingIsSaving, selectSelectedReading, selectSelectedReadings } from 'src/app/store/selectors/reading.selectors';
 import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 
 @Component({
@@ -37,10 +40,12 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   enterpriseData: IOption[] = [];
   readingColumns: { key: keyof IReading; label: string }[] = [];
   isEditing: boolean = false;
+  enableExport: boolean = false;
   selectedReading!: IReading;
   selectedBulkStatus: any;
   setState: string = ''
   selectedZoneId: string = '';
+  selectedZoneDesc: string = '';
 
   isReadingsLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
@@ -103,6 +108,29 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       { label: 'CANCELADO', value: 'CANCELED' },
     ];
 
+    this.getAllReadings()
+    this.getAllZones()   
+  }
+
+  getAllZones(){
+    this.store.dispatch(listAllZones());
+    this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(zones => {
+      if (zones) {
+        this.zones = zones;
+        this.zoneData = [
+          {label: 'TODOS BAIRROS', value: 'AZN'},
+          ...zones.map(zone => ({
+            label: zone.designation.toUpperCase(),
+            value: zone.zoneId
+         }))
+        ]
+        
+        this.filteredReadings = [...this.readingsData]
+      }
+    });
+  }
+
+  getAllReadings(){
     this.store.dispatch(listAllReadings());
     
     this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe(readings => {
@@ -119,18 +147,6 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.store.dispatch(listAllZones());
-    this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(zones => {
-      if (zones) {
-        this.zones = zones;
-        this.zoneData = zones.map(zone => ({
-           label: zone.designation.toUpperCase(),
-           value: zone.zoneId
-        }));
-        
-        this.filteredReadings = [...this.readingsData]
-      }
-    });
   }
 
   translateState(state: string): string {
@@ -148,6 +164,20 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   exportExcel() {
     this.store.dispatch(exportReadingsByZone({zoneId: this.selectedZoneId}))
+
+    this.store.pipe(select(selectExportedReadingFile), take(1)).subscribe((fileContent) => {
+      if (fileContent) {
+        const date =  new Date()
+        const blob = new Blob([fileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.selectedZoneDesc}_${date.getDay()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.xlsx`; 
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } 
+    });
   }
   
   private setFormControlState(isEnabled: boolean): void {
@@ -197,34 +227,52 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   filterByZone(event: {value: string, label: string}) {
     this.selectedZoneId = event.value;
-    this.applyFilters();
+    this.selectedZoneDesc = event.label;
+
+    
+    this.store.dispatch(resetReadingActions())
+    
+    if (event.value === 'AZN') {
+      this.enableExport = false
+      this.getAllReadings()
+    } else
+    {
+      
+      this.applyFilters();}
   }
 
   filterByState(event: {value: string, label: string}) {
     this.selectedState =event.value;
+    
     this.applyFilters();
   }
 
   applyFilters() {
-    const payload = {
-      zoneId: this.selectedZoneId,
-      state: this.selectedState
-    }
-
-    console.log('Payload::> ', payload);
     
-
-    if (this.selectedZoneId && this.selectedState) {
-      this.store.dispatch(getReadingByStateZone({payload}))
+    this.cancel() 
+    const payload = {
+      zoneId: this.selectedZoneId 
+    }
+    
+    
+    if (this.selectedZoneId) {
+      this.store.dispatch(getReadingByZone({payload}))
   
       this.store.pipe(select(selectSelectedReadings), filter((readings) => !!readings), first()).subscribe((readings) => {
         if (readings) {
+           
           this.filteredReadings = readings
-          this.readingsList = readings
+          this.readingsList = readings 
+            this.enableExport = true
+           
         }
       }) 
     }
 
+  }
+
+  cancel() {
+    this.isEditing = false
   }
 
   toggleSelection(reading: any) {
@@ -366,6 +414,28 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
         String(value).toLowerCase().includes(searchTermLower)
       )
     );
+  }
+
+  async exportToZip(data: any, fileName: string) {
+    // Create an Excel sheet
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Convert to Excel format
+    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const excelBlob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    // Create ZIP file
+    const zip = new JSZip();
+    zip.file(`${fileName}.xlsx`, excelBlob);
+
+    // Generate ZIP and trigger download
+    zip.generateAsync({ type: 'blob' }).then((zipBlob) => {
+      saveAs(zipBlob, `${fileName}.zip`);
+    });
   }
 
   generateMonths(): void {
