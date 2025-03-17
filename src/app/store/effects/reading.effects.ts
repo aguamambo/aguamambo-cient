@@ -7,6 +7,7 @@ import { ErrorMessageService } from "src/app/services/error-message.service";
 import { getReading, getReadingSuccess, getReadingFailure, listAllReadings, listAllReadingsSuccess, listAllReadingsFailure, createReading, createReadingSuccess, createReadingFailure, updateReading, updateReadingSuccess, updateReadingFailure, deleteReading, deleteReadingSuccess, deleteReadingFailure, getLastReadingByMeter, getLastReadingByMeterSuccess, getLastReadingByMeterFailure, loadReadingsCount, loadReadingsCountSuccess, loadReadingsCountFailure, getLastReadingByClient, getLastReadingByClientSuccess, getLastReadingByClientFailure, getReadingByClientId, getReadingByClientIdFailure, getReadingByClientIdSuccess, getReadingByMeterId, getReadingByMeterIdFailure, getReadingByMeterIdSuccess, getReadingByStatus, getReadingByStatusFailure, getReadingByStatusSuccess, updateBulkReadings, updateBulkReadingsFailure, updateBulkReadingsSuccess, uploadFile, uploadFileFailure, uploadFileSuccess, exportReadingsByZone, exportReadingsByZoneFailure, exportReadingsByZoneSuccess, getReadingByStateZone, getReadingByStateZoneFailure, getReadingByStateZoneSuccess, getReadingByZone, getReadingByZoneFailure, getReadingByZoneSuccess } from "../actions";
 import { Router } from "@angular/router";
 import { PdfService } from "src/app/services/pdf.service";
+import { FileHandlerService } from "src/app/services/file-handler.service";
 
 @Injectable()
 export class ReadingEffects {
@@ -14,6 +15,7 @@ export class ReadingEffects {
     private actions$: Actions,
     private apiService: ApiService,
     private pdfFile: PdfService,
+    private fileHandlerService: FileHandlerService,
     private errorMessage: ErrorMessageService
   ) { }
 
@@ -98,10 +100,13 @@ export class ReadingEffects {
     this.actions$.pipe(
       ofType(exportReadingsByZone),
       exhaustMap((action) =>
-        this.apiService.get<string>(`/reading/export/last-readings/by-zone?zoneId=${action.zoneId}`).pipe(
-          map(fileContent => exportReadingsByZoneSuccess({fileContent:  JSON.stringify(fileContent)})),
-          catchError(error => {
-            this.errorMessage.getErrorMessage(error.status, error.error);
+        this.apiService.exportExcel(`/reading/export/last-readings/by-zone?zoneId=${action.zoneId}`).pipe(
+          map((base64String: string) => {
+            const blob = this.fileHandlerService.base64ToBlob(base64String, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            return exportReadingsByZoneSuccess({ fileContent: blob });
+          }),
+          catchError(error => { 
+            this.errorMessage.getErrorMessage(error.status, error.error); 
             return of(exportReadingsByZoneFailure({ error }));
           })
         )

@@ -127,7 +127,7 @@ export const exportReadingsByZone = createAction(
 
 export const exportReadingsByZoneSuccess = createAction(
   '[Reading] Export Readings By Zone Success',
-  props<{ fileContent: string }>()
+  props<{ fileContent: Blob }>()
 );
 
 export const exportReadingsByZoneFailure = createAction(

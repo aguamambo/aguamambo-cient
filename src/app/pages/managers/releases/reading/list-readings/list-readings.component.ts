@@ -6,8 +6,7 @@ import { Observable, Subject, pipe } from 'rxjs';
 import { delay, filter, first, take, takeUntil } from 'rxjs/operators';
 import { IOption } from 'src/app/models/option';
 import { IReading } from 'src/app/models/reading';
-import * as XLSX from 'xlsx';
-import * as JSZip from 'jszip';
+import * as XLSX from 'xlsx'; 
 import { saveAs } from 'file-saver';
 import { IZone } from 'src/app/models/zone';
 import { exportReadingsByZone, getClientByZoneId, getReadingByStateZone, getReadingByZone, getZoneByEnterpriseId, IAppState, listAllReadings, listAllZones, resetReadingActions, updateReading } from 'src/app/store';
@@ -165,7 +164,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   exportExcel() {
     this.store.dispatch(exportReadingsByZone({ zoneId: this.selectedZoneId }))
 
-    this.store.pipe(select(selectExportedReadingFile), take(1)).subscribe((fileContent) => {
+    this.store.pipe(select(selectExportedReadingFile), filter((file) => !!file), first()).subscribe((fileContent) => {
       if (fileContent) {
         const date = new Date()
         const day = String(date.getDate()).padStart(2, '0');
@@ -424,29 +423,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       )
     );
   }
-
-  async exportToZip(data: any, fileName: string) {
-    // Create an Excel sheet
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-    // Convert to Excel format
-    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const excelBlob = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-
-    // Create ZIP file
-    const zip = new JSZip();
-    zip.file(`${fileName}.xlsx`, excelBlob);
-
-    // Generate ZIP and trigger download
-    zip.generateAsync({ type: 'blob' }).then((zipBlob) => {
-      saveAs(zipBlob, `${fileName}.zip`);
-    });
-  }
-
+ 
   generateMonths(): void {
     this.monthsData = [
       { value: '1', label: 'Janeiro' },

@@ -58,7 +58,7 @@ export interface IReadingState extends EntityState<IReading> {
   isLoading: boolean;
   isSaving: boolean;
   fileUploaded: boolean;
-  fileContent: string;
+  fileContent: Blob | null;
   errorMessage: string;
   successMessage: string;
   readingId: string;
@@ -80,7 +80,7 @@ export const initialState: IReadingState = adapter.getInitialState({
   statusCode: 0,
   successMessage: '',
   readingId: '',
-  fileContent: '',
+  fileContent: null,
   error: null,
   selectedReading: null,
   selectedReadings: [],   
@@ -186,8 +186,7 @@ const reducer = createReducer(
   })),
  
   on(exportReadingsByZone, (state) => ({ ...state, isSaving: true })),
-  on(exportReadingsByZoneSuccess, (state, { fileContent }) => {
-    console.log('File Content:', fileContent); // Log the file content
+  on(exportReadingsByZoneSuccess, (state, { fileContent }) => { 
     return {
       ...state,
       isSaving: false,

@@ -9,11 +9,10 @@ import { Observable } from 'rxjs';
 export class ApiService {
     private API_URL = environment.API_URL;
 
-
     constructor(private http: HttpClient) {
     }
 
-    public get<T>(url: string) {
+    public get<T>(url: string, p0?: { responseType: string; }) {
         return this.http.get<T>(this.normalizeUrl(url));
     }
  
@@ -33,12 +32,19 @@ export class ApiService {
         return this.http.delete<T>(this.normalizeUrl(url));
     }
 
+    public exportExcel(url: string, params?: any) {
+        return this.http.get(this.normalizeUrl(url), {
+            params,
+            responseType: 'text'
+        });
+    }
+    
+
     public upload<T>(payload: { readingMonth: number; readingYear: number; file: File }, url: string) {
         const formData = new FormData();
         formData.append('file', payload.file);
         formData.append('readingMonth', payload.readingMonth.toString());
         formData.append('readingYear', payload.readingYear.toString());
-    
         return this.http.post<T>(this.normalizeUrl(url), formData);
     }
     
