@@ -26,7 +26,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   readingsList: IReading[] = [];
   readingsData: IReading[] = [];
   selectedReadings: any[] = [];
-  filteredReadings: IReading[] = []; 
+  filteredReadings: IReading[] = [];
   selectedZone: string = '';
   selectedState: string = '';
 
@@ -56,14 +56,14 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
   getReadingsByCustomerId$ = this.store.pipe(select(selectSelectedReading));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeter));
-  readingColumnsWithCheckbox: ({ key: keyof IReading ; label: string; })[];
+  readingColumnsWithCheckbox: ({ key: keyof IReading; label: string; })[];
 
   constructor(private fb: FormBuilder, private store: Store<IAppState>, private fileService: FileHandlerService) {
     this.readingForm = this.fb.group({
       readingMonth: ['', Validators.required],
       currentReading: ['', Validators.required],
       counter: [''],
-      lastReading: [''],  
+      lastReading: [''],
       readingYear: [''],
       state: ['']
     });
@@ -109,30 +109,30 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     ];
 
     this.getAllReadings()
-    this.getAllZones()   
+    this.getAllZones()
   }
 
-  getAllZones(){
+  getAllZones() {
     this.store.dispatch(listAllZones());
     this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(zones => {
       if (zones) {
         this.zones = zones;
         this.zoneData = [
-          {label: 'TODOS BAIRROS', value: 'AZN'},
+          { label: 'TODOS BAIRROS', value: 'AZN' },
           ...zones.map(zone => ({
             label: zone.designation.toUpperCase(),
             value: zone.zoneId
-         }))
+          }))
         ]
-        
+
         this.filteredReadings = [...this.readingsData]
       }
     });
   }
 
-  getAllReadings(){
+  getAllReadings() {
     this.store.dispatch(listAllReadings());
-    
+
     this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe(readings => {
       if (readings) {
         this.readingsList = readings;
@@ -142,7 +142,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
           updatedAt: this.formatDate(reading.updatedAt),
           state: this.translateState(reading.state)
         }));
-        
+
         this.filteredReadings = [...this.readingsData]
       }
     });
@@ -158,33 +158,42 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       case 'CANCELED':
         return 'CANCELADO';
       default:
-        return state; 
+        return state;
     }
   }
 
   exportExcel() {
-    this.store.dispatch(exportReadingsByZone({zoneId: this.selectedZoneId}))
+    this.store.dispatch(exportReadingsByZone({ zoneId: this.selectedZoneId }))
 
     this.store.pipe(select(selectExportedReadingFile), take(1)).subscribe((fileContent) => {
       if (fileContent) {
-        const date =  new Date()
+        const date = new Date()
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
         const blob = new Blob([fileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${this.selectedZoneDesc}_${date.getDay()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.xlsx`; 
+        a.download = `${this.selectedZoneDesc}_${day}-${month}-${year} ${hours}:${minutes}:${seconds}.xlsx`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-      } 
+
+        window.URL.revokeObjectURL(url);
+      }
     });
   }
-  
+
   private setFormControlState(isEnabled: boolean): void {
     const method = isEnabled ? 'enable' : 'disable';
     this.readingForm.controls['readingYear'][method]();
     this.readingForm.controls['counter'][method]();
-    this.readingForm.controls['lastReading'][method]();  
+    this.readingForm.controls['lastReading'][method]();
   }
 
   editReading(reading: IReading): void {
@@ -204,8 +213,8 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   }
 
   submitForm(): void {
-    this.readingForm.controls['readingYear'].enable(); 
-    
+    this.readingForm.controls['readingYear'].enable();
+
     if (this.readingForm.valid && this.isEditing) {
       const payload = {
         readingMonth: this.selectedReading.readingMonth,
@@ -225,48 +234,48 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  filterByZone(event: {value: string, label: string}) {
+  filterByZone(event: { value: string, label: string }) {
     this.selectedZoneId = event.value;
     this.selectedZoneDesc = event.label;
 
-    
+
     this.store.dispatch(resetReadingActions())
-    
+
     if (event.value === 'AZN') {
       this.enableExport = false
       this.getAllReadings()
-    } else
-    {
-      
-      this.applyFilters();}
+    } else {
+
+      this.applyFilters();
+    }
   }
 
-  filterByState(event: {value: string, label: string}) {
-    this.selectedState =event.value;
-    
+  filterByState(event: { value: string, label: string }) {
+    this.selectedState = event.value;
+
     this.applyFilters();
   }
 
   applyFilters() {
-    
-    this.cancel() 
+
+    this.cancel()
     const payload = {
-      zoneId: this.selectedZoneId 
+      zoneId: this.selectedZoneId
     }
-    
-    
+
+
     if (this.selectedZoneId) {
-      this.store.dispatch(getReadingByZone({payload}))
-  
+      this.store.dispatch(getReadingByZone({ payload }))
+
       this.store.pipe(select(selectSelectedReadings), filter((readings) => !!readings), first()).subscribe((readings) => {
         if (readings) {
-           
+
           this.filteredReadings = readings
-          this.readingsList = readings 
-            this.enableExport = true
-           
+          this.readingsList = readings
+          this.enableExport = true
+
         }
-      }) 
+      })
     }
 
   }
@@ -278,11 +287,11 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   toggleSelection(reading: any) {
     const index = this.selectedReadings.findIndex(item => item.id === reading.id);
     if (index > -1) {
-        this.selectedReadings.splice(index, 1);
+      this.selectedReadings.splice(index, 1);
     } else {
-        this.selectedReadings.push(reading);
+      this.selectedReadings.push(reading);
     }
-}
+  }
 
   resetFilters() {
     this.selectedZone = '';
@@ -290,37 +299,37 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.filteredReadings = [...this.readingsList];
   }
   applyBulkStatusChange(): void {
-    if (this.selectedBulkStatus) { 
-      this.readingsList = this.readingsList.map((reading) => {  
+    if (this.selectedBulkStatus) {
+      this.readingsList = this.readingsList.map((reading) => {
         return {
           ...reading,
           state: this.selectedBulkStatus
         };
-      }); 
-     this.saveUpdatedReadings();
+      });
+      this.saveUpdatedReadings();
     }
   }
-  
-  
+
+
   onBulkStatusChange(event: { value: string }): void {
-    const selectedStatus = event.value; 
+    const selectedStatus = event.value;
     if (selectedStatus) {
-      this.selectedBulkStatus = selectedStatus; 
+      this.selectedBulkStatus = selectedStatus;
     }
   }
-   
+
   private saveUpdatedReadings(): void {
     if (this.selectedBulkStatus) {
-      this.readingsList.forEach((reading) => { 
-        const updatedReading = { ...reading, state: this.selectedBulkStatus }; 
-        this.store.dispatch(updateReading({ 
-          readingId: updatedReading.readingId, 
-          reading: updatedReading 
-        })); 
+      this.readingsList.forEach((reading) => {
+        const updatedReading = { ...reading, state: this.selectedBulkStatus };
+        this.store.dispatch(updateReading({
+          readingId: updatedReading.readingId,
+          reading: updatedReading
+        }));
       });
     }
   }
-  
+
 
   loadEnterpriseData(): void {
     this.store.pipe(select(selectSelectedEnterprises), takeUntil(this.destroy$)).subscribe((enterprises) => {
@@ -354,7 +363,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     if (event?.value) {
       this.readingForm.get('state')?.setValue(event.value);
 
-     this.setState = event.value;      
+      this.setState = event.value;
     }
   }
 
@@ -374,7 +383,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       });
     }
   }
-  
+
   onZoneSelect(event: { value: string }): void {
     if (event?.value) {
       this.selectedZoneId = event.value
@@ -382,13 +391,13 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       this.filterPendingReadingsByZone(event.value);
     }
   }
-  
+
   filterPendingReadingsByZone(zoneId: string): void {
     this.filteredReadings = this.readingsData.filter(
       reading => reading.state === 'PENDENTE'
     );
   }
-  
+
 
   getCurrentYear(): number {
     return new Date().getFullYear();

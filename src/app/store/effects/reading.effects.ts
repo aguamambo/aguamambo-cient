@@ -99,7 +99,7 @@ export class ReadingEffects {
       ofType(exportReadingsByZone),
       exhaustMap((action) =>
         this.apiService.get<string>(`/reading/export/last-readings/by-zone?zoneId=${action.zoneId}`).pipe(
-          map(fileContent => exportReadingsByZoneSuccess({fileContent})),
+          map(fileContent => exportReadingsByZoneSuccess({fileContent:  JSON.stringify(fileContent)})),
           catchError(error => {
             this.errorMessage.getErrorMessage(error.status, error.error);
             return of(exportReadingsByZoneFailure({ error }));
