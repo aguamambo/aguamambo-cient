@@ -6,11 +6,11 @@ import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
 import { IInvoice } from 'src/app/models/invoice';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
-import { IAppState, getZoneByEnterpriseId, getClientByZoneId, listAllInvoices, getWaterBillByReadingId } from 'src/app/store';
+import { IAppState, getZoneByEnterpriseId, getClientByZoneId, listAllInvoices, getWaterBillByReadingId, resetInvoiceActions, getInvoiceByZoneId, getWaterBillsByZoneId, listAllZones } from 'src/app/store';
 import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
-import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices, selectSelectedWaterBill, selectSelectedWaterBills } from 'src/app/store/selectors/invoice.selectors';
 import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 
 @Component({
@@ -29,11 +29,14 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
   fileUrl: SafeUrl | null = null;
   zoneData: IOption[] = [];
   zones: IZone[] = [];
-  lastInvoice: number = 0;
+  lastInvoice: number = 0; 
   enterpriseData: IOption[] = [];
   invoiceColumns: { key: keyof IInvoice; label: string }[] = [];
   isEditing: boolean = false;
   selectedinvoice!: IInvoice;
+  enableExport: boolean = false;
+  selectedZoneId: string = '';
+  selectedZoneDesc: string = '';
   isDialogOpen: boolean = false;
   dialogType: 'success' | 'error' = 'success'; 
   dialogMessage = ''; 
@@ -69,6 +72,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadData(); 
+    this.getAllZones()
   }
 
   private loadData(): void {
@@ -87,6 +91,24 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
       }
     });
   }
+
+   getAllZones() {
+      this.store.dispatch(listAllZones());
+      this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(zones => {
+        if (zones) {
+          this.zones = zones;
+          this.zoneData = [
+            { label: 'TODOS BAIRROS', value: 'AZN' },
+            ...zones.map(zone => ({
+              label: zone.designation.toUpperCase(),
+              value: zone.zoneId
+            }))
+          ]
+  
+          this.filteredInvoices = [...this.invoicesData]
+        }
+      });
+    }
 
   filterInvoices(searchTerm: string): void {
     const searchTermLower = searchTerm.toLowerCase();
@@ -108,22 +130,53 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
     });
   }
 
-  onValueSelected(option: IOption): void {
-    if (option && option.value) {
-      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
-      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
-        if (zones) {
-          this.zoneData = [
-            { label: 'Seleccione...', value: '' },
-            ...zones.map(zone => ({
-              label: zone.designation,
-              value: zone.zoneId
-            }))
-          ];
-        }
-      });
+  filterByZone(event: { value: string, label: string }) {
+      this.selectedZoneId = event.value;
+      this.selectedZoneDesc = event.label;
+  
+  
+      this.store.dispatch(resetInvoiceActions())
+  
+      if (event.value === 'AZN') {
+        this.enableExport = false
+        this.store.dispatch(listAllInvoices());
+      } else {
+  
+        this.applyFilters();
+      }
     }
-  }
+
+     applyFilters() {
+     
+         
+    
+    
+        if (this.selectedZoneId) {
+          this.store.dispatch(getInvoiceByZoneId({ zoneId: this.selectedZoneId  }))
+    
+          this.store.pipe(select(selectSelectedInvoices), filter((invoice) => !!invoice), first()).subscribe((invoice) => {
+            if (invoice) {
+              this.filteredInvoices = invoice
+              this.invoicesList = invoice
+              this.enableExport = true
+    
+            }
+          })
+        }
+    
+      }
+    
+
+      
+        exportExcel() {
+          this.store.dispatch(getWaterBillsByZoneId({ zoneId: this.selectedZoneId }))
+      
+          this.store.pipe(select(selectSelectedWaterBills), filter((file) => !!file), first()).subscribe((file) => {
+            if (file) {
+              this.handleBase64File(file.base64); 
+            }
+          });
+        }
 
   onEnterpriseSelect(event: { value: string; label: string }): void {
     if (event && event.value) {
@@ -207,9 +260,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
           first()
         )
         .subscribe((file) => { 
-          if (file ) { 
-            console.log(file);
-            
+          if (file ) {              
             this.handleBase64File(file.base64); 
         }});
     }

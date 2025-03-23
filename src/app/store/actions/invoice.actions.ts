@@ -81,6 +81,21 @@ export const getInvoiceByMeterFailure = createAction(
   props<{ error: any }>()
 );
 
+export const getInvoiceByZoneId = createAction(
+  '[Invoice] Get Invoice By ZoneId',
+  props<{ zoneId: string}>()
+);
+
+export const getInvoiceByZoneIdSuccess = createAction(
+  '[Invoice] Get Invoice By ZoneId Success',
+  props<{ invoices: IInvoice[] }>()
+);
+
+export const getInvoiceByZoneIdFailure = createAction(
+  '[Invoice] Get Invoice By ZoneId Failure',
+  props<{ error: any }>()
+);
+
 // GET invoices/{readingId}
 export const getWaterBillByReadingId = createAction(
   '[Invoice] Get WaterBil by Reading',
@@ -94,6 +109,22 @@ export const getWaterBillByReadingIdSuccess = createAction(
 
 export const getWaterBillByReadingIdFailure = createAction(
   '[Invoice] Get WaterBil by Reading Failure',
+  props<{ error: any }>()
+);
+
+// GET invoices/{zoneId}
+export const getWaterBillsByZoneId = createAction(
+  '[Invoice] Get WaterBils by Reading',
+  props<{ zoneId: string }>()
+);
+
+export const getWaterBillsByZoneIdSuccess = createAction(
+  '[Invoice] Get WaterBils by Reading Success',
+  props<{ payload: IFile }>()  
+);
+
+export const getWaterBillsByZoneIdFailure = createAction(
+  '[Invoice] Get WaterBils by Reading Failure',
   props<{ error: any }>()
 );
 

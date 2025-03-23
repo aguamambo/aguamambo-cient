@@ -33,6 +33,11 @@ export const selectSelectedWaterBill = createSelector(
   (state) => state.selectedWaterBillFile
 );
 
+export const selectSelectedWaterBills = createSelector(
+  selectInvoiceState,
+  (state) => state.selectedWaterBillsFile
+);
+
 export const selectInvoiceSuccessMessage = createSelector(
   selectInvoiceState,
   (state) => state.successMessage

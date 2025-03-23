@@ -16,9 +16,20 @@
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
         <h2 class="text-lg font-semibold mb-4">Lista de Facturas</h2>
 
-        <div *ngIf="invoicesList.length > 0" class="grid grid-cols-2 px-6  w-full">
+        <div class="grid grid-cols-4 px-6 w-full gap-4">
+            <app-custom-drop-down label="Bairro" [options]="zoneData" (selectionChange)="filterByZone($event)">
+            </app-custom-drop-down>
 
-            <app-search-input  (searchChange)="filterInvoices($event)"></app-search-input>
+            <div class="w-full ">
+                <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">
+                    Pesquisar Leitura
+                </label>
+                <app-search-input (searchChange)="filterInvoices($event)"></app-search-input>
+            </div>
+            <div *ngIf="filteredInvoices.length > 0 && enableExport" class="flex items-end justify-end py-4 w-full ">
+                <button (click)="exportExcel()" class="bg-green-500 text-white py-2 px-6 rounded ml-2">Imprimir Facturas</button>
+            </div>
+
         </div>
         <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
             <ng-container *ngIf="invoicesList.length > 0; else noData">

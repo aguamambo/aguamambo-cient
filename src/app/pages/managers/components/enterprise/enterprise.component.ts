@@ -107,7 +107,6 @@ export class EnterpriseComponent implements OnInit {
         this._store.pipe(select(selectEnterpriseErrorMessage)).subscribe(
           error => {
             if (error) {
-              console.log(error);
               this._dialogService.open({
                 title: 'Criação da Empresa',
                 type: 'error',

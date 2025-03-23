@@ -4,8 +4,8 @@ import { exhaustMap, map, catchError, of } from "rxjs";
 import { IInvoice } from "src/app/models/invoice";
 import { ApiService } from "src/app/services/api.service";
 import { ErrorMessageService } from "src/app/services/error-message.service";
-import { getInvoice, getInvoiceSuccess, getInvoiceFailure, listAllInvoices, listAllInvoicesSuccess, listAllInvoicesFailure, createInvoice, createInvoiceSuccess, createInvoiceFailure, updateInvoice, updateInvoiceSuccess, updateInvoiceFailure, deleteInvoice, deleteInvoiceSuccess, deleteInvoiceFailure, loadInvoicesCount, loadInvoicesCountSuccess, loadInvoicesCountFailure, getInvoiceByReadingId, getInvoiceByReadingIdFailure, getInvoiceByReadingIdSuccess, getWaterBillByReadingId, getWaterBillByReadingIdFailure, getWaterBillByReadingIdSuccess, getInvoiceByClientId, getInvoiceByClientIdFailure, getInvoiceByClientIdSuccess, getInvoiceByStatus, getInvoiceByStatusFailure, getInvoiceByStatusSuccess, getInvoiceByMeter, getInvoiceByMeterFailure, getInvoiceByMeterSuccess } from "../actions";
 import { IFile } from "src/app/models/file";
+import { getInvoice, getInvoiceSuccess, getInvoiceFailure, getInvoiceByReadingId, getInvoiceByReadingIdSuccess, getInvoiceByReadingIdFailure, getInvoiceByClientId, getInvoiceByClientIdSuccess, getInvoiceByClientIdFailure, getInvoiceByStatus, getInvoiceByStatusSuccess, getInvoiceByStatusFailure, getInvoiceByMeter, getInvoiceByMeterSuccess, getInvoiceByMeterFailure, getWaterBillByReadingId, getWaterBillByReadingIdSuccess, getWaterBillByReadingIdFailure, getWaterBillsByZoneId, getWaterBillsByZoneIdSuccess, getWaterBillsByZoneIdFailure, listAllInvoices, listAllInvoicesSuccess, listAllInvoicesFailure, createInvoice, createInvoiceSuccess, createInvoiceFailure, updateInvoice, updateInvoiceSuccess, updateInvoiceFailure, deleteInvoice, deleteInvoiceSuccess, deleteInvoiceFailure, loadInvoicesCount, loadInvoicesCountSuccess, loadInvoicesCountFailure, getInvoiceByZoneId, getInvoiceByZoneIdFailure, getInvoiceByZoneIdSuccess } from "../actions";
 
 @Injectable()
 export class InvoiceEffects {
@@ -92,9 +92,22 @@ export class InvoiceEffects {
             )
         )
     );
+ 
+    getInvoiceByZoneId$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getInvoiceByZoneId),
+            exhaustMap(action =>
+                this.apiService.get<IInvoice[]>(`/invoice/zone/${action.zoneId}`).pipe(
+                    map(invoices => getInvoiceByZoneIdSuccess({ invoices })),
+                    catchError(error => {
+                        this.errorMessage.getErrorMessage(error.status, error.error);
+                        return of(getInvoiceByZoneIdFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
 
-
-    
     getWaterBillByReadingId$ = createEffect(() =>
         this.actions$.pipe(
             ofType(getWaterBillByReadingId),
@@ -110,7 +123,20 @@ export class InvoiceEffects {
         )
     );
 
-
+    getWaterBillsByZoneIdId$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getWaterBillsByZoneId),
+            exhaustMap(action =>
+                this.apiService.get<IFile>(`/invoice/waterBills/${action.zoneId}`).pipe(
+                    map((file) => getWaterBillsByZoneIdSuccess({ payload: file })),
+                    catchError(error => {
+                        this.errorMessage.getErrorMessage(error.status, error.error);
+                        return of(getWaterBillsByZoneIdFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
 
     listAllInvoices$ = createEffect(() =>
         this.actions$.pipe(

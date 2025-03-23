@@ -36,7 +36,13 @@ import {
   getInvoiceByMeter,
   getInvoiceByMeterFailure,
   getInvoiceByMeterSuccess,
-  resetInvoiceActions
+  resetInvoiceActions,
+  getWaterBillsByZoneId,
+  getWaterBillsByZoneIdSuccess,
+  getWaterBillsByZoneIdFailure,
+  getInvoiceByZoneId,
+  getInvoiceByZoneIdFailure,
+  getInvoiceByZoneIdSuccess
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
 import { IFile } from 'src/app/models/file';
@@ -50,6 +56,7 @@ export interface IInvoiceState extends EntityState<IInvoice> {
   selectedInvoice: IInvoice | null;
   selectedInvoices: IInvoice[] | null;
   selectedWaterBillFile: IFile | null; 
+  selectedWaterBillsFile: IFile | null; 
   invoiceCount: number;
 }
 
@@ -63,6 +70,7 @@ export const initialState: IInvoiceState = adapter.getInitialState({
   selectedInvoice: null,
   selectedInvoices: null,
   selectedWaterBillFile: null,
+  selectedWaterBillsFile: null,
   invoiceCount: 0,
 });
 
@@ -147,6 +155,21 @@ const reducer = createReducer(
     errorMessage: error.error,
   })),
 
+  on(getWaterBillsByZoneId, (state) => ({ ...state, isLoading: true })),
+
+  on(getWaterBillsByZoneIdSuccess, (state, { payload }) => {
+    return {
+      ...state,
+      selectedWaterBillsFile: payload,
+      isLoading: false
+    };
+  }),
+  on(getWaterBillsByZoneIdFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error.error,
+  })),
+
   // List all invoices
   on(listAllInvoices, (state) => ({ ...state, isLoading: true })),
   on(listAllInvoicesSuccess, (state, { invoices }) =>
@@ -157,6 +180,20 @@ const reducer = createReducer(
   })
   ),
   on(listAllInvoicesFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error.error,
+  })),
+
+ on(getInvoiceByZoneId, (state) => ({ ...state, isLoading: true })),
+  on(getInvoiceByZoneIdSuccess, (state, { invoices }) =>
+  ({
+    ...state,
+    selectedInvoices: invoices,
+    isLoading: false
+  })
+  ),
+  on(getInvoiceByZoneIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
     errorMessage: error.error,

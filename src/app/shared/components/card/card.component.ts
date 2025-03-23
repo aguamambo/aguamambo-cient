@@ -10,6 +10,5 @@ export class CardComponent {
   enterpriseData: IOption[] = [];
   
   onValueSelected(option: IOption): void {
-    console.log(option.value);
   }
 }
