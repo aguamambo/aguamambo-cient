@@ -27,7 +27,7 @@
                 <app-search-input (searchChange)="filterInvoices($event)"></app-search-input>
             </div>
             <div *ngIf="filteredInvoices.length > 0 && enableExport" class="flex items-end justify-end py-4 w-full ">
-                <button (click)="exportExcel()" class="bg-green-500 text-white py-2 px-6 rounded ml-2">Imprimir Facturas</button>
+                <button (click)="printSelectedZoneInvoices()" class="bg-green-500 text-white py-2 px-6 rounded ml-2">Imprimir Facturas</button>
             </div>
 
         </div>

@@ -168,7 +168,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
     
 
       
-        exportExcel() {
+        printSelectedZoneInvoices() {
           this.store.dispatch(getWaterBillsByZoneId({ zoneId: this.selectedZoneId }))
       
           this.store.pipe(select(selectSelectedWaterBills), filter((file) => !!file), first()).subscribe((file) => {
