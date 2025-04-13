@@ -5,7 +5,7 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { IEnterprise } from 'src/app/models/enterprise';
 import { DialogService } from 'src/app/services/dialog.service';
 import { createEnterprise, IAppState, listAllEnterprises, updateEnterprise } from 'src/app/store';
-import { selectEnterpriseErrorMessage, selectEnterpriseIsLoading, selectEnterpriseIsSaving, selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
+import { selectEnterpriseErrorMessage, selectEnterpriseIsLoading, selectEnterpriseIsSaving, selectSelectedEnterprise, selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
 
 @Component({
   selector: 'app-enterprise',
@@ -66,85 +66,87 @@ export class EnterpriseComponent implements OnInit {
 
   }
 
+
   submitEnterpriseForm(): void {
-    this._dialogService.reset()
-    if (this.enterpriseForm.valid) {
-      const payload = this.enterpriseForm.value;
-
-      if (this.isEditing) {
-        this._store.dispatch(updateEnterprise({ enterpriseId: payload.enterpriseId, enterprise: payload }));
-        this._store.pipe(select(selectEnterpriseErrorMessage)).subscribe(
-          error => {
-            if (error) {
-              this._dialogService.open({
-                title: 'Actualizacao da Empresa',
-                type: 'error',
-                message: 'Um erro ocorreu ao actualizar a Empresa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
-                isProcessing: false,
-                showConfirmButton: false,
-                errorDetails: error
-              })
-            } else {
-              this._store.pipe(select(selectSelectedEnterprises), filter((rubric) => !!rubric))
-                .subscribe((rubric) => {
-                  if (rubric) {
-                    this.isEditing = false;
-                    this._dialogService.open({
-                      title: 'Actualizacao da Empresa',
-                      type: 'success',
-                      message: 'Empresa Actualizada com sucesso!',
-                      isProcessing: false,
-                      showConfirmButton: false,
-                    })
-                    this.eraseForm();
-                  }
-                });
+      this._dialogService.reset()
+      if (this.enterpriseForm.valid) {
+  
+        const payload = this.enterpriseForm.value;
+  
+        if (this.isEditing) {
+          this._store.dispatch(updateEnterprise({ enterpriseId: payload.enterpriseId, enterprise: payload }));
+          this._store.pipe(select(selectEnterpriseErrorMessage)).subscribe(
+            error => {
+              if (error) {
+                this._dialogService.open({
+                  title: 'Actualizacao da Empresa',
+                  type: 'error',
+                  message: 'Um erro ocorreu ao actualizar a Empresa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
+                  isProcessing: false,
+                  showConfirmButton: false,
+                  errorDetails: error
+                })
+              } else {
+                this._store.pipe(select(selectSelectedEnterprises), filter((enterprise) => !!enterprise))
+                  .subscribe((enterprise) => {
+                    if (enterprise) {
+                      this.eraseForm();
+                      this.isEditing = false;
+                      this._dialogService.open({
+                        title: 'Actualizacao da Empresa',
+                        type: 'success',
+                        message: 'Empresa Actualizado com sucesso!',
+                        isProcessing: false,
+                        showConfirmButton: false,
+                      })
+                    }
+                  });
+              }
             }
-          }
-        )
-      } else {
-        this._store.dispatch(createEnterprise({ enterprise: payload }));
-        this._store.pipe(select(selectEnterpriseErrorMessage)).subscribe(
-          error => {
-            if (error) {
-              this._dialogService.open({
-                title: 'Criação da Empresa',
-                type: 'error',
-                message: 'Um erro ocorreu ao criar a Empresa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
-                isProcessing: false,
-                showConfirmButton: false,
-                errorDetails: error
-              })
-            } else {
-              this._store.pipe(select(selectSelectedEnterprises), filter((enterprise) => !!enterprise))
-                .subscribe((enterprise) => {
-                  if (enterprise) {
-                    this._dialogService.open({
-                      title: 'Criação de Empresa',
-                      type: 'success',
-                      message: 'Empresa criada com sucesso!',
-                      isProcessing: false,
-                      showConfirmButton: false,
-                    })
-                    this.eraseForm();
-                  }
-                });
-            }
-
-          })
-
+          )
+        } else {
+          this._store.dispatch(createEnterprise({ enterprise: payload }));
+          this._store.pipe(select(selectEnterpriseErrorMessage)).subscribe(
+            error => {
+              if (error) {
+                this._dialogService.open({
+                  title: 'Criação da Empresa',
+                  type: 'error',
+                  message: 'Um erro ocorreu ao criar a Empresa! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
+                  isProcessing: false,
+                  showConfirmButton: false,
+                  errorDetails: error
+                })
+              } else {
+                this._store.pipe(select(selectSelectedEnterprise), filter((enterprise) => !!enterprise))
+                  .subscribe((enterprise) => {
+                    if (enterprise) {
+                      this._dialogService.open({
+                        title: 'Criação de Empresa',
+                        type: 'success',
+                        message: 'Empresa criada com sucesso!',
+                        isProcessing: false,
+                        showConfirmButton: false,
+                      })
+                      this.eraseForm();
+                    }
+                  });
+              }
+  
+            })
+  
+        }
+      }
+      else {
+        this._dialogService.open({
+          title: 'Validação de Dados',
+          type: 'info',
+          message: 'Por favor verifique se os campos estão devidadmente preenchidos e volte a submeter.',
+          isProcessing: false,
+          showConfirmButton: false,
+        })
       }
     }
-    else {
-      this._dialogService.open({
-        title: 'Validação de Dados',
-        type: 'info',
-        message: 'Por favor verifique se os campos estão devidadmente preenchidos e volte a submeter.',
-        isProcessing: false,
-        showConfirmButton: false,
-      })
-    }
-  }
 
   eraseForm() {
     this._dialogService.reset()
