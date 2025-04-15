@@ -213,8 +213,15 @@ export class ContractComponent implements OnInit, OnDestroy {
   saveContract(): void {
     this._dialogService.reset()
     if (this.contractForm.valid) {
+      this._dialogService.open({
+        title: 'Processando',
+        message: 'Aguarde um instante enquanto guarda ainformações do contracto.',
+        type: 'loading',
+        isProcessing: true,
+      });
 
       const contractData = this.contractForm.value;
+      
       this._store.dispatch(createContract({ contract: contractData }));
 
       this._store.pipe(select(selectContractError)).subscribe(
@@ -226,11 +233,14 @@ export class ContractComponent implements OnInit, OnDestroy {
               message: 'Um erro ocorreu ao criar o Contracto! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
               isProcessing: false,
               showConfirmButton: false,
+              errorDetails: error.error
+
             })
+             
           } else {
-            this._store.pipe(select(selectSelectedContract), filter((fineConfiguration) => !!fineConfiguration))
-              .subscribe((fineConfiguration) => {
-                if (fineConfiguration) {
+            this._store.pipe(select(selectSelectedContract), filter((contract) => !!contract))
+              .subscribe((contract) => {
+                if (contract) {
                   this._dialogService.open({
                     title: 'Criação do Contracto',
                     type: 'success',

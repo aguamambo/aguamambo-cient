@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { IContract } from 'src/app/models/contract';
+import { Error } from 'src/app/models/error';
 
 // GET contracts/{id}
 export const getContract = createAction(
@@ -15,7 +16,7 @@ export const getContractSuccess = createAction(
 
 export const getContractFailure = createAction(
   '[Contract] Load Contract Failure',
-  props<{ error: any }>()
+  props<{  error: Error }>()
 );
 
 // GET contracts/{clientId}
@@ -31,7 +32,7 @@ export const getContractByClientIdSuccess = createAction(
 
 export const getContractByClientIdFailure = createAction(
   '[Contract] Load Contract By ClientId Failure',
-  props<{ error: any }>()
+  props<{  error: Error }>()
 );
 
 // GET contracts
@@ -46,7 +47,7 @@ export const listAllContractsSuccess = createAction(
 
 export const listAllContractsFailure = createAction(
   '[Contract] List All Contracts Failure',
-  props<{ error: any }>()
+  props<{  error: Error }>()
 );
 
 // POST contracts
@@ -62,7 +63,7 @@ export const createContractSuccess = createAction(
 
 export const createContractFailure = createAction(
   '[Contract] Create Contract Failure',
-  props<{ error: any }>()
+  props<{  error: Error }>()
 );
 
 // Pontract contracts/{id}
@@ -78,7 +79,7 @@ export const updateContractSuccess = createAction(
 
 export const updateContractFailure = createAction(
   '[Contract] Update Contract Failure',
-  props<{ error: any }>()
+  props<{  error: Error }>()
 );
 
 // DELETE contracts/{id}
@@ -94,7 +95,7 @@ export const deleteContractSuccess = createAction(
 
 export const deleteContractFailure = createAction(
   '[Contract] Delete Contract Failure',
-  props<{ error: any }>()
+  props<{  error: Error }>()
 );
 
 // GET contracts/count
@@ -109,7 +110,7 @@ export const loadContractsCountSuccess = createAction(
 
 export const loadContractsCountFailure = createAction(
   '[Contract] Load Contracts Count Failure',
-  props<{ error: any }>()
+  props<{  error: Error }>()
 );
 
 

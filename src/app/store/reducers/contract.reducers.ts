@@ -25,15 +25,15 @@ import {
   getContractByClientIdFailure,
   getContractByClientIdSuccess,
   resetContractActions
-} from "../actions/contract.actions";
-import { Update } from "@ngrx/entity";
+} from "../actions/contract.actions"; 
+import { Error } from "src/app/models/error";
 
 export interface IContractState extends EntityState<IContract> {
   isLoading: boolean;
   isSaving: boolean;
   errorMessage: string;
   successMessage: string;
-  error: any;
+  contractError: Error | null;
   selectedContract: IContract | null;
   selectedContracts: IContract[] | null;
   contractsCount: number;
@@ -45,7 +45,7 @@ export const initialState: IContractState = adapter.getInitialState({
   isSaving: false,
   errorMessage: '',
   successMessage: '',
-  error: null,
+  contractError: null,
   selectedContract: null,
   selectedContracts: null,
   contractsCount: 0,
@@ -63,9 +63,8 @@ const reducer = createReducer(
   })),
   on(getContractFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
-    errorMessage: error.error,
-    error: error
+    isLoading: false, 
+    contractError: error
   })), 
   
   // Get contract by ID
@@ -77,9 +76,8 @@ const reducer = createReducer(
   })),
   on(getContractByClientIdFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
-    errorMessage: error.error,
-    error: error
+    isLoading: false, 
+    contractError: error
   })),
 
   // List all contracts
@@ -89,9 +87,8 @@ const reducer = createReducer(
   ),
   on(listAllContractsFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
-    errorMessage: error.error,
-    error: error
+    isLoading: false, 
+    contractError: error
   })),
 
   // Create contract
@@ -101,9 +98,8 @@ const reducer = createReducer(
   ),
   on(createContractFailure, (state, { error }) => ({
     ...state,
-    isSaving: false,
-    errorMessage: error.error,
-    error: error
+    isSaving: false, 
+    contractError: error
   })),
 
   // Update contract
@@ -115,9 +111,8 @@ const reducer = createReducer(
   ),
   on(updateContractFailure, (state, { error }) => ({
     ...state,
-    isSaving: false,
-    errorMessage: error.error,
-    error: error
+    isSaving: false, 
+    contractError: error
   })),
 
   // Delete contract
@@ -127,9 +122,8 @@ const reducer = createReducer(
   ),
   on(deleteContractFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
-    errorMessage: error.error,
-    error: error
+    isLoading: false, 
+    contractError: error
   })),
 
   // Get contracts count
@@ -141,9 +135,8 @@ const reducer = createReducer(
   })),
   on(loadContractsCountFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
-    errorMessage: error.error,
-    error: error
+    isLoading: false, 
+    contractError: error
   })),
   
   on(resetContractActions, () => initialState)
