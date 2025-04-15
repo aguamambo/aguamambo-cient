@@ -46,13 +46,14 @@ import {
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
 import { IFile } from 'src/app/models/file';
+import { Error } from 'src/app/models/error';
 
 export interface IInvoiceState extends EntityState<IInvoice> {
   isLoading: boolean;
   isSaving: boolean;
   errorMessage: string;
   successMessage: string;
-  error: any;
+  invoiceError: Error | null;
   selectedInvoice: IInvoice | null;
   selectedInvoices: IInvoice[] | null;
   selectedWaterBillFile: IFile | null; 
@@ -66,7 +67,7 @@ export const initialState: IInvoiceState = adapter.getInitialState({
   isSaving: false,
   errorMessage: '',
   successMessage: '',
-  error: null,
+  invoiceError: null,
   selectedInvoice: null,
   selectedInvoices: null,
   selectedWaterBillFile: null,
@@ -87,7 +88,7 @@ const reducer = createReducer(
   on(getInvoiceFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   // Get invoice by ID
@@ -100,7 +101,7 @@ const reducer = createReducer(
   on(getInvoiceByReadingIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   // Get invoice by ID
@@ -113,7 +114,7 @@ const reducer = createReducer(
   on(getInvoiceByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   on(getInvoiceByStatus, (state) => ({ ...state, isLoading: true })),
@@ -125,7 +126,7 @@ const reducer = createReducer(
   on(getInvoiceByStatusFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   on(getInvoiceByMeter, (state) => ({ ...state, isLoading: true })),
@@ -137,7 +138,7 @@ const reducer = createReducer(
   on(getInvoiceByMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   on(getWaterBillByReadingId, (state) => ({ ...state, isLoading: true })),
@@ -152,7 +153,7 @@ const reducer = createReducer(
   on(getWaterBillByReadingIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   on(getWaterBillsByZoneId, (state) => ({ ...state, isLoading: true })),
@@ -167,7 +168,7 @@ const reducer = createReducer(
   on(getWaterBillsByZoneIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   // List all invoices
@@ -182,7 +183,7 @@ const reducer = createReducer(
   on(listAllInvoicesFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
  on(getInvoiceByZoneId, (state) => ({ ...state, isLoading: true })),
@@ -196,7 +197,7 @@ const reducer = createReducer(
   on(getInvoiceByZoneIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   // Create invoice
@@ -207,7 +208,7 @@ const reducer = createReducer(
   on(createInvoiceFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   // Update invoice
@@ -220,7 +221,7 @@ const reducer = createReducer(
   on(updateInvoiceFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   // Delete invoice
@@ -231,7 +232,7 @@ const reducer = createReducer(
   on(deleteInvoiceFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
 
   // Load invoice count
@@ -244,7 +245,7 @@ const reducer = createReducer(
   on(loadInvoicesCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    invoiceError: error
   })),
   
   on(resetInvoiceActions, () => initialState)

@@ -18,7 +18,7 @@ import { IAppState, createInvoice, createReading, getClientMeterByClient, getInv
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectClientMeterIsLoading, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
-import { selectSelectedInvoice, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceError, selectSelectedInvoice, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
 import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
 @Component({
@@ -76,8 +76,8 @@ export class RegisterReadingComponent implements OnInit {
   user: string = '';
 
   constructor(
-    private store: Store<IAppState>, 
-    private auth: AuthService, 
+    private store: Store<IAppState>,
+    private auth: AuthService,
     private _dialogService: DialogService,
     private sanitizer: DomSanitizer
   ) {
@@ -95,7 +95,7 @@ export class RegisterReadingComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.auth.checkSession();
     this.generateYearsList();
-    
+
     this.initForm();
     this.loadData();
   }
@@ -150,10 +150,10 @@ export class RegisterReadingComponent implements OnInit {
     this.registReadingForm.get('readingYear')?.setValue(event.value);
     this.selectedYear = event.value
   }
-  
-  getReadingByMeter(counter: string){
-    this.registReadingForm.get('meterId')?.setValue( counter)
-            this.store.dispatch(getLastReadingByMeter({ meterId:  counter }));
+
+  getReadingByMeter(counter: string) {
+    this.registReadingForm.get('meterId')?.setValue(counter)
+    this.store.dispatch(getLastReadingByMeter({ meterId: counter }));
     this.getReadingsByCMeterId$.pipe(
       skipWhile((readings) => !readings),
       first()
@@ -167,7 +167,7 @@ export class RegisterReadingComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    const result =  Object.values(this.registReadingForm.value).every(value => value !== null && value !== undefined);
+    const result = Object.values(this.registReadingForm.value).every(value => value !== null && value !== undefined);
     this.validFields = result
     return result
   }
@@ -193,10 +193,10 @@ export class RegisterReadingComponent implements OnInit {
       );
     }
   }
-  
+
   onZoneSelect(event: { value: string; label: string }): void {
     if (event && event.value) {
-      this.counter = '' 
+      this.counter = ''
       this.selectedZone = event.value
       this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
       this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
@@ -216,15 +216,15 @@ export class RegisterReadingComponent implements OnInit {
     }
   }
 
-  getClientsByZone(event: { value: string; label: string }){
+  getClientsByZone(event: { value: string; label: string }) {
     this.onZoneSelect(event)
   }
-  
-  getZonesByEnterpriseId(event: { value: string; label: string }){
+
+  getZonesByEnterpriseId(event: { value: string; label: string }) {
     this.onEnterpriseSelected(event)
     this.getClientsByZone({ value: this.selectedZone, label: '' })
   }
-  
+
 
   onClientSelect(selectedClient: { label: string, value: string }): void {
     const clientDetails = this.clientsList.find(client => client.clientId === selectedClient.value);
@@ -232,22 +232,22 @@ export class RegisterReadingComponent implements OnInit {
       this.counter = ''
       this.clientId = clientDetails.clientId;
       this.store.dispatch(getClientMeterByClient({ clientId: this.clientId }));
-  
+
       this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe(
         (meters) => {
           if (meters) {
-            this.clientMetersData = [ 
+            this.clientMetersData = [
               ...meters.map(meter => ({ label: meter.meterId || '', value: meter.meterId || '' }))
             ];
             this.counter = meters[0].meterId
             this.getReadingByMeter(this.counter)
           }
         }
-        
+
       );
     }
   }
-  
+
   onMeterSelected(option: IOption) {
     if (option && option.value) {
       this.lastReading = 0
@@ -262,7 +262,7 @@ export class RegisterReadingComponent implements OnInit {
 
   onNumberInputChange(inputElement: HTMLInputElement, controlName: string): void {
     const sanitizedValue = inputElement.value.replace(/[^0-9]/g, '');
-    inputElement.value = sanitizedValue; 
+    inputElement.value = sanitizedValue;
     if (sanitizedValue) {
       this.registReadingForm.get(controlName)?.setValue(sanitizedValue);
     } else
@@ -280,19 +280,19 @@ export class RegisterReadingComponent implements OnInit {
         type: 'loading',
         isProcessing: true,
       });
-  
+
       const formData = this.registReadingForm.value;
-      
+
       this.store.dispatch(createReading({ reading: formData }));
 
       this.store.dispatch(resetInvoiceActions());
-  
+
       this.getCreatedReading$
         .pipe(filter((reading) => !!reading), first())
         .subscribe({
           next: (reading) => {
             if (reading) {
-              
+
               const payload = { readingId: reading.readingId };
               this._dialogService.open({
                 title: 'Sucesso',
@@ -300,84 +300,103 @@ export class RegisterReadingComponent implements OnInit {
                 type: 'success'
               });
               this.store.dispatch(createInvoice({ payload }));
+
+
               this.resetFields()
             }
-  
-            this.store
-              .pipe(
-                select(selectSelectedInvoice),
-                filter((invoice) => !!invoice),
-                first()
-              )
-              .subscribe({
-                next: (invoice) => {
-                  if (invoice) {
-                    
-                    this._dialogService.close(true);
-                    this._dialogService.open({
-                      title: 'Factura',
-                      message: 'Carregando dados da Factura.',
-                      type: 'loading',
-                      isProcessing: true,
-                    }); 
-  
-                  this.store.dispatch(
-                    getWaterBillByReadingId({ readingId: invoice.readingId })
-                  );
-  
-                }
+
+            this.store.pipe(select(selectInvoiceError)).subscribe(
+              error => {
+                if (error) {
+                  this._dialogService.open({
+                    title: 'Criação da Factura',
+                    type: 'error',
+                    message: 'Um erro ocorreu ao criar a Factura!',
+                    isProcessing: false,
+                    showConfirmButton: false,
+                    errorDetails: error.error
+                  })
+                } 
+                else{
                   this.store
-                    .pipe(
-                      select(selectSelectedWaterBill),
-                      filter((file) => !!file),
-                      first()
-                    )
-                    .subscribe({
-                      next: (file) => {
-                        if (file) {
-                          this.handleBase64File(file.base64);
-                          this.onReset()
-                        }
-                      },
-                      error: () => {
-                        this.openDialog('error', 'Failed to load the invoice file.');
-                      },
-                    });
-                },
-                error: () => {
-                  this.openDialog('error', 'Error fetching the invoice.');
-                },
-              });
+                  .pipe(
+                    select(selectSelectedInvoice),
+                    filter((invoice) => !!invoice),
+                    first()
+                  )
+                  .subscribe({
+                    next: (invoice) => {
+                      if (invoice) {
+    
+                        this._dialogService.close(true);
+                        this._dialogService.open({
+                          title: 'Factura',
+                          message: 'Carregando dados da Factura.',
+                          type: 'loading',
+                          isProcessing: true,
+                        });
+    
+                        this.store.dispatch(
+                          getWaterBillByReadingId({ readingId: invoice.readingId })
+                        );
+    
+                      }
+                      this.store
+                        .pipe(
+                          select(selectSelectedWaterBill),
+                          filter((file) => !!file),
+                          first()
+                        )
+                        .subscribe({
+                          next: (file) => {
+                            if (file) {
+                              this.handleBase64File(file.base64);
+                              this.onReset()
+                            }
+                          },
+                          error: () => {
+                            this.openDialog('error', 'Failed to load the invoice file.');
+                          },
+                        });
+                    },
+                    error: () => {
+                      this.openDialog('error', 'Error fetching the invoice.');
+                    },
+                  });
+                }
+              })
+
+            
           },
           error: (error) => {
             this._dialogService.open({
               title: 'Erro',
               message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
               type: 'error',
-              showConfirmButton: true, 
+              showConfirmButton: true,
               cancelText: 'Cancelar',
             });
           },
         });
     }
-    else{
+    else {
       this._dialogService.open({
         title: 'Erro',
         message: 'Por favor preenche todos os campos antes de submeter',
         type: 'error',
-        showConfirmButton: true, 
+        showConfirmButton: true,
         cancelText: 'Cancelar',
       });
     }
   }
-  
+
 
   handleBase64File(base64String: string): void {
     const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, '');
     this.openPdfFromBase64(cleanBase64);
 
   }
-  
+
   onReset(): void {
     this.store.dispatch(resetReadingActions());
     this.store.dispatch(resetClientActions());
@@ -387,25 +406,25 @@ export class RegisterReadingComponent implements OnInit {
     this.store.dispatch(resetClientMetersActions());
   }
 
-  resetFields(){
-    
+  resetFields() {
+
     this.lastReading = 0;
     this.counter = '';
     this.readingId = null;
     this.clientId = null;
-    this.zoneData  = [{ label: 'Seleccione...', value: '' }];
-    this.clientMetersData  = [];
-    this.enterpriseData  = [{ label: 'Seleccione...', value: '' }]; 
+    this.zoneData = [{ label: 'Seleccione...', value: '' }];
+    this.clientMetersData = [];
+    this.enterpriseData = [{ label: 'Seleccione...', value: '' }];
     this.clientData = [
       { label: 'Seleccione...', value: '' }
     ];
-    this.monthsData  = [];
-    this.zoneList  = [];
-    this.enterprisesList  = [];
-    this.clientsList  = [];
-    this.readingsList  = [];
-    this.isDialogOpen  = false;
-    this.validFields  = false;
+    this.monthsData = [];
+    this.zoneList = [];
+    this.enterprisesList = [];
+    this.clientsList = [];
+    this.readingsList = [];
+    this.isDialogOpen = false;
+    this.validFields = false;
     this.registReadingForm.get('currentReading')?.reset()
     this.loadData()
     const option: IOption = {
@@ -416,11 +435,11 @@ export class RegisterReadingComponent implements OnInit {
   }
 
   openPdfFromBase64(base64: string): void {
-    try{
-      
+    try {
+
       const blob = this.base64ToBlob(base64, 'application/pdf');
       const url = URL.createObjectURL(blob);
-      const pdfWindow = window.open('','_blank');
+      const pdfWindow = window.open('', '_blank');
       if (pdfWindow) {
         pdfWindow.document.write(
           `
@@ -453,12 +472,12 @@ export class RegisterReadingComponent implements OnInit {
         )
         this._dialogService.close(true)
       }
-      else{
+      else {
         this._dialogService.open({
           title: 'Erro ao carregar a factura',
           message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
           type: 'error',
-          showConfirmButton: true, 
+          showConfirmButton: true,
           cancelText: 'Cancelar',
         });
       }
@@ -468,12 +487,12 @@ export class RegisterReadingComponent implements OnInit {
         title: 'Erro ao carregar a factura',
         message: 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte',
         type: 'error',
-        showConfirmButton: true, 
+        showConfirmButton: true,
         cancelText: 'Cancelar',
       });
     }
   }
-  
+
   private base64ToBlob(base64: string, mimeType: string = 'application/octet-stream'): Blob {
     const binaryString = atob(base64);
     const length = binaryString.length;
@@ -487,7 +506,7 @@ export class RegisterReadingComponent implements OnInit {
 
   onMonthSelect(selectedOption: { value: string; label: string }) {
     this.registReadingForm.get('readingMonth')?.setValue(selectedOption.value)
-    this.selectedMonth =  selectedOption.value
+    this.selectedMonth = selectedOption.value
   }
 
   ngOnDestroy(): void {
@@ -511,7 +530,7 @@ export class RegisterReadingComponent implements OnInit {
       { value: '12', label: 'Dezembro' }
     ];
   }
- 
+
   checkSession() {
     if (!this.auth.authenticated()) {
       this.auth.logout()

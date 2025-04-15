@@ -159,8 +159,7 @@ export class InvoiceEffects {
             exhaustMap(action =>
                 this.apiService.post<IInvoice>('/invoice', action.payload).pipe(
                     map(invoice => createInvoiceSuccess({ invoice })),
-                    catchError(error => {
-                        this.errorMessage.getErrorMessage(error.status, error.error);
+                    catchError(error => { 
                         return of(createInvoiceFailure({ error }));
                     })
                 )

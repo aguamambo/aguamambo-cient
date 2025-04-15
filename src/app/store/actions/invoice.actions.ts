@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { IInvoice } from 'src/app/models/invoice';
 import { IFile } from 'src/app/models/file';
+import { Error } from 'src/app/models/error';
 
 // GET invoices/{id}
 export const getInvoice = createAction(
@@ -16,7 +17,7 @@ export const getInvoiceSuccess = createAction(
 
 export const getInvoiceFailure = createAction(
   '[Invoice] Get Invoice Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET invoices/{readingId}
@@ -32,7 +33,7 @@ export const getInvoiceByReadingIdSuccess = createAction(
 
 export const getInvoiceByReadingIdFailure = createAction(
   '[Invoice] Get Invoice By Reading Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET invoice/client/{clientId}
@@ -48,7 +49,7 @@ export const getInvoiceByClientIdSuccess = createAction(
 
 export const getInvoiceByClientIdFailure = createAction(
   '[Invoice] Get Invoice By Client Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 export const getInvoiceByStatus = createAction(
@@ -63,7 +64,7 @@ export const getInvoiceByStatusSuccess = createAction(
 
 export const getInvoiceByStatusFailure = createAction(
   '[Invoice] Get Invoice By Status Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 export const getInvoiceByMeter = createAction(
@@ -78,7 +79,7 @@ export const getInvoiceByMeterSuccess = createAction(
 
 export const getInvoiceByMeterFailure = createAction(
   '[Invoice] Get Invoice By Meter Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 export const getInvoiceByZoneId = createAction(
@@ -93,7 +94,7 @@ export const getInvoiceByZoneIdSuccess = createAction(
 
 export const getInvoiceByZoneIdFailure = createAction(
   '[Invoice] Get Invoice By ZoneId Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET invoices/{readingId}
@@ -109,7 +110,7 @@ export const getWaterBillByReadingIdSuccess = createAction(
 
 export const getWaterBillByReadingIdFailure = createAction(
   '[Invoice] Get WaterBil by Reading Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET invoices/{zoneId}
@@ -125,7 +126,7 @@ export const getWaterBillsByZoneIdSuccess = createAction(
 
 export const getWaterBillsByZoneIdFailure = createAction(
   '[Invoice] Get WaterBils by Reading Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET invoices
@@ -140,7 +141,7 @@ export const listAllInvoicesSuccess = createAction(
 
 export const listAllInvoicesFailure = createAction(
   '[Invoice] List All Invoices Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // POST invoices
@@ -156,7 +157,7 @@ export const createInvoiceSuccess = createAction(
 
 export const createInvoiceFailure = createAction(
   '[Invoice] Create Invoice Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // PUT invoices/{id}
@@ -172,7 +173,7 @@ export const updateInvoiceSuccess = createAction(
 
 export const updateInvoiceFailure = createAction(
   '[Invoice] Update Invoice Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // DELETE invoices/{id}
@@ -188,7 +189,7 @@ export const deleteInvoiceSuccess = createAction(
 
 export const deleteInvoiceFailure = createAction(
   '[Invoice] Delete Invoice Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET invoices/count
@@ -203,7 +204,7 @@ export const loadInvoicesCountSuccess = createAction(
 
 export const loadInvoicesCountFailure = createAction(
   '[Invoice] Load Invoices Count Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 

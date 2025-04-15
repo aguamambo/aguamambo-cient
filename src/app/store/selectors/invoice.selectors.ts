@@ -23,9 +23,9 @@ export const selectInvoiceIsSaving = createSelector(
   (state) => state.isSaving
 );
 
-export const selectInvoiceErrorMessage = createSelector(
+export const selectInvoiceError = createSelector(
   selectInvoiceState,
-  (state) => state.errorMessage
+  (state) => state.invoiceError
 );
 
 export const selectSelectedWaterBill = createSelector(

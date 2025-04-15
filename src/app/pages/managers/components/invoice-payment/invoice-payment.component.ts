@@ -6,7 +6,7 @@ import { IInvoice } from 'src/app/models/invoice';
 import { DialogService } from 'src/app/services/dialog.service';
 import { ToasterService } from 'src/app/services/toaster.service';
 import { createInvoice, IAppState, listAllInvoices, updateInvoice } from 'src/app/store';
-import { selectInvoiceErrorMessage, selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceError, selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
 
 
 interface InvoicePayment {
@@ -101,7 +101,7 @@ export class InvoicePaymentComponent implements OnInit {
 
       if (this.isEditing) {
         this._store.dispatch(updateInvoice({ invoiceId: payload.invoiceId, invoice: payload }));
-        this._store.pipe(select(selectInvoiceErrorMessage)).subscribe(
+        this._store.pipe(select(selectInvoiceError)).subscribe(
           error => {
             if (error) {
               this._dialogService.open({
@@ -110,7 +110,7 @@ export class InvoicePaymentComponent implements OnInit {
                 message: 'Um erro ocorreu ao actualizar a Factura! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
-                errorDetails: error
+                errorDetails: error.message
               })
             } else {
               this._store.pipe(select(selectSelectedInvoices), filter((invoice) => !!invoice))
@@ -132,7 +132,7 @@ export class InvoicePaymentComponent implements OnInit {
         )
       } else {
         this._store.dispatch(createInvoice({ payload: payload }));
-        this._store.pipe(select(selectInvoiceErrorMessage)).subscribe(
+        this._store.pipe(select(selectInvoiceError)).subscribe(
           error => {
             if (error) {
               this._dialogService.open({
@@ -141,7 +141,7 @@ export class InvoicePaymentComponent implements OnInit {
                 message: 'Um erro ocorreu ao criar a Factura! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
                 isProcessing: false,
                 showConfirmButton: false,
-                errorDetails: error
+                errorDetails: error.message
               })
             } else {
               this._store.pipe(select(selectSelectedInvoice), filter((invoice) => !!invoice))

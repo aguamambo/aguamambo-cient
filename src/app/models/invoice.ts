@@ -11,3 +11,9 @@ export interface IInvoice {
     finePercentage:number;
     readingId: string;
   }
+
+
+  export interface InvoiceResponse {
+    invoice: IInvoice,
+    error : Error
+  }
