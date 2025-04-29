@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { ISuspension } from 'src/app/models/suspension';
+import { Error } from 'src/app/models/error';
 
 // GET suspensions/{id}
 export const getSuspension = createAction(
@@ -15,7 +16,7 @@ export const getSuspensionSuccess = createAction(
 
 export const getSuspensionFailure = createAction(
   '[Suspension] Load Suspension Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 export const getSuspensionByClientId = createAction(
@@ -30,7 +31,7 @@ export const getSuspensionByClientIdSuccess = createAction(
 
 export const getSuspensionByClientIdFailure = createAction(
   '[Suspension] Load Suspension Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET suspensions
@@ -45,7 +46,7 @@ export const listAllSuspensionsSuccess = createAction(
 
 export const listAllSuspensionsFailure = createAction(
   '[Suspension] Load Suspensions Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // POST suspensions
@@ -61,7 +62,7 @@ export const createSuspensionSuccess = createAction(
 
 export const createSuspensionFailure = createAction(
   '[Suspension] Create Suspension Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // PUT suspensions/{id}
@@ -77,7 +78,7 @@ export const updateSuspensionSuccess = createAction(
 
 export const updateSuspensionFailure = createAction(
   '[Suspension] Update Suspension Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // DELETE suspensions/{id}
@@ -93,7 +94,7 @@ export const deleteSuspensionSuccess = createAction(
 
 export const deleteSuspensionFailure = createAction(
   '[Suspension] Delete Suspension Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET suspensions/count
@@ -108,7 +109,7 @@ export const loadSuspensionsCountSuccess = createAction(
 
 export const loadSuspensionsCountFailure = createAction(
   '[Suspension] Load Suspensions Count Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 

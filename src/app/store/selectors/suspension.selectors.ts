@@ -23,9 +23,9 @@ export const selectSuspensionIsSaving = createSelector(
   (state) => state.isSaving
 );
 
-export const selectSuspensionErrorMessage = createSelector(
+export const selectSuspensionError = createSelector(
   selectSuspensionState,
-  (state) => state.errorMessage
+  (state) => state.suspensionError
 );
 
 export const selectSuspensionSuccessMessage = createSelector(

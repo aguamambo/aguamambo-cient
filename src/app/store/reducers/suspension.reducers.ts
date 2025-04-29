@@ -26,13 +26,14 @@ import {
   resetSuspensionActions,
 } from '../actions/suspension.actions';
 import { Update } from '@ngrx/entity';
+import { Error } from 'src/app/models/error';
 
 export interface ISuspensionState extends EntityState<ISuspension> {
   isLoading: boolean;
   isSaving: boolean;
   errorMessage: string;
   successMessage: string;
-  error: any;
+  suspensionError: Error | null;
   selectedSuspension: ISuspension | null;
   selectedSuspensions: ISuspension[] | null;
   SuspensionCount: number;
@@ -45,7 +46,7 @@ export const initialState: ISuspensionState = adapter.getInitialState({
   isSaving: false,
   errorMessage: '',
   successMessage: '',
-  error: null,
+  suspensionError: null,
   selectedSuspension: null,
   selectedSuspensions: null,
   SuspensionCount: 0,
@@ -64,7 +65,7 @@ const reducer = createReducer(
   on(getSuspensionFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    suspensionError: error,
   })),
 
   // Get Suspension by ID
@@ -77,7 +78,7 @@ const reducer = createReducer(
   on(getSuspensionByClientIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    suspensionError: error,
   })),
 
   // List all Suspensions
@@ -90,7 +91,7 @@ const reducer = createReducer(
   on(listAllSuspensionsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    suspensionError: error,
   })),
 
   // Create Suspension
@@ -101,7 +102,7 @@ const reducer = createReducer(
   on(createSuspensionFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error.error,
+    suspensionError: error,
   })),
 
   // Update Suspension
@@ -115,7 +116,7 @@ const reducer = createReducer(
   on(updateSuspensionFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error.error,
+    suspensionError: error,
   })),
 
   // Delete Suspension
@@ -126,7 +127,7 @@ const reducer = createReducer(
   on(deleteSuspensionFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    suspensionError: error,
   })),
 
   // Load Suspensions count
@@ -139,7 +140,7 @@ const reducer = createReducer(
   on(loadSuspensionsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    suspensionError: error,
   })),
   
   on(resetSuspensionActions, () => initialState)

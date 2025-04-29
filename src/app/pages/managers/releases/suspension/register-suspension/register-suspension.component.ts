@@ -2,7 +2,7 @@ import { DialogService } from 'src/app/services/dialog.service';
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { filter, first, Observable, Subject, takeUntil } from "rxjs";
 import { GenericConfig } from "src/app/core/config/generic.config";
 import { IClient } from "src/app/models/client";
 import { IEnterprise } from "src/app/models/enterprise";
@@ -13,7 +13,7 @@ import { IAppState, createSuspension, getClientByZoneId, getClientMeter, getClie
 import { selectClientIsLoading, selectSelectedClients } from "src/app/store/selectors/client.selectors";
 import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
-import { selectSuspensionIsSaving } from "src/app/store/selectors/suspension.selectors";
+import { selectSuspensionError, selectSuspensionIsSaving } from "src/app/store/selectors/suspension.selectors";
 import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
 @Component({
@@ -181,14 +181,46 @@ onMeterSeclected(option: IOption) {
   }
 
   saveSuspension(): void {
-    this._dialogService.reset()
+    this._dialogService.reset() 
     if (this.registSuspensionForm.valid) {
+      this._dialogService.open({
+        title: 'Processando',
+        message: 'Aguarde um instante enquanto guarda ainformações da suspensao.',
+        type: 'loading',
+        isProcessing: true,
+      });
+
+     
       const formData = this.registSuspensionForm.value;
+
       this.store.dispatch(createSuspension({suspension: formData}))
+
+      this.store.pipe(select(selectSuspensionError))
+
+
+      
+      this.isSuspensionSaving$.pipe(filter((response) => !!response), first()).subscribe((response) => {
+        if (response) {
+          this._dialogService.open({
+            title: 'Sucesso',
+            message: 'Suspensao criada com sucesso.',
+            type: 'success',
+            isProcessing: false,
+          });
+          this.registSuspensionForm.reset();
+        } else {
+          this._dialogService.open({
+            title: 'Erro',
+            message: 'Ocorreu um erro ao criar a suspensao.',
+            type: 'error',
+            isProcessing: false,
+          });
+        }
+      });
     } else {
       
     }
-  }
+  } 
 
   onStartMonthSelect(selectedOption: { value: string; label: string }) {
     this.registSuspensionForm.get('startDate')?.setValue(selectedOption.value)

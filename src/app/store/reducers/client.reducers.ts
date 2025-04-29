@@ -29,6 +29,7 @@ import {
   resetClientActions
 } from "../actions/client.actions";
 import { Update } from "@ngrx/entity";
+import { Error } from "src/app/models/error";
 
 export interface IClientState extends EntityState<IClient> {
   isLoading: boolean;
@@ -36,7 +37,7 @@ export interface IClientState extends EntityState<IClient> {
   errorMessage: string;
   statusCode: number;
   successMessage: string;
-  error: any;
+  clientError: Error| null;
   selectedClient: IClient | null;
   selectedClients: IClient[] | null;
   clientCount: number;
@@ -49,7 +50,7 @@ export const initialState: IClientState = adapter.getInitialState({
   errorMessage: '',
   successMessage: '',
   statusCode: 0,
-  error: null,
+  clientError: null,
   selectedClient: null,
   selectedClients: null,
   clientCount: 0,
@@ -68,7 +69,7 @@ const reducer = createReducer(
   on(getClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    clientError: error
   })),
 
   // Get client by ZoneId
@@ -81,7 +82,7 @@ const reducer = createReducer(
   on(getClientByZoneIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    clientError: error
   })),
 
   // Get client by ZoneId
@@ -94,7 +95,7 @@ const reducer = createReducer(
   on(getClientByContractTypeIdFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    clientError: error
   })),
 
   // List all clients
@@ -105,7 +106,7 @@ const reducer = createReducer(
   on(listAllClientsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    clientError: error
   })),
 
   // Create client
@@ -121,7 +122,7 @@ const reducer = createReducer(
     ...state,
     isSaving: false,
     statusCode: statusCode,
-    errorMessage: error.error,
+    clientError: error
   })),
 
   // Update client
@@ -134,7 +135,7 @@ const reducer = createReducer(
   on(updateClientFailure, (state, { error }) => ({
     ...state,
     isSaving: false,
-    errorMessage: error.error,
+    clientError: error
   })),
 
   // Delete client
@@ -145,7 +146,7 @@ const reducer = createReducer(
   on(deleteClientFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    clientError: error
   })),
 
   // Get client count
@@ -158,7 +159,7 @@ const reducer = createReducer(
   on(loadClientsCountFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.error,
+    clientError: error
   })),
   
   on(resetClientActions, () => initialState)

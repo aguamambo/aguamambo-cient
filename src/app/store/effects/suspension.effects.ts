@@ -21,7 +21,6 @@ export class SuspensionEffects {
         this.apiService.get<ISuspension>(`/suspension/${action.suspensionId}`).pipe(
           map(suspension => getSuspensionSuccess({ suspension })),
           catchError(error => {
-           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(getSuspensionFailure({ error }));
           })
         )
@@ -36,8 +35,7 @@ export class SuspensionEffects {
             this.apiService.get<ISuspension[]>(`/suspension/by-client/${action.clientId}`).pipe(
                 map(suspensions => getSuspensionByClientIdSuccess({ suspensions: suspensions })),
                 catchError(error => {
-                   this.errorMessage.getErrorMessage(error.status, error.error);
-                    return of(getSuspensionByClientIdFailure({ error }));
+                            return of(getSuspensionByClientIdFailure({ error }));
                 })
             )
         )
@@ -51,7 +49,6 @@ export class SuspensionEffects {
         this.apiService.get<ISuspension[]>('/suspension').pipe(
           map(suspensions => listAllSuspensionsSuccess({ suspensions })),
           catchError(error => {
-           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(listAllSuspensionsFailure({ error }));
           })
         )
@@ -66,7 +63,6 @@ export class SuspensionEffects {
         this.apiService.post<ISuspension>('/suspension', action.suspension).pipe(
           map(suspension => createSuspensionSuccess({ suspension })),
           catchError(error => {
-           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(createSuspensionFailure({ error }));
           })
         )
@@ -81,7 +77,6 @@ export class SuspensionEffects {
         this.apiService.put<ISuspension>(`/suspension/${action.suspensionId}`, action.suspension).pipe(
           map(suspension => updateSuspensionSuccess({ suspension })),
           catchError(error => {
-           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(updateSuspensionFailure({ error }));
           })
         )
@@ -96,7 +91,6 @@ export class SuspensionEffects {
         this.apiService.delete(`/suspension/${action.suspensionId}`).pipe(
           map(() => deleteSuspensionSuccess({ suspensionId: action.suspensionId })),
           catchError(error => {
-           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(deleteSuspensionFailure({ error }));
           })
         )
@@ -111,7 +105,6 @@ export class SuspensionEffects {
         this.apiService.get<number>('/suspension/count').pipe(
           map(count => loadSuspensionsCountSuccess({ count })),
           catchError(error => {
-           this.errorMessage.getErrorMessage(error.status, error.error);
             return of(loadSuspensionsCountFailure({ error }));
           })
         )

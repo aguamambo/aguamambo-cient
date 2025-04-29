@@ -6,12 +6,13 @@ import { GenericConfig } from 'src/app/core/config/generic.config';
 import { IClient } from 'src/app/models/client';
 import { IClientMeter } from 'src/app/models/clientMeter';
 import { IContractType } from 'src/app/models/contractType';
+import { Error } from 'src/app/models/error';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
 import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
 import { listAllZones, listAllContractTypes, createClient, createClientMeter} from 'src/app/store';
-import { selectSelectedClient, selectClientIsSaving, selectClientErrorMessage, selectClientSuccessMessage, selectClientStatusCode } from 'src/app/store/selectors/client.selectors';
+import { selectSelectedClient, selectClientIsSaving, selectClientSuccessMessage, selectClientStatusCode, selectClientError } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedContractTypes } from 'src/app/store/selectors/contractType.selectors';
 import { selectSelectedZones, selectZoneIsLoading } from 'src/app/store/selectors/zone.selectors';
@@ -34,7 +35,7 @@ export class ClientComponent implements OnInit {
   zoneList: IZone[] = [];
   isClientSaving$!: Observable<boolean>;
   isZonesLoading$!: Observable<boolean>;
-  errorMessage$!: Observable<string | null>;
+  clientError$!: Observable<Error | null>;
   successMessage$!: Observable<string | null>;
   selectStatusCode$!: Observable<number | null>; 
 
@@ -75,7 +76,7 @@ export class ClientComponent implements OnInit {
 
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
     this.isClientSaving$ = this.store.select(selectClientIsSaving);
-    this.errorMessage$ = this.store.select(selectClientErrorMessage);
+    this.clientError$ = this.store.select(selectClientError);
     this.successMessage$ = this.store.select(selectClientSuccessMessage);
     this.selectStatusCode$ = this.store.select(selectClientStatusCode)
     this.loadData()

@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { IClient } from 'src/app/models/client';
+import { Error } from 'src/app/models/error';
 
 // GET clients/{id}
 export const getClient = createAction(
@@ -15,7 +16,7 @@ export const getClientSuccess = createAction(
 
 export const getClientFailure = createAction(
   '[Client] Get Client By ID Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET clients/{zoneId}
@@ -31,7 +32,7 @@ export const getClientByZoneIdSuccess = createAction(
 
 export const getClientByZoneIdFailure = createAction(
   '[Client] Get Client By ZoneId Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET clients/{zoneId}
@@ -47,7 +48,7 @@ export const getClientByContractTypeIdSuccess = createAction(
 
 export const getClientByContractTypeIdFailure = createAction(
   '[Client] Get Client By ContractTypeId Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET clients
@@ -62,7 +63,7 @@ export const listAllClientsSuccess = createAction(
 
 export const listAllClientsFailure = createAction(
   '[Client] List All Clients Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // POST clients
@@ -78,7 +79,7 @@ export const createClientSuccess = createAction(
 
 export const createClientFailure = createAction(
   '[Client] Create Client Failure',
-  props<{ error: any , statusCode: number }>()
+  props<{ error: Error , statusCode: number }>()
 );
 
 // PUT clients/{id}
@@ -94,7 +95,7 @@ export const updateClientSuccess = createAction(
 
 export const updateClientFailure = createAction(
   '[Client] Update Client Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // DELETE clients/{id}
@@ -110,7 +111,7 @@ export const deleteClientSuccess = createAction(
 
 export const deleteClientFailure = createAction(
   '[Client] Delete Client Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // GET clients/count
@@ -125,7 +126,7 @@ export const loadClientsCountSuccess = createAction(
 
 export const loadClientsCountFailure = createAction(
   '[Client] Load Clients Count Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 export const resetClientActions = createAction(

@@ -529,6 +529,9 @@ export class RegisterReadingComponent implements OnInit {
       { value: '11', label: 'Novembro' },
       { value: '12', label: 'Dezembro' }
     ];
+  
+    const currentMonth = (new Date().getMonth() + 1).toString();
+    this.registReadingForm.get('readingMonth')?.setValue(currentMonth);
   }
 
   checkSession() {

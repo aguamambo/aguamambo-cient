@@ -28,9 +28,9 @@ export const selectClientSuccessMessage = createSelector(
   (state) => state.successMessage
 );
 
-export const selectError = createSelector(
+export const selectClientError = createSelector(
   selectClientState,
-  (state) => state.error
+  (state) => state.clientError
 );
 
 export const selectSelectedClient = createSelector(
