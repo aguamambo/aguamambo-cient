@@ -3,7 +3,7 @@
   </app-breadcrumb>
 
   <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md p-4">
-    <ng-container *ngIf="(isClientLoading$ | async) || (isInvoiceLoading$ | async) || (isContractLoading$ | async)">
+    <ng-container *ngIf="(isClientLoading$ | async) || (isInvoiceLoading$ | async) || (isContractLoading$ | async) || (isZoneLoading$ | async)">
       <div class="flex flex-col justify-center my-4 gap-1">
         <app-loading-spinner></app-loading-spinner>
         <span class="flex justify-center text-sm">
@@ -66,7 +66,7 @@
 
     </div>
 
-    <div class="p-6 border-y" *ngIf="invoicesData.length > 0">
+    <div class="p-6 border-y" *ngIf="showInvoicesData">
       <label class="font-semibold text-lg mb-2 block py-1 px-3">
         Lista de Faturas
       </label>
@@ -106,7 +106,7 @@
               <ul class="overflow-auto max-h-40 rounded-xl">
                 <li *ngFor="let option of paymentMethods" (click)="onPaymentMethodSelected(option)"
                   class="px-4 py-2 hover:bg-deep-dark hover:text-light-mode text-gray-900 dark:text-light-mode cursor-pointer">
-                  {{ option.label }}
+                  {{ option.value }}
                 </li>
               </ul>
             </div>
@@ -114,7 +114,7 @@
         </div>        
       </div>
 
-      <div class="flex flex-col">
+      <div class="flex flex-col" *ngIf="showAmountInput">
         <label class="font-semibold text-sm">Valor Pago</label>
         <input type="text" formControlName="amount" #amount (input)="onNumberInputChange(amount)"
           class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
@@ -122,17 +122,22 @@
       </div>
 
       <div class="flex flex-col ">
-        <label class="font-semibold text-sm">Valor a Pagar</label>
+        <label class="font-semibold text-sm">{{outstandingText}} </label>
         <span class="font-bold">{{ formatCurrency(outstandingAmount) }}</span>
       </div>
 
+      <div class="flex flex-col ">
+        <label class="font-semibold text-sm">Total de Facturas Selecionadas</label>
+        <span class="font-bold">{{ formatCurrency(totalInvoicesValue) }}</span>
+      </div>
+
       <div class="flex flex-col pr-6">
-        <label class="font-semibold text-sm">Saldo</label>
+        <label class="font-semibold text-sm">{{customerBalance >= 0 ? 'Saldo' : 'Dívida' }}</label>
         <span class="font-bold">{{ formatCurrency(customerBalance) }}</span>
       </div>
     </div>
 
-    <div class="w-full flex justify-end px-4" *ngIf="form.valid">
+    <div class="w-full flex justify-end px-4" *ngIf="showSubmitButton">
       <button (click)="onSubmit()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
         Carregar Pagamento
       </button>

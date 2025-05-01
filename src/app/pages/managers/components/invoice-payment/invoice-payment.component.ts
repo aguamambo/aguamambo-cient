@@ -6,7 +6,7 @@ import { IInvoice } from 'src/app/models/invoice';
 import { DialogService } from 'src/app/services/dialog.service';
 import { ToasterService } from 'src/app/services/toaster.service';
 import { createInvoice, IAppState, listAllInvoices, updateInvoice } from 'src/app/store';
-import { selectInvoiceError, selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceError, selectInvoiceIsLoading, selectInvoiceIsSaving, selectInvoice, selectInvoices } from 'src/app/store/selectors/invoice.selectors';
 
 
 interface InvoicePayment {
@@ -39,7 +39,7 @@ export class InvoicePaymentComponent implements OnInit {
   invoicePaymentsColumns: { key: keyof InvoicePayment; label: string }[] = [];
 
   private destroy$ = new Subject<void>();
-  getInvoices$ = this._store.pipe(select(selectSelectedInvoices));
+  getInvoices$ = this._store.pipe(select(selectInvoices));
 
   constructor(
     private _fb: FormBuilder,
@@ -113,7 +113,7 @@ export class InvoicePaymentComponent implements OnInit {
                 errorDetails: error.message
               })
             } else {
-              this._store.pipe(select(selectSelectedInvoices), filter((invoice) => !!invoice))
+              this._store.pipe(select(selectInvoices), filter((invoice) => !!invoice))
                 .subscribe((invoice) => {
                   if (invoice) {
                     this.eraseForm()
@@ -144,7 +144,7 @@ export class InvoicePaymentComponent implements OnInit {
                 errorDetails: error.message
               })
             } else {
-              this._store.pipe(select(selectSelectedInvoice), filter((invoice) => !!invoice))
+              this._store.pipe(select(selectInvoice), filter((invoice) => !!invoice))
                 .subscribe((invoice) => {
                   if (invoice) {
                     this._dialogService.open({

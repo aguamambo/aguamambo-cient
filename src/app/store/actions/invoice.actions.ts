@@ -74,7 +74,7 @@ export const getInvoiceByMeter = createAction(
 
 export const getInvoiceByMeterSuccess = createAction(
   '[Invoice] Get Invoice By Meter Success',
-  props<{ invoice: IInvoice[] }>()
+  props<{ invoices: IInvoice[] }>()
 );
 
 export const getInvoiceByMeterFailure = createAction(

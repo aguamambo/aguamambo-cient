@@ -3,14 +3,14 @@ import { IInvoiceState } from '../reducers/invoice.reducers';
 
 export const selectInvoiceState = createFeatureSelector<IInvoiceState>('invoice');
 
-export const selectSelectedInvoices = createSelector(
+export const selectInvoices = createSelector(
   selectInvoiceState,
-  (state) => state.selectedInvoices
+  (state) => state.invoices
 );
 
-export const selectSelectedInvoice = createSelector(
+export const selectInvoice = createSelector(
   selectInvoiceState,
-  (state) => state.selectedInvoice
+  (state) => state.invoice
 );
 
 export const selectInvoiceIsLoading = createSelector(

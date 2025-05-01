@@ -22,6 +22,7 @@ export class AutocompleteInputComponent {
   highlightedIndex: number = -1;
 
   onSearchInputChange() {
+    this.filteredData = [];
     if (this.displayLabel) {
       this.filteredData = this.dataSource.filter(option =>
         option.label && option.label.toLowerCase().includes(this.displayLabel.toLowerCase())
@@ -44,6 +45,10 @@ export class AutocompleteInputComponent {
   }
   
   onSelect(option: Option) {
+    
+    this.searchValue = ''
+    this.displayLabel = ''
+
     this.displayLabel = option.label; 
     this.searchValue = option.value
     this.filteredData = []; 

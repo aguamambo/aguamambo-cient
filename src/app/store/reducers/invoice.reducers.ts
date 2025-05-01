@@ -54,22 +54,23 @@ export interface IInvoiceState extends EntityState<IInvoice> {
   errorMessage: string;
   successMessage: string;
   invoiceError: Error | null;
-  selectedInvoice: IInvoice | null;
-  selectedInvoices: IInvoice[] | null;
+  invoice: IInvoice | null;
+  invoices: IInvoice[] | null;
   selectedWaterBillFile: IFile | null; 
   selectedWaterBillsFile: IFile | null; 
   invoiceCount: number;
 }
 
 export const adapter: EntityAdapter<IInvoice> = createEntityAdapter<IInvoice>();
+
 export const initialState: IInvoiceState = adapter.getInitialState({
   isLoading: false,
   isSaving: false,
   errorMessage: '',
   successMessage: '',
   invoiceError: null,
-  selectedInvoice: null,
-  selectedInvoices: null,
+  invoice: null,
+  invoices: null,
   selectedWaterBillFile: null,
   selectedWaterBillsFile: null,
   invoiceCount: 0,
@@ -82,7 +83,7 @@ const reducer = createReducer(
   on(getInvoice, (state) => ({ ...state, isLoading: true })),
   on(getInvoiceSuccess, (state, { invoice }) => ({
     ...state,
-    selectedInvoice: invoice,
+    invoice: invoice,
     isLoading: false,
   })),
   on(getInvoiceFailure, (state, { error }) => ({
@@ -95,7 +96,7 @@ const reducer = createReducer(
   on(getInvoiceByReadingId, (state) => ({ ...state, isLoading: true })),
   on(getInvoiceByReadingIdSuccess, (state, { invoice }) => ({
     ...state,
-    selectedInvoice: invoice,
+    invoice: invoice,
     isLoading: false,
   })),
   on(getInvoiceByReadingIdFailure, (state, { error }) => ({
@@ -108,7 +109,7 @@ const reducer = createReducer(
   on(getInvoiceByClientId, (state) => ({ ...state, isLoading: true })),
   on(getInvoiceByClientIdSuccess, (state, { invoice }) => ({
     ...state,
-    selectedInvoices: invoice,
+    invoices: invoice,
     isLoading: false,
   })),
   on(getInvoiceByClientIdFailure, (state, { error }) => ({
@@ -120,7 +121,7 @@ const reducer = createReducer(
   on(getInvoiceByStatus, (state) => ({ ...state, isLoading: true })),
   on(getInvoiceByStatusSuccess, (state, { invoice }) => ({
     ...state,
-    selectedInvoices: invoice,
+    invoices: invoice,
     isLoading: false,
   })),
   on(getInvoiceByStatusFailure, (state, { error }) => ({
@@ -130,11 +131,13 @@ const reducer = createReducer(
   })),
 
   on(getInvoiceByMeter, (state) => ({ ...state, isLoading: true })),
-  on(getInvoiceByMeterSuccess, (state, { invoice }) => ({
+
+  on(getInvoiceByMeterSuccess, (state, { invoices }) => ({
     ...state,
-    selectedInvoices: invoice,
+    invoices: invoices,
     isLoading: false,
   })),
+  
   on(getInvoiceByMeterFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
@@ -176,7 +179,7 @@ const reducer = createReducer(
   on(listAllInvoicesSuccess, (state, { invoices }) =>
   ({
     ...state,
-    selectedInvoices: invoices,
+    invoices: invoices,
     isLoading: false
   })
   ),
@@ -190,7 +193,7 @@ const reducer = createReducer(
   on(getInvoiceByZoneIdSuccess, (state, { invoices }) =>
   ({
     ...state,
-    selectedInvoices: invoices,
+    invoices: invoices,
     isLoading: false
   })
   ),
@@ -203,7 +206,7 @@ const reducer = createReducer(
   // Create invoice
   on(createInvoice, (state) => ({ ...state, isSaving: true })),
   on(createInvoiceSuccess, (state, { invoice }) =>
-    ({ ...state, isSaving: false, selectedInvoice: invoice, successMessage: 'Invoice created successfully!' })
+    ({ ...state, isSaving: false, invoice: invoice, successMessage: 'Invoice created successfully!' })
   ),
   on(createInvoiceFailure, (state, { error }) => ({
     ...state,
@@ -215,7 +218,7 @@ const reducer = createReducer(
   on(updateInvoice, (state) => ({ ...state, isSaving: true })),
   on(updateInvoiceSuccess, (state, { invoice }) =>
   (
-    { ...state, isSaving: false, selectedInvoice: invoice, successMessage: 'Invoice updated successfully!' }
+    { ...state, isSaving: false, invoice: invoice, successMessage: 'Invoice updated successfully!' }
   )
   ),
   on(updateInvoiceFailure, (state, { error }) => ({

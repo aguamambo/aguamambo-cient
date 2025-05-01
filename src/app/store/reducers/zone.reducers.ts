@@ -27,8 +27,7 @@ import {
   getZoneByClientId,
   getZoneByClientIdFailure,
   getZoneByClientIdSuccess,
-} from '../actions/zone.actions';
-import { Update } from '@ngrx/entity';
+} from '../actions/zone.actions'; 
 
 export interface IZoneState extends EntityState<IZone> {
   isLoading: boolean;

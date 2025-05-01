@@ -79,7 +79,7 @@ export class InvoiceEffects {
             ofType(getInvoiceByMeter),
             exhaustMap(action =>
                 this.apiService.get<IInvoice[]>(`/invoice/meter/${action.meterId}`).pipe(
-                    map(invoice => getInvoiceByMeterSuccess({ invoice })),
+                    map(invoices => getInvoiceByMeterSuccess({ invoices })),
                     catchError(error => {
                         return of(getInvoiceByMeterFailure({ error }));
                     })

@@ -10,7 +10,7 @@ import { IAppState, getZoneByEnterpriseId, getClientByZoneId, listAllInvoices, g
 import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectSelectedClientMeter, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
-import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoice, selectSelectedInvoices, selectSelectedWaterBill, selectSelectedWaterBills } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectInvoice, selectInvoices, selectSelectedWaterBill, selectSelectedWaterBills } from 'src/app/store/selectors/invoice.selectors';
 import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 
 @Component({
@@ -48,7 +48,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
   getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
   getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
-  getInvoices$ = this.store.pipe(select(selectSelectedInvoice));
+  getInvoices$ = this.store.pipe(select(selectInvoice));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
 
   constructor( private store: Store<IAppState>, private sanitizer: DomSanitizer) {
@@ -78,7 +78,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
   private loadData(): void {
     this.generateMonths()
     this.store.dispatch(listAllInvoices());
-    this.store.pipe(select(selectSelectedInvoices), takeUntil(this.destroy$)).subscribe(invoices => {
+    this.store.pipe(select(selectInvoices), takeUntil(this.destroy$)).subscribe(invoices => {
       if (invoices) {
         this.invoicesList = invoices;
         this.invoicesData = invoices.map(invoice => ({
@@ -94,7 +94,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
 
    getAllZones() {
       this.store.dispatch(listAllZones());
-      this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(zones => {
+      this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), takeUntil(this.destroy$)).subscribe(zones => {
         if (zones) {
           this.zones = zones;
           this.zoneData = [
@@ -154,7 +154,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
         if (this.selectedZoneId) {
           this.store.dispatch(getInvoiceByZoneId({ zoneId: this.selectedZoneId  }))
     
-          this.store.pipe(select(selectSelectedInvoices), filter((invoice) => !!invoice), first()).subscribe((invoice) => {
+          this.store.pipe(select(selectInvoices), filter((invoice) => !!invoice), takeUntil(this.destroy$)).subscribe((invoice) => {
             if (invoice) {
               this.filteredInvoices = invoice
               this.invoicesList = invoice
@@ -171,7 +171,7 @@ export class ListInvoiceComponent  implements OnInit, OnDestroy {
         printSelectedZoneInvoices() {
           this.store.dispatch(getWaterBillsByZoneId({ zoneId: this.selectedZoneId }))
       
-          this.store.pipe(select(selectSelectedWaterBills), filter((file) => !!file), first()).subscribe((file) => {
+          this.store.pipe(select(selectSelectedWaterBills), filter((file) => !!file), takeUntil(this.destroy$)).subscribe((file) => {
             if (file) {
               this.handleBase64File(file.base64); 
             }

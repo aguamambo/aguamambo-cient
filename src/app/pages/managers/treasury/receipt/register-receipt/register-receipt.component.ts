@@ -9,12 +9,12 @@ import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
 import { createReceipt, getClientByZoneId, getContractByClientId, getEnterpriseByZoneId, getInvoiceByClientId, getInvoiceByMeter, getInvoiceByStatus, getReceiptFile, getReceiptPaymentMethods, getZoneByClientId, getZoneByEnterpriseId, listAllClients, listAllEnterprises, listAllZones, resetClientActions, resetClientMetersActions, resetContractActions, resetInvoiceActions, resetReceiptActions } from 'src/app/store';
 import { IClient } from 'src/app/models/client';
 import { IOption } from 'src/app/models/option';
-import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectSelectedInvoices } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceIsLoading, selectInvoiceIsSaving, selectInvoices } from 'src/app/store/selectors/invoice.selectors';
 import { selectContractIsLoading, selectSelectedContracts } from 'src/app/store/selectors/contract.selectors';
 import { IContract } from 'src/app/models/contract';
 import { selectPaymentMethods, selectReceiptErrorMessage, selectReceiptIsSaving, selectSelectedReceipt, selectSelectedReceiptFile } from 'src/app/store/selectors/receipt.selectors';
 import { DialogService } from 'src/app/services/dialog.service';
-import { selectSelectedZone, selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
+import { selectSelectedZone, selectSelectedZones, selectZoneIsLoading } from 'src/app/store/selectors/zone.selectors';
 import { selectSelectedEnterprise, selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
 import { IZone } from 'src/app/models/zone';
 import { IEnterprise } from 'src/app/models/enterprise';
@@ -35,9 +35,11 @@ export class RegisterReceiptComponent implements OnInit {
   isClientLoading$: Observable<boolean>
   isInvoiceLoading$: Observable<boolean>
   isContractLoading$: Observable<boolean>
+  isZoneLoading$: Observable<boolean>
   isReceiptSaving$: Observable<boolean>
   clientData: IOption[] = [];
   contractsData: IOption[] = [];
+  firstContract!: IOption;
   paymentMethods: IOption[] = [];
   contractList: IContract[] = [];
   invoicesData: IInvoice[] = [];
@@ -50,14 +52,19 @@ export class RegisterReceiptComponent implements OnInit {
   isOpen: boolean = false;
   dialogType: 'success' | 'error' = 'success';
   dialogMessage = '';
+  outstandingText = 'Total a Pagar';
   selectedLabel = '';
   counter: string = 'Selecione...';
   invoiceColumns: { key: keyof IInvoice; label: string }[] = [];
   customerBalance: number = 0;
   enablePaymentButton: boolean = false;
   showInvoicesToBePaid: boolean = false
+  showAmountInput: boolean = false
+  showSubmitButton: boolean = false
+  showInvoicesData: boolean = false
   valorPago: number = 0;
   outstandingAmount: number = 0;
+  totalInvoicesValue: number = 0;
   zoneData: IOption[] = [];
   enterpriseData: IOption[] = [];
   enterprisesList: IEnterprise[] = [];
@@ -71,7 +78,7 @@ export class RegisterReceiptComponent implements OnInit {
   constructor(private fb: FormBuilder,
     private _dialogService: DialogService, private store: Store, private generic: GenericConfig, private auth: AuthService) {
     this.form = this.fb.group({
-      paymentDate: [this.fullDate, Validators.required],
+      paymentDate: [this.fullDate],
       amount: ['', Validators.required],
       invoiceIds: [[]],
       paymentMethod: ['', Validators.required],
@@ -81,9 +88,11 @@ export class RegisterReceiptComponent implements OnInit {
     });
 
     this.isClientLoading$ = this.store.pipe(select(selectClientIsLoading))
+    this.isZoneLoading$ = this.store.pipe(select(selectZoneIsLoading))
     this.isInvoiceLoading$ = this.store.pipe(select(selectInvoiceIsLoading))
     this.isContractLoading$ = this.store.pipe(select(selectContractIsLoading))
     this.isReceiptSaving$ = this.store.pipe(select(selectReceiptIsSaving))
+
     this.invoiceColumns = [
       { key: 'invoiceId', label: 'Código' },
       { key: 'description', label: 'Descrição' },
@@ -109,7 +118,7 @@ export class RegisterReceiptComponent implements OnInit {
     this.store.dispatch(listAllEnterprises());
     this.store.dispatch(getReceiptPaymentMethods());
 
-    this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
+    this.getEnterprises$.pipe(filter((enterprises) => !!enterprises), takeUntil(this.destroy$)).subscribe((enterprises) => {
       if (enterprises) {
         this.enterprisesList = enterprises;
         this.enterpriseData = [
@@ -122,7 +131,7 @@ export class RegisterReceiptComponent implements OnInit {
       }
     });
 
-    this.getClients$.pipe(takeUntil(this.destroy$)).subscribe(clients => {
+    this.getClients$.pipe(filter((clients) => !!clients), takeUntil(this.destroy$)).subscribe(clients => {
       if (clients) {
         this.clientsList = clients;
         this.clientData = [
@@ -135,7 +144,7 @@ export class RegisterReceiptComponent implements OnInit {
       }
     });
 
-    this.store.pipe(select(selectSelectedZones)).subscribe(zones => {
+    this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), takeUntil(this.destroy$)).subscribe(zones => {
       if (zones) {
         this.zoneList = zones;
         this.zoneData = [
@@ -148,7 +157,7 @@ export class RegisterReceiptComponent implements OnInit {
       }
     });
 
-    this.getPaymentMethods$.pipe(takeUntil(this.destroy$)).subscribe(paymentMethods => {
+    this.store.pipe(select(selectPaymentMethods), filter((paymentMethods) => !!paymentMethods), first()).subscribe(paymentMethods => {
       if (paymentMethods) {
         this.paymentMethods = [
           ...paymentMethods.map(paymentMethod => ({
@@ -175,43 +184,43 @@ export class RegisterReceiptComponent implements OnInit {
       )
     );
   }
-  onClientSelect(event: { value: string; label: string }) {
-    this.store.pipe(select(resetContractActions))
-    this.store.pipe(select(resetInvoiceActions))
 
-    this.form.get('clientId')?.setValue(event.value);
-    this.store.dispatch(getContractByClientId({ clientId: event.value }));
-    this.store.pipe(select(selectSelectedContracts), takeUntil(this.unsubscribe$)).subscribe(contracts => {
-      if (contracts && contracts.length > 0) {
-        this.contractList = contracts;
-        const firstContract = { value: contracts[0].contractId, label: contracts[0].meterId };
-        this.counter = firstContract.label;
-        this.contractsData = contracts.map(contract => ({
-          label: contract.meterId,
-          value: contract.contractId,
-        }));
-        this.onContractSelected(firstContract);
-      }
-    });
-  }
+
 
   onContractSelected(event: { value: string; label: string }) {
-    const selectedContract = this.contractList.find(contract => contract.contractId === event.value);
 
+    this.store.dispatch(resetInvoiceActions());
+ 
+    const selectedContract = this.contractList.find(contract => contract.contractId === event.value);
+  
     if (selectedContract) {
       this.customerBalance = selectedContract.balance;
 
-      // Fetch invoices only if meter ID changes
-      this.store.dispatch(getInvoiceByMeter({ meterId: event.label }));
-      this.store.pipe(select(selectSelectedInvoices), takeUntil(this.unsubscribe$)).subscribe(invoices => {
-        if (invoices) {
-          this.invoicesData = invoices.filter(invoice => !invoice.paymentStatus);
+      this.store.dispatch(resetInvoiceActions());
 
-          this.filteredInvoices = [...this.invoicesData]
-        }
-      });
+      this.invoicesData = [];
+      this.filteredInvoices = [];
+
+      this.showInvoicesData = (this.invoicesData.length > 0);
+ 
+
+      this.store.dispatch(getInvoiceByMeter({ meterId: selectedContract.meterId }));
+
+      this.store.pipe(select(selectInvoices), filter((invoices) => !!invoices), takeUntil(this.destroy$))
+        .subscribe(invoices => {
+          if (invoices) {
+  
+            this.invoicesData = invoices.filter(invoice => !invoice.paymentStatus);
+
+            this.filteredInvoices = [...this.invoicesData];
+
+            this.showInvoicesData = (this.invoicesData.length > 0);
+ 
+          }
+        });
     }
-  } 
+  }
+
 
   addInvoiceToPayment(invoice: IInvoice) {
     if (!this.invoicesToBePaid.includes(invoice)) {
@@ -244,7 +253,7 @@ export class RegisterReceiptComponent implements OnInit {
 
         this.form.controls['invoiceIds'].setValue([...invoiceIds]);
 
-        
+
       }
 
       this.calculateOutstandingAmount();
@@ -255,11 +264,14 @@ export class RegisterReceiptComponent implements OnInit {
 
   onPaymentMethodSelected(event: { value: string; label: string }) {
     this.form.get('paymentMethod')?.setValue(event.value)
+    this.selectedLabel = event.value
+    this.isOpen = ! this.isOpen
   }
 
   onSubmit() {
+ 
     this._dialogService.reset()
-    if (this.form.valid) {
+ if (this.form.valid) {
 
       this._dialogService.open({
         title: 'Processando',
@@ -327,6 +339,7 @@ export class RegisterReceiptComponent implements OnInit {
                 )
                 .subscribe(file => {
                   if (file) {
+                    this.resetField()
                     this.handleBase64File(file.base64);
                     this.onReset()
                   }
@@ -358,17 +371,14 @@ export class RegisterReceiptComponent implements OnInit {
     if (option && option.value) {
       this.counter = ''
       this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
-      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe(
+      this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), takeUntil(this.destroy$)).subscribe(
         (zones) => {
           if (zones) {
             this.zoneList = zones;
-            this.zoneData = [ 
+            this.zoneData = [
               ...zones.map(zone => ({ label: zone.designation, value: zone.zoneId }))
             ];
           }
-        },
-        () => {
-          this.openDialog('error', 'Erro ao carregar zonas.');
         }
       );
     }
@@ -383,13 +393,13 @@ export class RegisterReceiptComponent implements OnInit {
   onEnterpriseSelected(option: IOption): void {
     if (option && option.value) {
       this.counter = '';
- 
+
       this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
-      this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(
+      this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), takeUntil(this.destroy$)).subscribe(
         (zones) => {
           if (zones) {
             this.zoneList = zones;
-            this.zoneData = [ 
+            this.zoneData = [
               ...zones.map(zone => ({ label: zone.designation, value: zone.zoneId }))
             ];
           }
@@ -401,13 +411,13 @@ export class RegisterReceiptComponent implements OnInit {
   onZoneSelected(event: { value: string; label: string }): void {
     if (event && event.value) {
       this.counter = '';
-  
+
       this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
-      this.store.pipe(select(selectSelectedClients), filter((clients) => !!clients), first()).subscribe(
+      this.store.pipe(select(selectSelectedClients), filter((clients) => !!clients), takeUntil(this.destroy$)).subscribe(
         (clients) => {
           if (clients) {
             this.clientList = clients;
-            this.clientData = [ 
+            this.clientData = [
               ...clients.map(client => ({ label: client.name, value: client.clientId }))
             ];
           }
@@ -416,36 +426,62 @@ export class RegisterReceiptComponent implements OnInit {
     }
   }
 
-
   onClientSelected(event: { value: string; label: string }) {
-    if (event && event.value) {
-      this.store.pipe(select(resetContractActions));
-      this.store.pipe(select(resetInvoiceActions));
 
-      this.form.get('clientId')?.setValue(event.value);
-      this.store.dispatch(getContractByClientId({ clientId: event.value }));
-      this.store.pipe(select(selectSelectedContracts), takeUntil(this.unsubscribe$)).subscribe(contracts => {
-        if (contracts && contracts.length > 0) {
+    this.store.dispatch(resetContractActions());
+    this.resetField() 
+
+    this.contractList = [];
+    
+
+    this.form.get('clientId')?.setValue(event.value)
+
+    this.store.dispatch(getContractByClientId({ clientId: event.value }));
+
+    this.store
+      .pipe(
+        select(selectSelectedContracts),
+        filter(contracts => !!contracts),
+        first()
+      )
+      .subscribe(contracts => {
+        if (contracts) {
+
           this.contractList = contracts;
-          const firstContract = { value: contracts[0].contractId, label: contracts[0].meterId };
-          this.counter = firstContract.label;
+
+          this.firstContract = { value: this.contractList[0].contractId, label: this.contractList[0].meterId };
+
+          this.counter = this.firstContract.label;
+
           this.contractsData = contracts.map(contract => ({
             label: contract.meterId,
             value: contract.contractId,
           }));
-          this.onContractSelected(firstContract);
+
+          this.onContractSelected(this.firstContract);
         }
       });
-
-       
-    }
   }
+
 
   onReset(): void {
     this.store.dispatch(resetReceiptActions());
     this.store.dispatch(resetClientActions());
     this.store.dispatch(resetContractActions());
     this.store.dispatch(resetClientMetersActions());
+  }
+
+  resetField() {
+    this.outstandingAmount = 0
+    this.totalInvoicesValue = 0
+    this.customerBalance = 0
+    this.invoicesToBePaid = []
+    this.showAmountInput = false
+    this.showSubmitButton = false
+    this.invoicesData.length = 0
+    this.filteredInvoices = [...this.invoicesData]
+    this.showInvoicesData = this.invoicesData.length > 0
+    this.showInvoicesToBePaid = this.invoicesToBePaid.length > 0
   }
 
   openPdfFromBase64(base64: string): void {
@@ -520,13 +556,37 @@ export class RegisterReceiptComponent implements OnInit {
 
   calculateOutstandingAmount() {
     const totalInvoices = this.invoicesToBePaid.reduce((total, invoice) => total + invoice.totalAmount, 0);
-    this.outstandingAmount = totalInvoices - this.customerBalance - this.valorPago;
 
-  this.showInvoicesToBePaid = this.invoicesToBePaid.length > 0
+    if (this.customerBalance <= 0) {
+      this.outstandingAmount = Math.abs(this.customerBalance) + totalInvoices - this.valorPago
+      this.outstandingText = 'Total a Pagar'
+    } else
+      {
+        this.outstandingAmount = totalInvoices - this.customerBalance - this.valorPago;
+        this.outstandingText = 'Total Remanescente'
+      }
+  
+      this.totalInvoicesValue = totalInvoices
+      
+      this.showInvoicesToBePaid = this.invoicesToBePaid.length > 0
+
+      if (totalInvoices===0) {
+        this.form.controls['amount'].reset()
+      }
+      
+      this.showAmountInput = totalInvoices > this.customerBalance && totalInvoices > 0
+
+      if (this.showAmountInput) {
+        this.showSubmitButton = false
+      } else  {
+        this.form.controls['amount'].setValue(totalInvoices);
+        this.showSubmitButton =  totalInvoices > 0
+      }
   }
 
-  formatCurrency(amount: number | null): string {
-    return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'MZN' }).format(amount || 0);
+  formatCurrency(amount: number): string {
+
+    return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'MZN' }).format(Math.abs(amount) || 0);
   }
 
   onNumberInputChange(inputElement: HTMLInputElement): void {
@@ -537,9 +597,10 @@ export class RegisterReceiptComponent implements OnInit {
       inputElement.value = parts[0] + '.' + parts.slice(1).join('');
     }
 
-    this.form.controls['amount'].setValue(inputElement.value);
+      this.form.controls['amount'].setValue(inputElement.value);
+      this.valorPago = parseFloat(inputElement.value) || 0;
 
-    this.valorPago = parseFloat(inputElement.value) || 0;
-
+      this.showSubmitButton = this.form.get('amount')?.value > 0 
+       
   }
 }

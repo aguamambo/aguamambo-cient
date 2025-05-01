@@ -18,7 +18,7 @@ import { IAppState, createInvoice, createReading, getClientMeterByClient, getInv
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectClientMeterIsLoading, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
 import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
-import { selectInvoiceError, selectSelectedInvoice, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
+import { selectInvoiceError, selectInvoice, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
 import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
 @Component({
@@ -105,7 +105,7 @@ export class RegisterReadingComponent implements OnInit {
       currentReading: new FormControl(null),
       readingMonth: new FormControl(null),
       readingYear: new FormControl(this.getCurrentYear()),
-      meterId: new FormControl(null) 
+      meterId: new FormControl(null)
     });
   }
 
@@ -282,108 +282,108 @@ export class RegisterReadingComponent implements OnInit {
       });
 
       this.store.dispatch(resetInvoiceActions());
-      
-      if (this.registReadingForm.valid){
+
+      if (this.registReadingForm.valid && (+this.lastReading <= +this.registReadingForm.get('currentReading')?.value)) {
         const formData = this.registReadingForm.value;
         this.store.dispatch(createReading({ reading: formData }));
-      }
 
-      this.store.pipe(select(selectSelectedReading))      
-        .pipe(filter((reading) => !!reading), first())
-        .subscribe({
-          next: (reading) => {
-            if (reading) {
+        this.store.pipe(select(selectSelectedReading))
+          .pipe(filter((reading) => !!reading), first())
+          .subscribe({
+            next: (reading) => {
+              if (reading) {
 
-              const payload = { readingId: reading.readingId };
+                const payload = { readingId: reading.readingId };
+                this._dialogService.open({
+                  title: 'Sucesso',
+                  message: 'Leitura salva com sucesso!',
+                  type: 'success'
+                });
+                this.store.dispatch(createInvoice({ payload }));
+
+
+                this.resetFields()
+              }
+
+              this.store.pipe(select(selectInvoiceError)).subscribe(
+                error => {
+                  if (error) {
+                    this._dialogService.open({
+                      title: 'Criação da Factura',
+                      type: 'error',
+                      message: 'Um erro ocorreu ao criar a Factura!',
+                      isProcessing: false,
+                      showConfirmButton: false,
+                      errorDetails: error.error
+                    })
+                  }
+                  else {
+                    this.store
+                      .pipe(
+                        select(selectInvoice),
+                        filter((invoice) => !!invoice),
+                        first()
+                      )
+                      .subscribe({
+                        next: (invoice) => {
+                          if (invoice) {
+
+                            this._dialogService.close(true);
+                            this._dialogService.open({
+                              title: 'Factura',
+                              message: 'Carregando dados da Factura.',
+                              type: 'loading',
+                              isProcessing: true,
+                            });
+
+                            this.store.dispatch(
+                              getWaterBillByReadingId({ readingId: invoice.readingId })
+                            );
+
+                          }
+                          this.store
+                            .pipe(
+                              select(selectSelectedWaterBill),
+                              filter((file) => !!file),
+                              first()
+                            )
+                            .subscribe({
+                              next: (file) => {
+                                if (file) {
+                                  this.handleBase64File(file.base64);
+                                  this.onReset()
+                                }
+                              },
+                              error: () => {
+                                this.openDialog('error', 'Failed to load the invoice file.');
+                              },
+                            });
+                        },
+                        error: () => {
+                          this.openDialog('error', 'Error fetching the invoice.');
+                        },
+                      });
+                  }
+                })
+
+
+            },
+            error: (error) => {
               this._dialogService.open({
-                title: 'Sucesso',
-                message: 'Leitura salva com sucesso!',
-                type: 'success'
+                title: 'Erro',
+                message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
+                type: 'error',
+                showConfirmButton: true,
+                cancelText: 'Cancelar',
               });
-              this.store.dispatch(createInvoice({ payload }));
-
-
-              this.resetFields()
-            }
-
-            this.store.pipe(select(selectInvoiceError)).subscribe(
-              error => {
-                if (error) {
-                  this._dialogService.open({
-                    title: 'Criação da Factura',
-                    type: 'error',
-                    message: 'Um erro ocorreu ao criar a Factura!',
-                    isProcessing: false,
-                    showConfirmButton: false,
-                    errorDetails: error.error
-                  })
-                } 
-                else{
-                  this.store
-                  .pipe(
-                    select(selectSelectedInvoice),
-                    filter((invoice) => !!invoice),
-                    first()
-                  )
-                  .subscribe({
-                    next: (invoice) => {
-                      if (invoice) {
-    
-                        this._dialogService.close(true);
-                        this._dialogService.open({
-                          title: 'Factura',
-                          message: 'Carregando dados da Factura.',
-                          type: 'loading',
-                          isProcessing: true,
-                        });
-    
-                        this.store.dispatch(
-                          getWaterBillByReadingId({ readingId: invoice.readingId })
-                        );
-    
-                      }
-                      this.store
-                        .pipe(
-                          select(selectSelectedWaterBill),
-                          filter((file) => !!file),
-                          first()
-                        )
-                        .subscribe({
-                          next: (file) => {
-                            if (file) {
-                              this.handleBase64File(file.base64);
-                              this.onReset()
-                            }
-                          },
-                          error: () => {
-                            this.openDialog('error', 'Failed to load the invoice file.');
-                          },
-                        });
-                    },
-                    error: () => {
-                      this.openDialog('error', 'Error fetching the invoice.');
-                    },
-                  });
-                }
-              })
-
-            
-          },
-          error: (error) => {
-            this._dialogService.open({
-              title: 'Erro',
-              message: error.message || 'Ocorreu um erro inesperado. Por favor contacte a equipa tecnica para o suporte.',
-              type: 'error',
-              showConfirmButton: true,
-              cancelText: 'Cancelar',
-            });
-          },
-        });
+            },
+          });
+      }
     }
     else {
       this._dialogService.open({
         title: 'Erro',
-        message: 'Por favor preenche todos os campos antes de submeter',
+        message: 'Por favor preenche correctamente todos os campos antes de submeter',
         type: 'error',
         showConfirmButton: true,
         cancelText: 'Cancelar',
@@ -425,9 +425,9 @@ export class RegisterReadingComponent implements OnInit {
     this.clientsList = [];
     this.readingsList = [];
     this.isDialogOpen = false;
-    this.validFields = false; 
+    this.validFields = false;
     this.registReadingForm.get('currentReading')?.reset()
-    this.registReadingForm.get('meterId')?.reset() 
+    this.registReadingForm.get('meterId')?.reset()
     this.loadData()
     const option: IOption = {
       label: '',
@@ -531,7 +531,7 @@ export class RegisterReadingComponent implements OnInit {
       { value: '11', label: 'Novembro' },
       { value: '12', label: 'Dezembro' }
     ];
-  
+
     const currentMonth = (new Date().getMonth() + 1).toString();
     this.registReadingForm.get('readingMonth')?.setValue(currentMonth);
   }
