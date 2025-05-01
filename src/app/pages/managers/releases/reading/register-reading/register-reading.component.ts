@@ -168,7 +168,7 @@ export class RegisterReadingComponent implements OnInit {
 
   isFormValid(): boolean {
     const result = Object.values(this.registReadingForm.value).every(value => value !== null && value !== undefined);
-    this.validFields = result
+    this.validFields = result && +this.registReadingForm.get('currentReading')?.value > this.lastReading
     return result
   }
 
