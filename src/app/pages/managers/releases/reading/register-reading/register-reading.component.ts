@@ -105,7 +105,7 @@ export class RegisterReadingComponent implements OnInit {
       currentReading: new FormControl(null),
       readingMonth: new FormControl(null),
       readingYear: new FormControl(this.getCurrentYear()),
-      meterId: new FormControl(null)
+      meterId: new FormControl(null) 
     });
   }
 
@@ -281,13 +281,14 @@ export class RegisterReadingComponent implements OnInit {
         isProcessing: true,
       });
 
-      const formData = this.registReadingForm.value;
-
-      this.store.dispatch(createReading({ reading: formData }));
-
       this.store.dispatch(resetInvoiceActions());
+      
+      if (this.registReadingForm.valid){
+        const formData = this.registReadingForm.value;
+        this.store.dispatch(createReading({ reading: formData }));
+      }
 
-      this.getCreatedReading$
+      this.store.pipe(select(selectSelectedReading))      
         .pipe(filter((reading) => !!reading), first())
         .subscribe({
           next: (reading) => {
@@ -407,7 +408,7 @@ export class RegisterReadingComponent implements OnInit {
   }
 
   resetFields() {
-
+    this.store.dispatch(resetClientActions());
     this.lastReading = 0;
     this.counter = '';
     this.readingId = null;
@@ -424,8 +425,9 @@ export class RegisterReadingComponent implements OnInit {
     this.clientsList = [];
     this.readingsList = [];
     this.isDialogOpen = false;
-    this.validFields = false;
+    this.validFields = false; 
     this.registReadingForm.get('currentReading')?.reset()
+    this.registReadingForm.get('meterId')?.reset() 
     this.loadData()
     const option: IOption = {
       label: '',
