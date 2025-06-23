@@ -66,93 +66,8 @@ export class ContractTypeComponent implements OnInit {
       }
     })
   } 
-
-  eraseForm() {
-    this.contractTypeForm.reset();
-    this._dialogService.reset()
-  }
-
-  submitContractTypeForm(): void {
-    this._dialogService.reset()
-    if (this.contractTypeForm.valid) {
-
-      const payload = this.contractTypeForm.value;
-
-      if (this.isEditing) {
-        this._store.dispatch(updateContractType({ contractTypeId: payload.contractTypeId, contractType: payload }));
-        this._store.pipe(select(selectContractTypeErrorMessage)).subscribe(
-          error => {
-            if (error) {
-              this._dialogService.open({
-                title: 'Actualizacao do Contacto',
-                type: 'error',
-                message: 'Um erro ocorreu ao actualizar o Contacto! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
-                isProcessing: false,
-                showConfirmButton: false,
-                errorDetails: error
-              })
-            } else {
-              this._store.pipe(select(selectSelectedContractTypes), filter((contractType) => !!contractType))
-                .subscribe((contractType) => {
-                  if (contractType) {
-                    this.eraseForm()
-                    this.isEditing = false;
-                    this._dialogService.open({
-                      title: 'Actualizacao do Contacto',
-                      type: 'success',
-                      message: 'Contacto Actualizado com sucesso!',
-                      isProcessing: false,
-                      showConfirmButton: false,
-                    })
-                  }
-                });
-            }
-          }
-        )
-      } else {
-        this._store.dispatch(createContractType({ contractType: payload }));
-        this._store.pipe(select(selectContractTypeErrorMessage)).subscribe(
-          error => {
-            if (error) {
-              this._dialogService.open({
-                title: 'Criação do Contacto',
-                type: 'error',
-                message: 'Um erro ocorreu ao criar o Contacto! verifique se os dados estão devidadmente preenchidos e volte a submeter.',
-                isProcessing: false,
-                showConfirmButton: false,
-                errorDetails: error
-              })
-            } else {
-              this._store.pipe(select(selectSelectedContractTypes), filter((contractType) => !!contractType))
-                .subscribe((contractType) => {
-                  if (contractType) {
-                    this._dialogService.open({
-                      title: 'Criação de Contacto',
-                      type: 'success',
-                      message: 'Contacto criado com sucesso!',
-                      isProcessing: false,
-                      showConfirmButton: false,
-                    })
-                    this.eraseForm()
-                  }
-                });
-            }
-
-          })
-
-      }
-    }
-    else {
-      this._dialogService.open({
-        title: 'Validação de Dados',
-        type: 'info',
-        message: 'Por favor verifique se os campos estão devidadmente preenchidos e volte a submeter.',
-        isProcessing: false,
-        showConfirmButton: false,
-      })
-    }
-  }
-
+ 
+  
   editContractType(contractType: any): void {
     this.isEditing = true;
     this.contractType = contractType
@@ -163,6 +78,93 @@ export class ContractTypeComponent implements OnInit {
       pricePerConsumptionUnit: this.contractType.pricePerConsumptionUnit,
       reconnectionFee: this.contractType.reconnectionFee
     });
+  }
+
+  submitContractTypeForm(): void {
+  this._dialogService.reset();
+
+  if (this.contractTypeForm.valid) {
+    const payload = this.contractTypeForm.value;
+
+    if (this.isEditing) {
+      this._store.dispatch(updateContractType({ contractTypeId: payload.contractTypeId, contractType: payload }));
+
+      this._store.pipe(select(selectContractTypeErrorMessage)).subscribe(error => {
+        if (error) {
+          this._dialogService.open({
+            title: 'Actualização do Tipo de Contrato',
+            type: 'error',
+            message: 'Ocorreu um erro ao actualizar o Tipo de Contrato. Verifique os dados e tente novamente.',
+            isProcessing: false,
+            showConfirmButton: false,
+            errorDetails: error
+          });
+        } else {
+          this._store.pipe(
+            select(selectSelectedContractType),
+            filter(ct => !!ct)
+          ).subscribe(contractType => {
+            if (contractType) {
+              this.isEditing = false;
+              this._dialogService.open({
+                title: 'Actualização do Tipo de Contrato',
+                type: 'success',
+                message: 'Tipo de Contrato actualizado com sucesso!',
+                isProcessing: false,
+                showConfirmButton: false,
+              });
+              this.eraseContractTypeForm();
+            }
+          });
+        }
+      });
+    } else {
+      this._store.dispatch(createContractType({ contractType: payload }));
+
+      this._store.pipe(select(selectContractTypeErrorMessage)).subscribe(error => {
+        if (error) {
+          this._dialogService.open({
+            title: 'Criação do Tipo de Contrato',
+            type: 'error',
+            message: 'Ocorreu um erro ao criar o Tipo de Contrato. Verifique os dados e tente novamente.',
+            isProcessing: false,
+            showConfirmButton: false,
+            errorDetails: error
+          });
+        } else {
+          this._store.pipe(
+            select(selectSelectedContractType),
+            filter(ct => !!ct)
+          ).subscribe(contractType => {
+            if (contractType) {
+              this._dialogService.open({
+                title: 'Criação do Tipo de Contrato',
+                type: 'success',
+                message: 'Tipo de Contrato criado com sucesso!',
+                isProcessing: false,
+                showConfirmButton: false,
+              });
+              this.eraseContractTypeForm();
+            }
+          });
+        }
+      });
+    }
+  } else {
+    this._dialogService.open({
+      title: 'Validação de Dados',
+      type: 'info',
+      message: 'Por favor verifique se os campos estão devidamente preenchidos e tente novamente.',
+      isProcessing: false,
+      showConfirmButton: false,
+    });
+  }
+}
+ 
+
+ eraseContractTypeForm() {
+    this._dialogService.reset()
+    this.contractTypeForm.reset();
   }
 
   deleteContractType(index: number): void {

@@ -22,7 +22,7 @@
         </thead>
         <tbody class="gap-1">
             <tr *ngFor="let row of getPaginatedData()"
-                class="border-t cursor-pointer hover:bg-[#818dfa] hover:text-deep-dark text-sm"
+                class="border-t cursor-pointer hover:bg-blue-300 hover:text-deep-dark text-sm"
                 (click)="onRowClick(row)">
                 <td *ngFor="let column of columns" class="px-4 py-2 text-start">
                     <ng-container *ngIf="column.key === 'checkbox'">

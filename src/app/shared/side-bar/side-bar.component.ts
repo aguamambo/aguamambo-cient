@@ -102,7 +102,8 @@ export class SideBarComponent {
         {
           label: 'Pagamento',
           subMenuOptions: [
-            { label: 'Pagar Factura', url: 'treasuries/payments/invoice-payment' }
+            { label: 'Pagar Factura', url: 'treasuries/payments/invoice-payment' },
+            { label: 'Outros Pagamentos', url: 'treasuries/payments/other-payments' }
           ],
           isOpen: false
         }

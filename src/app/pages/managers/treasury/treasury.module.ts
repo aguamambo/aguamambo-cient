@@ -5,13 +5,15 @@ import { ListInvoiceComponent } from "./invoice/list-invoice/list-invoice.compon
 import { ListReceiptComponent } from "./receipt/list-receipt/list-receipt.component";
 import { RegisterReceiptComponent } from "./receipt/register-receipt/register-receipt.component";
 import { TreasuryRoutingModule } from "./treasury-routing.module";
+import { OtherPaymentsComponent } from './invoice/other-payments/other-payments.component';
 
  
 @NgModule({
   declarations: [ 
     RegisterReceiptComponent,
     ListReceiptComponent,
-    ListInvoiceComponent 
+    ListInvoiceComponent,
+    OtherPaymentsComponent 
   ],
   imports: [
     CommonModule,

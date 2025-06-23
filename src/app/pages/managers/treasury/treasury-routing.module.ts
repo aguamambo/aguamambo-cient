@@ -4,11 +4,13 @@ import { RegisterReceiptComponent } from './receipt/register-receipt/register-re
 import { ListInvoiceComponent } from './invoice/list-invoice/list-invoice.component';
 import { Routes, RouterModule } from '@angular/router';
 import { authGuard } from 'src/app/core/guards/auth.guard';
+import { OtherPaymentsComponent } from './invoice/other-payments/other-payments.component';
 
 const routes: Routes = [ 
   { path: 'invoices/list', component: ListInvoiceComponent, canActivate: [authGuard]   },
   { path: 'receipts/list', component: ListReceiptComponent, canActivate: [authGuard]   },
-  { path: 'payments/invoice-payment', component: RegisterReceiptComponent, canActivate: [authGuard]   }
+  { path: 'payments/invoice-payment', component: RegisterReceiptComponent, canActivate: [authGuard]   },
+  { path: 'payments/other-payments', component: OtherPaymentsComponent, canActivate: [authGuard]   }
 ];
 
 @NgModule({

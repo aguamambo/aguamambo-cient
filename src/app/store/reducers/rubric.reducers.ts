@@ -43,7 +43,7 @@ export interface IRubricState extends EntityState<IRubric> {
   successMessage: string;
   error: any;
   selectedRubric: IRubric | null;
-  selectedRubrics: IRubric[];  // New selectedRubrics property
+  selectedRubrics: IRubric[] | null;  // New selectedRubrics property
   lastMeterRubric: IRubric | null;
   lastClientRubric: IRubric | null;
   rubricCount: number;
@@ -57,7 +57,7 @@ export const initialState: IRubricState = adapter.getInitialState({
   successMessage: '',
   error: null,
   selectedRubric: null,
-  selectedRubrics: [],   
+  selectedRubrics: null,   
   lastMeterRubric: null,
   lastClientRubric: null,
   rubricCount: 0,
@@ -108,8 +108,11 @@ const reducer = createReducer(
   // List all rubrics
   on(listAllRubrics, (state) => ({ ...state, isLoading: true })),
   on(listAllRubricsSuccess, (state, { rubrics }) =>
-    ({ ...state, selectedRubrics: rubrics, isLoading: false })
-  ),
+    ({ 
+      ...state, 
+      selectedRubrics: rubrics, 
+      isLoading: false 
+    })),
   on(listAllRubricsFailure, (state, { error }) => ({
     ...state,
     isLoading: false,

@@ -65,7 +65,7 @@ export interface IReadingState extends EntityState<IReading> {
   statusCode: number;
   error: any;
   selectedReading: IReading | null;
-  selectedReadings: IReading[];  
+  selectedReadings: IReading[] | null;  
   lastMeterReading: IReading | null;
   lastClientReading: IReading | null;
   readingCount: number;
@@ -83,7 +83,7 @@ export const initialState: IReadingState = adapter.getInitialState({
   fileContent: null,
   error: null,
   selectedReading: null,
-  selectedReadings: [],   
+  selectedReadings: null,   
   lastMeterReading: null,
   lastClientReading: null,
   readingCount: 0,

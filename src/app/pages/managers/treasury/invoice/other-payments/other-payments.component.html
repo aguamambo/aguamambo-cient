@@ -1,0 +1,32 @@
+<div class="flex flex-col h-full gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
+    <app-breadcrumb title="Outros Pagamentos" [breadcrumbItems]="['Dashboard', 'Outros Pagamentos']"></app-breadcrumb>
+
+    <div class="flex flex-col w-full p-4 gap-4 items-center justify-center h-full">
+        <div class="p-8 bg-white dark:bg-slate-700 shadow-md rounded-3xl grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <app-autocomplete-input label="Cliente" [dataSource]="clientData"
+                    (valueSelected)="onClientSelected($event)">
+                </app-autocomplete-input>
+            </div>
+
+            <div>
+                <app-autocomplete-input label="Rúbrica" [dataSource]="rubricData"
+                    (valueSelected)="onRubricSelected($event)">
+                </app-autocomplete-input>
+            </div>
+            <div class="flex justify-center items-end w-full">
+                <button (click)="submitPaymentk()"
+                    class="px-6 py-2 rounded-3xl w-full sm:rounded-lg bg-blue-700 hover:bg-blue-800 cursor-pointer transition duration-300 shadow-md dark:shadow-slate-800">
+
+                    <span class="text-base font-semibold md:text-md text-white">Cobrar</span>
+                </button>
+            </div>
+        </div>
+
+        <div
+            class="px-6 py-2 rounded-3xl w-full sm:rounded-lg bg-white dark:bg-slate-700  cursor-pointer transition duration-300 shadow-md dark:shadow-slate-800">
+            <app-table [data]="clientRubricList" [columns]="rubricColumns" [totalCount]="rubrics.length"
+                 >
+            </app-table>
+        </div>
+    </div>
