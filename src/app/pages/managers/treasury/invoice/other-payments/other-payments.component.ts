@@ -86,7 +86,7 @@ export class OtherPaymentsComponent implements OnInit {
     const pad = (n: number) => n.toString().padStart(2, '0');
 
     const day = pad(date.getDate());
-    const month = pad(date.getMonth() + 1); // mês começa do zero
+    const month = pad(date.getMonth() + 1);
     const year = date.getFullYear();
 
     const hours = pad(date.getHours());

@@ -555,6 +555,8 @@ export class RegisterReceiptComponent implements OnInit {
 
 
   calculateOutstandingAmount() {
+    this.outstandingAmount = 0
+
     const totalInvoices = this.invoicesToBePaid.reduce((total, invoice) => total + invoice.totalAmount, 0);
 
     if (this.customerBalance <= 0) {
@@ -599,6 +601,8 @@ export class RegisterReceiptComponent implements OnInit {
 
       this.form.controls['amount'].setValue(inputElement.value);
       this.valorPago = parseFloat(inputElement.value) || 0;
+
+      this.calculateOutstandingAmount()
 
       this.showSubmitButton = this.form.get('amount')?.value > 0 
        
