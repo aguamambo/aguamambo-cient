@@ -38,6 +38,9 @@ export class AuthEffects {
         this.actions$.pipe(
             ofType(login),
             exhaustMap(action =>
+                // The actual login API call is now handled by auth.service.login
+                // which includes the tap operator to save data and navigate.
+                // This effect will simply map the success/failure of that service call.
                 this.auth.login(action.credentials.username, action.credentials.password).pipe(
                     map(authResponse => loginSuccess({ authResponse: authResponse })),
                     catchError(error => {
@@ -49,33 +52,37 @@ export class AuthEffects {
         )
     );
 
+    // This effect is now simplified as auth.service.login already handles data storage and navigation.
+    // However, if you still want to dispatch loginSuccess after the service handles it,
+    // and perform *additional* actions here, you can keep this structure.
+    // For the purpose of centralizing data handling in AuthService, the direct localStorage calls
+    // are removed from here. The navigation logic remains here as it's an effect of the Ngrx state.
     onLoginSuccess$ = createEffect(
         () =>
             this.actions$.pipe(
                 ofType(loginSuccess),
                 map((action) => action.authResponse),
                 tap((response: IAuthResponse) => {
+                    // The auth.service.login method already calls saveAuthData.
+                    // If this effect is still needed for other side effects,
+                    // ensure saveAuthData is not called redundantly.
+                    // For now, removing direct localStorage calls as per the request to use auth.service.
+                    // this.auth.saveAuthData(response); // This is now handled inside auth.service.login
 
-                    localStorage.setItem('token', response.token);
-                    localStorage.setItem('refreshToken', response.refreshToken);
-                    localStorage.setItem('userId', this.auth.encryptData(response.userId));
-                    localStorage.setItem('name', this.auth.encryptData(response.name));
-                    localStorage.setItem('username', this.auth.encryptData(response.username));
-                    localStorage.setItem('role',    this.auth.encryptData( response.role));
-                    const userRole = response.role
-                     switch (userRole.toLowerCase()) {
-                         case 'tech_field':
-                         {
+                    const userRole = response.role;
+                    switch (userRole.toLowerCase()) {
+                        case 'tech_field':
+                        {
                             this.router.navigate(['/technical/dashboard']);
-                         }
-                         break;
-                         case 'admin': {
-                             this.router.navigate(['/manager/dashboard']);
-                         }
-                         break;
-                         default : this.router.navigate(['/technical/dashboard']);
-                         break;
-                     }
+                        }
+                        break;
+                        case 'admin': {
+                            this.router.navigate(['/manager/dashboard']);
+                        }
+                        break;
+                        default : this.router.navigate(['/technical/dashboard']);
+                        break;
+                    }
                 })
             ),
         { dispatch: false }

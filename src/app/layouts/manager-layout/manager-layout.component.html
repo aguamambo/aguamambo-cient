@@ -1,4 +1,4 @@
-<div class="flex flex-row h-screen w-screen overflow-hidden bg-stone-100 dark:bg-medium-dark transition duration-300">
+<div class="flex flex-row h-screen w-screen overflow-hidden bg-zinc-100 dark:bg-medium-dark transition duration-300">
     <div [class]="{'fixed inset-0 z-50 bg-light-mode dark:bg-deep-dark transition duration-300': isSidebarOpen, 'hidden': !isSidebarOpen}" 
          class="md:block w-64 h-screen transition duration-300">
         <app-side-bar [isSidebarOpen]="isSidebarOpen" (sidebarToggle)="toggleSidebar()" [logo]="currentLogo"></app-side-bar>

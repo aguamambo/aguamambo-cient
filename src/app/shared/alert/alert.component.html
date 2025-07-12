@@ -1,0 +1,6 @@
+<div [ngClass]="getAlertClasses()">
+  <!-- This is where the AlertCircle SVG will be projected or placed directly -->
+  <ng-content select="[alert-icon]"></ng-content>
+  <!-- Main content of the alert, typically the description -->
+  <ng-content></ng-content>
+</div>

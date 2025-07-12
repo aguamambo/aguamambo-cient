@@ -93,11 +93,12 @@ export class RegisterReadingComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = this.auth.checkSession();
-    this.generateYearsList();
-
-    this.initForm();
-    this.loadData();
+    this.auth.checkSession().then(userName => {
+      this.user = userName;
+      this.generateYearsList();
+      this.initForm();
+      this.loadData();
+    });
   }
 
   initForm(): void {

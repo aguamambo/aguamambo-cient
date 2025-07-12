@@ -24,6 +24,9 @@ import { DialogComponent } from './dialog/dialog.component';
 import { SearchInputComponent } from './search-input/search-input.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 import { UploadFileComponent } from './upload-file/upload-file.component';
+import { CardUiComponent } from './card-ui/card-ui.component'; 
+import { AlertComponent } from './alert/alert.component';
+import { AlertDescriptionComponent } from './alert-description/alert-description.component';
 
 @NgModule({
   declarations: [ 
@@ -48,7 +51,9 @@ import { UploadFileComponent } from './upload-file/upload-file.component';
     DialogComponent, 
     SearchInputComponent, 
     LineChartComponent, 
-    UploadFileComponent
+    UploadFileComponent,
+    CardUiComponent, 
+    AlertComponent, AlertDescriptionComponent
   ],
   imports: [
     CommonModule,
@@ -78,7 +83,10 @@ import { UploadFileComponent } from './upload-file/upload-file.component';
     DialogComponent,
     SearchInputComponent,
     LineChartComponent,
-    UploadFileComponent
+    UploadFileComponent,
+    CardUiComponent, 
+    AlertComponent, 
+    AlertDescriptionComponent
   ]
 })
 export class SharedModule { }

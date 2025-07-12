@@ -1,0 +1,17 @@
+<div [ngClass]="getCardClasses()">
+  <!-- Card Header -->
+  <div [ngClass]="getCardHeaderClasses()">
+    <h3 *ngIf="title" [ngClass]="getCardTitleClasses()">{{ title }}</h3>
+    <p *ngIf="description" [ngClass]="getCardDescriptionClasses()">{{ description }}</p>
+  </div>
+
+  <!-- Card Content (Projected Content) -->
+  <div [ngClass]="getCardContentClasses()">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Card Footer -->
+  <div *ngIf="footer" [ngClass]="getCardFooterClasses()">
+    <ng-content select="[card-footer]"></ng-content>
+  </div>
+</div>

@@ -1,15 +1,26 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-200 p-4 select-none">
-    <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-zinc-500 to-gray-400 p-4 select-none">
+    <app-card-ui class="w-1/5 h-full space-y-2">
         <div class="flex justify-center ">
             <img src="../../../assets/img/EAgua_1.png" alt="Sistema de Gestão de Água" class="h-16">
         </div>
+         <div class="text-center mt-4 mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Iniciar Sessão</h1>
+            <p class="text-gray-600 text-sm">Acesse o sistema de gestão de água</p>
+          </div>
+          <form [formGroup]="loginForm" class="p-8 space-y-6">
+            <!-- Error Alert -->
+            <ng-container *ngIf="loginError">
+                <app-alert className="mb-6 border-red-200 bg-red-50 flex">
+                    <svg alert-icon xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-red-600">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" x2="12" y1="8" y2="12"/>
+                        <line x1="12" x2="12.01" y1="16" y2="16"/>
+                    </svg>
+                    <app-alert-description class="text-red-700">{{ loginError }}</app-alert-description>
+                </app-alert>
+            </ng-container>
 
-        <div class="flex justify-center my-6 font-bold text-gray-700">
-            Iniciar Sessão
-        </div>
-        <form [formGroup]="loginForm">
-            <div class="mb-4">
+            <div class="mb-8">
                 <label for="userName" class="block text-gray-700 text-sm font-bold mb-2">
                     Utilizador
                 </label>
@@ -22,7 +33,7 @@
                         </svg>
                     </span>
                     <input type="text" id="userName" formControlName="username"
-                        class="block w-full pl-14 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        class="block w-full pl-14 pr-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                         placeholder="Insira ID do utilizador" />
                 </div>
 
@@ -41,12 +52,11 @@
                         </svg>
                     </span>
                     <input type="password" id="password" formControlName="password"
-                        class="block w-full pl-14 pr-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        class="block w-full pl-14 pr-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                         placeholder="Insira a senha" />
                 </div>
             </div>
-             
-             
+
 
             @if (isLoading$ | async) {
                 <div class="flex justify-center my-4">
@@ -56,11 +66,11 @@
 
             <!-- Login Button -->
             <div class="flex items-center justify-between">
-                <button (click)="login()"
-                    class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <app-button (clickEvent)="login()" variant="default" class="w-full">
                     Entrar
-                </button>
+                </app-button>
             </div>
         </form>
-    </div>
+    </app-card-ui>
+     
 </div>

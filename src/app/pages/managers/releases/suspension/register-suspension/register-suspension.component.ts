@@ -21,18 +21,18 @@ import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selector
   templateUrl: './register-suspension.component.html',
   styleUrl: './register-suspension.component.css'
 })
-export class RegisterSuspensionComponent  implements OnInit {
-  registSuspensionForm!: FormGroup;   
+export class RegisterSuspensionComponent implements OnInit {
+  registSuspensionForm!: FormGroup;
   clientsData: IOption[] = [];
   clientMetersData: IOption[] = [];
   enterpriseData: IOption[] = [];
-  monthsData: IOption[] = []; 
-  ZoneData: IOption[] = []; 
-  clientsList: IClient[] = []; 
+  monthsData: IOption[] = [];
+  ZoneData: IOption[] = [];
+  clientsList: IClient[] = [];
   ZoneList: IZone[] = [];
   enterprisesList: IEnterprise[] = [];
   clientMeter!: string | null
- 
+
   isCustomersLoading$: Observable<boolean>;
   isSuspensionSaving$: Observable<boolean>;
   isZonesLoading$: Observable<boolean>;
@@ -42,13 +42,13 @@ export class RegisterSuspensionComponent  implements OnInit {
   getZonesByCompanyId$ = this.store.pipe(select(selectSelectedZones));
   getEnterprise$ = this.store.pipe(select(selectSelectedEnterprises));
   getClients$ = this.store.pipe(select(selectSelectedClients));
-  getMeterByClientId$  = this.store.pipe(select(selectSelectedClientMeters));
+  getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
   private destroy$ = new Subject<void>();
   user: string = '';
   year: number = 0;
 
   constructor(
-    private _dialogService: DialogService, private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) { 
+    private _dialogService: DialogService, private store: Store<IAppState>, private auth: AuthService, private generic: GenericConfig) {
     this.isCustomersLoading$ = this.store.select(selectClientIsLoading);
     this.isSuspensionSaving$ = this.store.select(selectSuspensionIsSaving);
     this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
@@ -59,24 +59,26 @@ export class RegisterSuspensionComponent  implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = this.auth.checkSession();
-    this.initForm();
-    this.loadData();
+    this.auth.checkSession().then(userName => {
+      this.user = userName
+      this.initForm();
+      this.loadData();
+    });
   }
 
   initForm(): void {
-    
-    this.registSuspensionForm = new FormGroup({  
-        meterId: new FormControl(null),
-        startDate: new FormControl(null) 
+
+    this.registSuspensionForm = new FormGroup({
+      meterId: new FormControl(null),
+      startDate: new FormControl(null)
     });
 
   }
 
   loadData(): void {
     this._dialogService.reset()
-   this.monthsData =  this.generic.generateMonths();
-   this.store.dispatch(listAllEnterprises());
+    this.monthsData = this.generic.generateMonths();
+    this.store.dispatch(listAllEnterprises());
     this.getEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
       if (enterprises) {
         this.enterprisesList = enterprises;
@@ -129,48 +131,48 @@ export class RegisterSuspensionComponent  implements OnInit {
     }
   }
 
-  
-onClientSelect(event: { value: string; label: string }): void {
-  const clientId = event.value; 
 
-  if (clientId) { 
-    this.store.dispatch(getClientMeterByClient({ clientId: clientId }));
- 
-    this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
-      if (meters) {
-        this.clientMetersData = [
-          { label: 'Seleccione...', value: '' },
-          ...meters.map(meter => ({
-            label: meter.meterId || '',
-            value: meter.meterId || ''
-          }))
-        ];
-        
-      }
-    })
-  }  
-}
+  onClientSelect(event: { value: string; label: string }): void {
+    const clientId = event.value;
 
-onMeterSeclected(option: IOption) {
-  if (option && option.value) {
-    this.registSuspensionForm.get('meterId')?.setValue(option.value)
+    if (clientId) {
+      this.store.dispatch(getClientMeterByClient({ clientId: clientId }));
+
+      this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe((meters) => {
+        if (meters) {
+          this.clientMetersData = [
+            { label: 'Seleccione...', value: '' },
+            ...meters.map(meter => ({
+              label: meter.meterId || '',
+              value: meter.meterId || ''
+            }))
+          ];
+
+        }
+      })
+    }
   }
-}
 
- 
+  onMeterSeclected(option: IOption) {
+    if (option && option.value) {
+      this.registSuspensionForm.get('meterId')?.setValue(option.value)
+    }
+  }
 
-  getClients(){
+
+
+  getClients() {
     this.store.dispatch(listAllClients());
     this.getClients$.pipe(takeUntil(this.destroy$)).subscribe((clients) => {
       if (clients) {
-        this.clientsList = clients; 
+        this.clientsList = clients;
         this.clientsData = [
           { label: 'Seleccione...', value: '' },
           ...clients.map(client => ({
             label: client.name,
             value: client.clientId
           }))
-        ]; 
+        ];
       }
     });
   }
@@ -181,7 +183,7 @@ onMeterSeclected(option: IOption) {
   }
 
   saveSuspension(): void {
-    this._dialogService.reset() 
+    this._dialogService.reset()
     if (this.registSuspensionForm.valid) {
       this._dialogService.open({
         title: 'Processando',
@@ -190,15 +192,15 @@ onMeterSeclected(option: IOption) {
         isProcessing: true,
       });
 
-     
+
       const formData = this.registSuspensionForm.value;
 
-      this.store.dispatch(createSuspension({suspension: formData}))
+      this.store.dispatch(createSuspension({ suspension: formData }))
 
       this.store.pipe(select(selectSuspensionError))
 
 
-      
+
       this.isSuspensionSaving$.pipe(filter((response) => !!response), first()).subscribe((response) => {
         if (response) {
           this._dialogService.open({
@@ -218,9 +220,9 @@ onMeterSeclected(option: IOption) {
         }
       });
     } else {
-      
+
     }
-  } 
+  }
 
   onStartMonthSelect(selectedOption: { value: string; label: string }) {
     this.registSuspensionForm.get('startDate')?.setValue(selectedOption.value)

@@ -9,6 +9,6 @@ import { DialogService } from './services/dialog.service';
 export class AppComponent {
   title = 'eagua-client';
   constructor(private dialogService: DialogService) { 
-   localStorage.clear()
+    
   } 
 }
