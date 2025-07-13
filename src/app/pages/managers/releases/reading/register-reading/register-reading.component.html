@@ -1,115 +1,264 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
-  <app-breadcrumb title="Registar Nova Leitura" [breadcrumbItems]="['Dashboard', 'Registar Leitura']"></app-breadcrumb>
+<div class="bg-transparent">
+  <div class="mx-auto px-4 py-8">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div class="w-8 h-8 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Carregando dados...</p>
+    </div>
 
-  <div class="bg-light-mode dark:bg-deep-dark min-h-[40vh] w-full  rounded-lg shadow-md p-4">
-    <ng-container
-      *ngIf="(isZonesLoading$ | async) || (isEnterprisesLoading$ | async) || (isClientLoading$ | async) ||  (isMeterLoading$ | async)">
-      <div class="flex flex-col justify-center my-4 gap-1">
-        <app-loading-spinner></app-loading-spinner>
-        <span class="flex justify-center text-sm">
+    <!-- Main Content -->
+    <div *ngIf="!isLoading" class="space-y-6">
+      
+      <!-- Header Section -->
+      <div class="space-y-4">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm">
+          <a href="/dashboard" class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Dashboard
+          </a>
+          <span class="text-slate-400 dark:text-slate-500">/</span>
+          <span class="font-medium text-slate-900 dark:text-slate-100">Registar Nova Leitura</span>
+        </nav>
 
-          Carregando dados
-
-        </span>
+        <!-- Page Title -->
+        <div class="flex items-center space-x-3 p-4">
+          <div class="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Registar Nova Leitura</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              Adicione uma nova leitura do contador ou carregue um ficheiro
+            </p>
+          </div>
+        </div>
       </div>
-    </ng-container>
-    <!-- Checkbox for Mode Selection -->
-    <div class="flex items-center gap-2">
-      <input type="checkbox" id="uploadFileCheckbox" [(ngModel)]="isFileUploadSelected" />
-      <label for="uploadFileCheckbox" class="text-sm text-blue-800 dark:text-light-mode">
-        Carregar ficheiro em vez de preencher os dados manualmente
-      </label>
-    </div> 
-    <div class="w-full h-full " [ngClass]="isFileUploadSelected ? 'grid grid-cols-2' : 'grid md:grid-cols-4'">
-      <div class="flex gap-4 w-full">
 
+      <!-- Main Card -->
+      <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0 p-4">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Dados da Leitura</h2>
+            <div class="flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-xs text-slate-600 dark:text-slate-300">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ currentDate | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
 
-        <!-- Year and Month Selection (Always Visible) -->
-        <div class="flex flex-col sm:flex-row w-full px-4 gap-4 items-center py-2">
-          <form [formGroup]="registReadingForm" class="flex flex-col gap-4 w-full px-4 dark:bg-deep-dark">
+          <!-- Mode Selection -->
+          <div class="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+            <input 
+              type="checkbox" 
+              id="uploadMode"
+              [(ngModel)]="isFileUploadSelected"
+              (change)="onFileUploadToggle()"
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="uploadMode" class="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+              Carregar ficheiro em vez de preencher os dados manualmente
+            </label>
+          </div>
+        </div>
 
-            <div class="w-full">
-              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
-              <app-custom-drop-down formControlName="readingYear" [options]="yearsData"
-                (selectionChange)="onYearSelect($event)">
-              </app-custom-drop-down>
+        <div class="p-6 space-y-6">
+          <form [formGroup]="registReadingForm" (ngSubmit)="onSubmit()">
+            
+            <!-- Year and Month Selection -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  Ano Económico
+                </label>
+                <select 
+                  formControlName="readingYear" 
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <option value="">Seleccione o ano</option>
+                  <option *ngFor="let year of yearsData" [value]="year.value">
+                    {{ year.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  Mês
+                </label>
+                <select 
+                  formControlName="readingMonth"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <option value="">Seleccione o mês</option>
+                  <option *ngFor="let month of monthsData" [value]="month.value">
+                    {{ month.label }}
+                  </option>
+                </select>
+              </div>
             </div>
 
-            <div class="w-full">
-              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Mês</label>
-              <app-custom-drop-down formControlName="readingMonth" [options]="monthsData"
-                (selectionChange)="onMonthSelect($event)">
-              </app-custom-drop-down>
+            <div class="h-px bg-slate-200 dark:bg-slate-700 my-6"></div>
+
+            <!-- File Upload Mode -->
+            <div *ngIf="isFileUploadSelected" class="space-y-6">
+              <div class="text-center">
+                <h3 class="flex items-center justify-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">
+                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  </svg>
+                  Carregar Ficheiro de Leituras
+                </h3>
+              </div>
+              <app-upload-file [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"/>
             </div>
+
+            <!-- Manual Input Mode -->
+            <div *ngIf="!isFileUploadSelected" class="space-y-6">
+              <div class="text-center mb-6">
+                <h3 class="flex items-center justify-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  Preencher Dados da Leitura
+                </h3>
+              </div>
+
+              <!-- Enterprise, Zone, Client Selection -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                  <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    Empresa
+                  </label>
+                  <select 
+                    formControlName="enterprise" 
+                    (change)="onEnterpriseChange($event)"
+                    class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <option value="">Seleccione a empresa</option>
+                    <option *ngFor="let enterprise of enterpriseData" [value]="enterprise.value">
+                      {{ enterprise.label }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Zona
+                  </label>
+                  <select 
+                    formControlName="zone"
+                    (change)="onZoneChange($event)"
+                    class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <option value="">Seleccione a zona</option>
+                    <option *ngFor="let zone of zoneData" [value]="zone.value">
+                      {{ zone.label }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Cliente
+                  </label>
+                  <select 
+                    formControlName="client"
+                    (change)="onClientChange($event)"
+                    class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <option value="">Seleccione o cliente</option>
+                    <option *ngFor="let client of clientData" [value]="client.value">
+                      {{ client.label }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Meter and Reading Information -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                  <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Contador
+                  </label>
+                  <select 
+                    formControlName="meter"
+                    (change)="onMeterChange($event)"
+                    class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <option value="">Seleccione o contador</option>
+                    <option *ngFor="let meter of meterData" [value]="meter.value">
+                      {{ meter.label }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Leitura Anterior</label>
+                  <div class="h-11 px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md flex items-center font-mono text-sm text-slate-700 dark:text-slate-300">
+                    {{ lastReading | number }}
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Leitura Actual</label>
+                  <input 
+                    type="text" 
+                    formControlName="currentReading"
+                    (input)="onCurrentReadingInput($event)"
+                    placeholder="Digite a leitura actual"
+                    class="h-11 w-full px-3 py-2 border rounded-md font-mono text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class]="registReadingForm.get('currentReading')?.errors?.['invalidReading'] 
+                      ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-100' 
+                      : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100'">
+                  
+                  <div *ngIf="registReadingForm.get('currentReading')?.errors?.['invalidReading']" 
+                       class="mt-1 text-xs text-red-600 dark:text-red-400">
+                    A leitura actual deve ser maior que a leitura anterior ({{ lastReading }})
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end pt-6" *ngIf="!isFileUploadSelected">
+              <button 
+                type="submit"
+                [disabled]="!isFormValid() || isSubmitting"
+                class="min-w-[200px] h-11 px-6 font-medium rounded-md transition-all duration-200 flex items-center justify-center gap-2"
+                [class]="isFormValid() && !isSubmitting 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg' 
+                  : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'">
+                
+                <span *ngIf="!isSubmitting">Submeter Leitura</span>
+                <span *ngIf="isSubmitting" class="flex items-center gap-2">
+                  <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Processando...
+                </span>
+              </button>
+            </div>
+
           </form>
-        </div>
-
-      </div>
-      <!-- File Upload Mode -->
-      <div *ngIf="isFileUploadSelected" class="flex flex-col gap-4 w-full">
-        <span class="text-lg font-medium p-3">Carregar ficheiro de Leituras</span>
-        <div class="px-3 w-full">
-          <app-upload-file [selectedMonth]="selectedMonth" [selectedYear]="selectedYear">
-          </app-upload-file>
-        </div>
-      </div>
-
-      <!-- Manual Input Mode -->
-      <div *ngIf="!isFileUploadSelected" class="col-span-3">
-        <form [formGroup]="registReadingForm" class="py-4 dark:bg-deep-dark">
-          <span class="text-lg font-medium p-3">Preencher dados da Leitura</span>
-
-          <div class="flex flex-col sm:flex-row w-full p-4 gap-4 items-center">
-            <div class="w-full">
-              <app-autocomplete-input label="Empresa" [dataSource]="enterpriseData"
-                (valueSelected)="onEnterpriseSelected($event)">
-              </app-autocomplete-input>
-            </div>
-            <div class="w-full">
-              <app-autocomplete-input label="Zona" [dataSource]="zoneData" (valueSelected)="onZoneSelect($event)">
-              </app-autocomplete-input>
-            </div>
-            <div class="w-full">
-              <app-autocomplete-input label="Cliente" [dataSource]="clientData"
-                (valueSelected)="onClientSelect($event)">
-              </app-autocomplete-input>
-            </div>
-          </div>
-
-          <div class="flex flex-col sm:grid sm:grid-cols-3 w-full p-4 gap-4 items-center">
-            <div class="w-full">
-              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-              <app-autocomplete-input [dataSource]="clientMetersData" [placeholder]="counter"
-                (valueSelected)="onMeterSelected($event)">
-              </app-autocomplete-input>
-            </div>
-
-            <div class="w-full">
-              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>
-              <span class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg 
-                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">
-                {{ lastReading }}
-              </span>
-            </div>
-
-            <div class="w-full">
-              <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Actual</label>
-              <input type="text" formControlName="currentReading" #currentReading
-                (input)="onNumberInputChange(currentReading, 'currentReading')" class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg 
-                            focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-            </div>
-          </div>
-        </form>
-
-        <div *ngIf="validFields" class="w-full flex items-center justify-end p-4">
-          <button (click)="saveReading()"
-            class="w-full md:w-1/4 bg-blue-600 py-2 text-light-mode rounded-full sm:rounded-lg">
-            Submeter
-          </button>
         </div>
       </div>
     </div>
-
   </div>
-
 </div>

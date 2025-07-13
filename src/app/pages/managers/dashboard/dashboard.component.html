@@ -1,29 +1,61 @@
-<div
-    class="min-w-full p-4 sm:p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 overflow-auto">
-    <div class="w-full max-w-7xl mx-auto">
+<div class="min-w-full p-4 sm:p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 overflow-auto">
+  <div class="w-full mx-auto">
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
-            <app-stats label="Total Cortes" [value]="totalCuts" subtext="Actualizado" [icon]="cutIcon"></app-stats>
-            <app-stats label="Total Leituras" [value]="totalReadings" subtext="Actualizado"
-                [icon]="readingIcon"></app-stats>
-            <app-stats label="Total Facturas" [value]="totalInvoices" subtext="Actualizado"
-                [icon]="invoiceIcon"></app-stats>
-            <app-stats label="Total Clientes" [value]="totalCustomers" subtext="Actualizado"
-                [icon]="customerIcon"></app-stats>
-        </div>
+    <h2 class="text-xl font-bold">Olá, {{ userName }}</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+      <app-stats label="Total Cortes" [value]="totalCuts" subtext="Atualizado" [icon]="cutIcon"></app-stats>
+      <app-stats label="Total Leituras" [value]="totalReadings" subtext="Atualizado" [icon]="readingIcon"></app-stats>
+      <app-stats label="Total Facturas" [value]="totalInvoices" subtext="Atualizado" [icon]="invoiceIcon"></app-stats>
+      <app-stats label="Total Clientes" [value]="totalCustomers" subtext="Atualizado" [icon]="customerIcon"></app-stats>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="bg-white border-l border-blue-600 dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-xl">
+        <h4 class="text-md font-semibold mb-2 text-blue-600">Comparação com o Mês Anterior</h4>
+        <p class="text-sm">Facturas: <span class="font-bold text-blue-600">{{ totalInvoices }}</span></p>
+      </div>
+      <div class="bg-white dark:bg-gray-800 border-l border-yellow-600 rounded-xl p-4 shadow-md hover:shadow-xl">
+        <h4 class="text-md font-semibold mb-2 text-yellow-600 ">Comparação com o Mês Anterior</h4>
+        <p class="text-sm">Cortes: <span class="font-bold">{{ previousCuts }}</span> → <span class="font-bold text-yellow-600">{{ totalCuts }}</span> (<span [ngClass]="{'text-yellow-600': cutChange > 0, 'text-red-600': cutChange < 0}">{{ cutChange }}%</span>)</p>
+      </div>
+    </div>
+
+    <div [formGroup]="form" class="mt-6 ml-auto flex w-1/2  justify-end m:flex-row gap-4  sm:items-center">
+      <app-custom-select
+        formControlName="period"
+        class="w-1/5"
+        label="Período"
+        [options]="periodOptions">
+      </app-custom-select>
+
+      <app-custom-select
+        formControlName="region"
+        class="w-1/5"
+        label="Região"
+        [options]="regionOptions">
+      </app-custom-select>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-xl p-4 mt-8 shadow-md hover:shadow-xl">
-        <!-- Skeleton Loader enquanto chartOptions é null -->
-
-        <div *ngIf="!chartOptions" class="space-y-4">
-            <app-skeleton lineHeight="24px" lineWidth="30%"></app-skeleton>
-            <app-skeleton lineHeight="12rem" lineWidth="100%"></app-skeleton>
-        </div>
-
-        <!-- Gráfico renderizado quando chartOptions estiver pronto -->
-        <apx-chart *ngIf="chartOptions" [series]="chartOptions.series" [chart]="chartOptions.chart"
-            [title]="chartOptions.title" [xaxis]="chartOptions.xaxis" [dataLabels]="chartOptions.dataLabels">
-        </apx-chart>
+      <ng-container *ngIf="chartOptions; else loading">
+        <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [title]="chartOptions.title" [xaxis]="chartOptions.xaxis" [dataLabels]="chartOptions.dataLabels"></apx-chart>
+      </ng-container>
+      <ng-template #loading>
+        <app-skeleton lineHeight="24px" lineWidth="30%"></app-skeleton>
+        <app-skeleton lineHeight="12rem" lineWidth="100%"></app-skeleton>
+      </ng-template>
     </div>
+
+    <div class="mt-8 p-4 bg-blue-100 dark:bg-blue-900 rounded-md text-sm text-blue-900 dark:text-blue-100">
+      <p><strong>Análise:</strong> O número de cortes subiu <span class="font-bold text-red-600">{{ cutChange }}%</span> em relação ao período anterior.</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 mt-8 shadow-md hover:shadow-xl">
+      <h3 class="text-lg font-semibold mb-4">Últimas Facturas Emitidas</h3>
+      <app-table [data]="recentInvoices" [columns]="invoiceColumns" [totalCount]="recentInvoices.length"></app-table>
+    </div>
+
+    
+  </div>
 </div>

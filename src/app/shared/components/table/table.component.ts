@@ -1,10 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-
-interface RowData {
-  [key: string]: any;
-}
-
+  
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',

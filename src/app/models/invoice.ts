@@ -17,3 +17,18 @@ export interface IInvoice {
     invoice: IInvoice,
     error : Error
   }
+
+  export interface InvoicePayment {
+    invoiceId: string;
+    description: string;
+    paymentMethod: string;
+    limitDate: string;
+    paymentStatus: boolean;
+    paymentDate: string;
+    amount: number;
+    fineAmount: number;
+    totalAmount: number;
+    finePercentage: number;
+    readingId: string;
+  }
+  

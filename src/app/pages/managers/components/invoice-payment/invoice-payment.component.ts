@@ -2,26 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
-import { IInvoice } from 'src/app/models/invoice';
+import { IInvoice, InvoicePayment } from 'src/app/models/invoice';
 import { DialogService } from 'src/app/services/dialog.service';
 import { ToasterService } from 'src/app/services/toaster.service';
 import { createInvoice, IAppState, listAllInvoices, updateInvoice } from 'src/app/store';
 import { selectInvoiceError, selectInvoiceIsLoading, selectInvoiceIsSaving, selectInvoice, selectInvoices } from 'src/app/store/selectors/invoice.selectors';
 
 
-interface InvoicePayment {
-  invoiceId: string;
-  description: string;
-  paymentMethod: string;
-  limitDate: string;
-  paymentStatus: boolean;
-  paymentDate: string;
-  amount: number;
-  fineAmount: number;
-  totalAmount: number;
-  finePercentage: number;
-  readingId: string;
-}
 
 @Component({
   selector: 'app-invoice-payment',

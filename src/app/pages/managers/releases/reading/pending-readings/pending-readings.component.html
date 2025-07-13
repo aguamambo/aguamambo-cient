@@ -1,124 +1,283 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
-    <app-breadcrumb title="Leituras Pendentes" [breadcrumbItems]="['Dashboard', 'Leituras Pendentes']"></app-breadcrumb>
-    
-    <ng-container *ngIf="(isReadingsLoading$ | async) || (isReadingSaving$ | async)">
-        <div class="flex flex-col justify-center my-4 gap-1">
-          <app-loading-spinner></app-loading-spinner>
-          <span class="flex justify-center text-sm">
-            <ng-container *ngIf="(isReadingSaving$ | async); else loadingData">
-              Actualizando leituras
-            </ng-container>
-            <ng-template #loadingData>
-              Carregando dados
-            </ng-template>
-          </span>
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+  <div class="mx-auto px-4 py-8 space-y-6">
+
+    <div class="space-y-4">
+      <nav class="flex items-center space-x-2 text-sm">
+        <a href="/dashboard"
+          class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Dashboard
+        </a>
+        <span class="text-slate-400 dark:text-slate-500">/</span>
+        <span class="font-medium text-slate-900 dark:text-slate-100">Leituras Pendentes</span>
+      </nav>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
+            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Leituras Pendentes</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              Gerir e actualizar leituras com estado Pendente
+            </p>
+          </div>
         </div>
-    </ng-container>
 
-    <div *ngIf="isEditing" class="py-4 dark:bg-deep-dark w-full mt-4">
-        <form [formGroup]="readingForm" class="p-4">
-            <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano Económico</label>
-                    <input formControlName="readingYear" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-                    <input formControlName="counter" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Anterior</label>
-                    <input formControlName="lastReading" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
-            </div>
-
-            <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
-                <div class="w-full">
-                    <app-custom-drop-down
-                        formControlName="readingMonth"
-                        label="Mês"
-                        [options]="monthsData"
-                        (selectionChange)="onMonthSelect($event)">
-                    </app-custom-drop-down>
-                </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura Actual</label>
-                    <input
-                        type="text"
-                        formControlName="currentReading"
-                        #currentReading
-                        (input)="onNumberInputChange(currentReading)"
-                        class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                </div>
-
-                <div class="w-full">
-                    <app-custom-drop-down
-                        formControlName="state"
-                        label="Estado"
-                        [options]="statusData"
-                        (selectionChange)=" onStatusSelect($event)">
-                    </app-custom-drop-down>
-                </div>
-            </div>
-        </form>
-
-        <div class="flex mt-4 p-6">
-            <button
-                type="button"
-                (click)="submitForm()" 
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer">
-                Atualizar Leitura
-            </button>
-        </div>
+        <div class="flex items-center gap-3">
+          </div>
+      </div>
     </div>
 
-    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
-        <h2 class="text-lg font-semibold mb-4">Lista de Leituras</h2>
- 
-        <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center gap-2">
-                <label for="bulkStatusChange" class="text-sm font-medium">Alterar Status para Todos</label>
-                <app-custom-drop-down
-                    id="bulkStatusChange"
-                    [(ngModel)]="selectedBulkStatus"
-                    [options]="statusData"
-                    (selectionChange)="onBulkStatusChange($event)">
-                </app-custom-drop-down>
-            </div>
-            <button
-                *ngIf="selectedBulkStatus"
-                (click)="applyBulkStatusChange()"
-                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 cursor-pointer">
-                Atualizar Todos
-            </button>
-        </div>
-
-        
-        <div *ngIf="readingsList.length > 0" class="grid grid-cols-2 px-6  w-full">
-
-            <app-search-input  (searchChange)="filterReadings($event)"></app-search-input>
-        </div>
-
-        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md my-6 p-4">
-              <div *ngIf="isReadingsLoading$ | async" class="space-y-4">
-                <app-skeleton lineHeight="24px" lineWidth="30%"></app-skeleton>
-                <app-skeleton *ngFor="let i of [1,2,3,4,5]" lineHeight="20px" lineWidth="100%"></app-skeleton>
-            </div>
-
-            <h2 *ngIf="!(isReadingsLoading$ | async)" class="text-lg font-semibold mb-4">Lista de Leituras</h2>
-
-            <ng-container *ngIf="readingsList.length > 0">
-                <app-table
-                    [data]="filteredReadings"
-                    [columns]="readingColumns"
-                    [totalCount]="filteredReadings.length"
-                    (rowClick)="editReading($event)">
-                </app-table>
-            </ng-container>
-             
-        </div>
+    <div *ngIf="(isReadingsLoading$ | async) || (isReadingSaving$ | async)" class="flex flex-col items-center justify-center py-12 space-y-4">
+      <div class="w-8 h-8 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        <span *ngIf="(isReadingSaving$ | async); else loadingData">Atualizando a leitura</span>
+        <ng-template #loadingData>Carregando dados</ng-template>
+      </p>
     </div>
+
+    <div *ngIf="isEditing" class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Editar Leitura
+        </h2>
+        <button (click)="cancelEdit()"
+          class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="readingForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Ano Económico</label>
+            <input formControlName="readingYear"
+              class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              readonly>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Contador</label>
+            <input formControlName="counter"
+              class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              readonly>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Leitura Anterior</label>
+            <input formControlName="lastReading"
+              class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              readonly>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="w-full">
+            <app-custom-drop-down
+                formControlName="readingMonth"
+                label="Mês"
+                [options]="monthsData"
+                (selectionChange)="onMonthSelect($event)">
+            </app-custom-drop-down>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Leitura Actual</label>
+            <input type="text" formControlName="currentReading" #currentReading (input)="onNumberInputChange(currentReading)"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          </div>
+          <div class="w-full">
+            <app-custom-drop-down
+                formControlName="state"
+                label="Estado"
+                [options]="statusData"
+                (selectionChange)=" onStatusSelect($event)">
+            </app-custom-drop-down>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" (click)="cancelEdit()"
+            class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" (click)="submitForm()" [disabled]="!readingForm.valid || (isReadingSaving$ | async)"
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+            <div *ngIf="isReadingSaving$ | async"
+              class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            {{ (isReadingSaving$ | async) ? 'Atualizando...' : 'Atualizar Leitura' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0">
+      <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="space-y-2 col-span-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Pesquisar Leitura</label>
+            <div class="relative">
+              <input type="text" [value]="searchTerm" (input)="filterReadings($any($event.target).value)"
+                placeholder="Pesquisar por cliente ou contador..."
+                class="h-11 w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="bulkStatusChange" class="text-sm font-medium text-slate-700 dark:text-slate-300">Alterar Status para Todos</label>
+            <app-custom-drop-down
+                id="bulkStatusChange"
+                [(ngModel)]="selectedBulkStatus"
+                [options]="statusData.slice(1)" (selectionChange)="onBulkStatusChange($event)"
+                class="h-11 w-full text-sm">
+            </app-custom-drop-down>
+          </div>
+
+          <div class="flex items-end justify-end">
+            <button *ngIf="selectedBulkStatus" (click)="applyBulkStatusChange()"
+              [disabled]="(isReadingSaving$ | async)"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+              <div *ngIf="isReadingSaving$ | async"
+                class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              {{ (isReadingSaving$ | async) ? 'Atualizando...' : 'Atualizar Todos' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div *ngIf="(isReadingsLoading$ | async)" class="space-y-4">
+          <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-1/3"></div>
+          <div *ngFor="let i of [1,2,3,4,5]" class="h-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+        </div>
+
+        <div *ngIf="!(isReadingsLoading$ | async)">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Lista de Leituras Pendentes</h2>
+          </div>
+
+          <div *ngIf="paginatedReadings && paginatedReadings.length > 0" class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-700">
+                  <th *ngFor="let column of readingColumns"
+                    class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm cursor-pointer">
+                    {{ column.label }}
+                  </th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let reading of paginatedReadings"
+                  class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                  (click)="editReading(reading)">
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.readingId }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.active ? 'Sim' : 'Não' }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono">{{ reading.consumption | number }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.updatedAt }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.createdAt }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono font-semibold">{{ reading.currentReading | number }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono">{{ reading.previousReading | number }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.readingMonth }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.readingYear }}</td>
+                  <td class="py-3 px-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [class]="getStatusColor(reading.state)">
+                      {{ reading.state }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono">{{ reading.meterId }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-500 dark:text-slate-400">{{ reading.userChanged }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-500 dark:text-slate-400">{{ reading.userCreated }}</td>
+                  <td class="py-3 px-4" (click)="$event.stopPropagation()">
+                    <button (click)="editReading(reading)"
+                      class="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="paginatedReadings.length === 0 && !(isReadingsLoading$ | async)" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">Nenhuma leitura pendente encontrada</h3>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Tente ajustar os filtros de pesquisa.</p>
+          </div>
+
+          <div *ngIf="filteredReadings.length > itemsPerPage"
+            class="flex justify-center items-center mt-6 p-4 border-t border-slate-200 dark:border-slate-700 space-x-2">
+
+            <button (click)="goToPage(1)" [disabled]="currentPage === 1"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Primeira Página</span>
+              &lt;&lt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Primeira</span>
+            </button>
+
+            <button (click)="previousPage()" [disabled]="currentPage === 1"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Página Anterior</span>
+              &lt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Anterior</span>
+            </button>
+
+            <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+              <button *ngIf="i + 1 === 1 || i + 1 === totalPages || (i + 1 >= currentPage - 2 && i + 1 <= currentPage + 2)"
+                (click)="goToPage(i + 1)"
+                [ngClass]="{
+                  'bg-blue-600 text-white': currentPage === i + 1,
+                  'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600': currentPage !== i + 1
+                }"
+                class="px-3 py-1 text-sm font-medium rounded-lg transition-colors">
+                {{ i + 1 }}
+              </button>
+              <span *ngIf="(i + 1 === currentPage - 3 || i + 1 === currentPage + 3) && totalPages > 5"
+                    class="text-sm text-slate-700 dark:text-slate-300">...</span>
+            </ng-container>
+
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Próxima Página</span>
+              &gt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Seguinte</span>
+            </button>
+
+            <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Última Página</span>
+              &gt;&gt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Última</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

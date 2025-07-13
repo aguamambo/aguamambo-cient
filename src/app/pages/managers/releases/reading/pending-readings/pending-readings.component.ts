@@ -15,13 +15,14 @@ import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 @Component({
   selector: 'app-pending-readings',
   templateUrl: './pending-readings.component.html',
-  styleUrl: './pending-readings.component.css'
+  styleUrls: ['./pending-readings.component.css'] // Corrected 'styleUrl' to 'styleUrls'
 })
-export class PendingReadingsComponent  implements OnInit, OnDestroy {
+export class PendingReadingsComponent implements OnInit, OnDestroy {
   readingForm: FormGroup;
   readingsList: IReading[] = [];
   readingsData: IReading[] = [];
   filteredReadings: IReading[] = [];
+  paginatedReadings: IReading[] = []; // New: For current page's readings
   monthsData: IOption[] = [];
   statusData: IOption[] = [];
   counter: string = '';
@@ -34,6 +35,12 @@ export class PendingReadingsComponent  implements OnInit, OnDestroy {
   isEditing: boolean = false;
   selectedReading!: IReading;
   selectedBulkStatus: any;
+  searchTerm: string = ''; // New: To hold search input
+
+  // Pagination properties
+  currentPage: number = 1;
+  itemsPerPage: number = 10; // Adjust as needed
+  totalPages: number = 0;
 
   isReadingsLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
@@ -50,7 +57,7 @@ export class PendingReadingsComponent  implements OnInit, OnDestroy {
       readingMonth: ['', Validators.required],
       currentReading: ['', Validators.required],
       counter: [''],
-      lastReading: [''],  
+      lastReading: [''],
       readingYear: [''],
       state: ['']
     });
@@ -90,7 +97,7 @@ export class PendingReadingsComponent  implements OnInit, OnDestroy {
       { label: 'CANCELADO', value: 'CANCELED' },
     ];
 
-    this.store.dispatch(getReadingByStatus({state: 'PENDING'}));
+    this.store.dispatch(getReadingByStatus({ state: 'PENDING' }));
 
     this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe(readings => {
       if (readings) {
@@ -99,15 +106,14 @@ export class PendingReadingsComponent  implements OnInit, OnDestroy {
           ...reading,
           createdAt: this.formatDate(reading.createdAt),
           updatedAt: this.formatDate(reading.updatedAt),
-          state: this.translateState(reading.state)
+          state: this.translateState(reading.state) // Ensure state is translated for display
         }));
-
-        this.filteredReadings = [...this.readingsData]
+        this.filterReadings(this.searchTerm); // Apply filter and pagination after data load
       }
     });
   }
 
-translateState(state: string): string {
+  translateState(state: string): string {
     switch (state) {
       case 'PENDING':
         return 'PENDENTE';
@@ -116,30 +122,45 @@ translateState(state: string): string {
       case 'CANCELED':
         return 'CANCELADO';
       default:
-        return state; 
+        return state;
+    }
+  }
+
+  getStatusColor(state: string): string {
+    switch (state) {
+      case 'APROVADO':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+      case 'PENDENTE':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
+      case 'CANCELADO':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+      default:
+        return 'bg-slate-100 text-slate-800 dark:bg-slate-700/20 dark:text-slate-400';
     }
   }
 
   filterReadings(searchTerm: string): void {
+    this.searchTerm = searchTerm; // Store the search term
     const searchTermLower = searchTerm.toLowerCase();
     this.filteredReadings = this.readingsData.filter(reading =>
       Object.values(reading).some(value =>
         String(value).toLowerCase().includes(searchTermLower)
       )
     );
+    this.currentPage = 1; // Reset to first page on filter change
+    this.paginateReadings();
   }
 
   private setFormControlState(isEnabled: boolean): void {
     const method = isEnabled ? 'enable' : 'disable';
     this.readingForm.controls['readingYear'][method]();
     this.readingForm.controls['counter'][method]();
-    this.readingForm.controls['lastReading'][method]();  
+    this.readingForm.controls['lastReading'][method]();
   }
 
   editReading(reading: IReading): void {
     this.isEditing = true;
     this.selectedReading = reading;
-
 
     this.readingForm.patchValue({
       readingMonth: reading.readingMonth,
@@ -147,61 +168,59 @@ translateState(state: string): string {
       counter: reading.meterId,
       lastReading: reading.previousReading,
       readingYear: reading.readingYear,
-      state: reading.state
+      state: reading.state // Use original state value for form
     });
 
-    this.setFormControlState(true);
+    // this.setFormControlState(true); // Don't re-enable if some are meant to be read-only
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.readingForm.reset();
+    this.setFormControlState(false);
   }
 
   submitForm(): void {
-    this.readingForm.controls['readingYear'].enable(); 
-    
+    this.readingForm.controls['readingYear'].enable(); // Re-enable for submission if needed
+
     if (this.readingForm.valid && this.isEditing) {
-      const payload = this.readingForm.value;
+      const payload = { ...this.selectedReading, ...this.readingForm.value };
+      // Convert state back to original enum value if it was translated for display
+      payload.state = this.statusData.find(s => s.label === payload.state)?.value || payload.state;
+
       this.store.dispatch(updateReading({ readingId: this.selectedReading.readingId, reading: payload }));
+
+      // Reset form and state after successful dispatch (or after effect completes)
+      // For immediate UX, you can reset here, but consider handling in effect for robustness.
       this.isEditing = false;
       this.readingForm.reset();
       this.setFormControlState(false);
 
-      delay(5000)
-      
-      this.loadData();
+      // This delay might not be ideal for handling async operations.
+      // Better to rely on NgRx effects to trigger reloadData after successful update.
+      // setTimeout(() => this.loadData(), 500); // Small delay to allow update to propagate
     }
   }
 
   applyBulkStatusChange(): void {
-    if (this.selectedBulkStatus) { 
-      this.readingsList = this.readingsList.map((reading) => {  
-        return {
-          ...reading,
-          state: this.selectedBulkStatus
-        };
-      }); 
-     this.saveUpdatedReadings();
-    }
-  }
-  
-  
-  onBulkStatusChange(event: { value: string }): void {
-    const selectedStatus = event.value; 
-    if (selectedStatus) {
-      this.selectedBulkStatus = selectedStatus; 
-    }
-  }
-   
-  private saveUpdatedReadings(): void {
-    if (this.selectedBulkStatus) { 
-      const readingIds = this.readingsList.map((reading) => reading.readingId);
-      
+    if (this.selectedBulkStatus) {
+      // Get only the readingIds from the currently filtered/paginated readings
+      const readingIds = this.filteredReadings.map((reading) => reading.readingId);
+
       const payload = {
         readingIds: readingIds,
         state: this.selectedBulkStatus
-      }; 
-      
-        this.store.dispatch(updateBulkReadings({  payload: payload  }));  
+      };
+
+      this.store.dispatch(updateBulkReadings({ payload: payload }));
+      this.selectedBulkStatus = ''; // Clear bulk status selection after applying
     }
   }
-  
+
+
+  onBulkStatusChange(event: { value: string }): void {
+    this.selectedBulkStatus = event.value;
+  }
 
   loadEnterpriseData(): void {
     this.store.pipe(select(selectSelectedEnterprises), takeUntil(this.destroy$)).subscribe((enterprises) => {
@@ -291,5 +310,34 @@ translateState(state: string): string {
   private formatDate(date: string): string {
     const d = new Date(date);
     return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  }
+
+  // --- Pagination Logic ---
+  paginateReadings(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedReadings = this.filteredReadings.slice(startIndex, endIndex);
+    this.totalPages = Math.ceil(this.filteredReadings.length / this.itemsPerPage);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.paginateReadings();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.paginateReadings();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.paginateReadings();
+    }
   }
 }

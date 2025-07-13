@@ -1,50 +1,61 @@
-import { FileHandlerService } from './../../../../../services/file-handler.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store, select } from '@ngrx/store';
-import { Observable, Subject, pipe } from 'rxjs';
-import { delay, filter, first, take, takeUntil } from 'rxjs/operators';
-import { IOption } from 'src/app/models/option';
-import { IReading } from 'src/app/models/reading';
-import * as XLSX from 'xlsx'; 
-import { saveAs } from 'file-saver';
-import { IZone } from 'src/app/models/zone';
-import { exportReadingsByZone, getClientByZoneId, getReadingByStateZone, getReadingByZone, getZoneByEnterpriseId, IAppState, listAllReadings, listAllZones, resetReadingActions, updateReading } from 'src/app/store';
-import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
-import { selectSelectedClientMeter } from 'src/app/store/selectors/clientMeter.selectors';
-import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
-import { selectExportedReadingFile, selectReadingIsLoading, selectReadingIsSaving, selectSelectedReading, selectSelectedReadings } from 'src/app/store/selectors/reading.selectors';
-import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { select, Store } from "@ngrx/store";
+import { Observable, Subject, filter, first, takeUntil, delay } from "rxjs";
+import { IOption } from "src/app/models/option";
+import { IReading } from "src/app/models/reading";
+import { IZone } from "src/app/models/zone";
+import { FileHandlerService } from "src/app/services/file-handler.service";
+import {
+  IAppState,
+  listAllZones,
+  listAllReadings,
+  exportReadingsByZone,
+  updateReading,
+  resetReadingActions,
+  getReadingByZone,
+} from "src/app/store";
+import { selectSelectedClients } from "src/app/store/selectors/client.selectors";
+import { selectSelectedClientMeter } from "src/app/store/selectors/clientMeter.selectors";
+import { selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
+import {
+  selectSelectedReading,
+  selectReadingIsLoading,
+  selectReadingIsSaving,
+  selectSelectedReadings,
+  selectExportedReadingFile,
+} from "src/app/store/selectors/reading.selectors";
+import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
 
 @Component({
-  selector: 'app-list-readings',
-  templateUrl: './list-readings.component.html',
+  selector: "app-list-readings",
+  templateUrl: "./list-readings.component.html",
 })
 export class ListReadingsComponent implements OnInit, OnDestroy {
   readingForm: FormGroup;
   readingsList: IReading[] = [];
-  readingsData: IReading[] = [];
-  selectedReadings: any[] = [];
-  filteredReadings: IReading[] = [];
-  selectedZone: string = '';
-  selectedState: string = '';
-
+  readingsData: IReading[] = []; // All raw readings from the store
+  selectedReadings: IReading[] = [];
+  // filteredReadings will now be a getter that applies all filters
+  selectedZone = "";
+  selectedState = "";
   monthsData: IOption[] = [];
   statusData: IOption[] = [];
-  counter: string = '';
+  counter = "";
   clientData: IOption[] = [];
   zoneData: IOption[] = [];
   zones: IZone[] = [];
-  lastReading: number = 0;
+  lastReading = 0;
   enterpriseData: IOption[] = [];
   readingColumns: { key: keyof IReading; label: string }[] = [];
-  isEditing: boolean = false;
-  enableExport: boolean = false;
+  isEditing = false;
+  enableExport = false;
   selectedReading!: IReading;
   selectedBulkStatus: any;
-  setState: string = ''
-  selectedZoneId: string = '';
-  selectedZoneDesc: string = '';
+  setState = "";
+  selectedZoneId = "";
+  selectedZoneDesc = "";
+  searchTerm = "";
 
   isReadingsLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
@@ -55,41 +66,41 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
   getReadingsByCustomerId$ = this.store.pipe(select(selectSelectedReading));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeter));
-  readingColumnsWithCheckbox: ({ key: keyof IReading; label: string; })[];
+  readingColumnsWithCheckbox: { key: keyof IReading; label: string }[];
 
-  constructor(private fb: FormBuilder, private store: Store<IAppState>, private fileService: FileHandlerService) {
-    this.readingForm = this.fb.group({
-      readingMonth: ['', Validators.required],
-      currentReading: ['', Validators.required],
-      counter: [''],
-      lastReading: [''],
-      readingYear: [''],
-      state: ['']
+  // Pagination Properties
+  currentPage: number = 1;
+  itemsPerPage: number = 10; // You can make this configurable if needed
+  totalPages: number = 1;
+
+  constructor(
+    private _fb: FormBuilder,
+    private store: Store<IAppState>,
+    private fileService: FileHandlerService,
+  ) {
+    this.readingForm = this._fb.group({
+      readingMonth: ["", Validators.required],
+      currentReading: ["", Validators.required],
+      counter: [""],
+      lastReading: [""],
+      readingYear: [""],
+      state: ["", Validators.required], // Added Validators.required here
     });
 
     this.isReadingsLoading$ = this.store.select(selectReadingIsLoading);
     this.isReadingSaving$ = this.store.select(selectReadingIsSaving);
 
     this.readingColumns = [
-      { key: 'readingId', label: 'Código' },
-      { key: 'active', label: 'Cliente Activo' },
-      { key: 'consumption', label: 'Consumo' },
-      { key: 'updatedAt', label: 'Data de Alteracao' },
-      { key: 'createdAt', label: 'Data de Criacao' },
-      { key: 'currentReading', label: 'Leitura Acutal' },
-      { key: 'previousReading', label: 'Leitura Anterior' },
-      { key: 'readingMonth', label: 'Mês' },
-      { key: 'readingYear', label: 'Ano Económico' },
-      { key: 'state', label: 'Estado' },
-      { key: 'meterId', label: 'Contador' },
-      { key: 'userChanged', label: 'Alterado por' },
-      { key: 'userCreated', label: 'Criado por' }
+      { key: "readingYear", label: "Ano" },
+      { key: "readingMonth", label: "Mês" },
+      { key: "meterId", label: "Contador" },
+      { key: "previousReading", label: "Leitura Anterior" },
+      { key: "currentReading", label: "Leitura Actual" },
+      { key: "state", label: "Estado" },
+      { key: "createdAt", label: "Data" },
     ];
 
-    this.readingColumnsWithCheckbox = [
-      { key: 'checkbox', label: '' },
-      ...this.readingColumns,
-    ];
+    this.readingColumnsWithCheckbox = [{ key: "checkbox", label: "" }, ...this.readingColumns];
   }
 
   ngOnInit(): void {
@@ -99,192 +110,227 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   private loadData(): void {
     this.generateMonths();
-
     this.statusData = [
-      { label: 'Seleccione...', value: '' },
-      { label: 'PENDENTE', value: 'PENDING' },
-      { label: 'APROVADO', value: 'APPROVED' },
-      { label: 'CANCELADO', value: 'CANCELED' },
+      { label: "Seleccione...", value: "" },
+      { label: "PENDENTE", value: "PENDING" },
+      { label: "APROVADO", value: "APPROVED" },
+      { label: "CANCELADO", value: "CANCELED" },
     ];
-
-    this.getAllReadings()
-    this.getAllZones()
+    this.getAllReadings();
+    this.getAllZones();
   }
 
   getAllZones() {
     this.store.dispatch(listAllZones());
-    this.store.pipe(select(selectSelectedZones), filter((zones) => !!zones), first()).subscribe(zones => {
-      if (zones) {
-        this.zones = zones;
-        this.zoneData = [
-          { label: 'TODOS BAIRROS', value: 'AZN' },
-          ...zones.map(zone => ({
-            label: zone.designation.toUpperCase(),
-            value: zone.zoneId
-          }))
-        ]
-
-        this.filteredReadings = [...this.readingsData]
-      }
-    });
+    this.store
+      .pipe(
+        select(selectSelectedZones),
+        filter((zones) => !!zones),
+        first(),
+      )
+      .subscribe((zones) => {
+        if (zones) {
+          this.zones = zones;
+          this.zoneData = [
+            { label: "TODOS BAIRROS", value: "AZN" },
+            ...zones.map((zone) => ({
+              label: zone.designation.toUpperCase(),
+              value: zone.zoneId,
+            })),
+          ];
+          // Initial filter, will be re-applied by getter
+          this.updatePagination();
+        }
+      });
   }
 
   getAllReadings() {
     this.store.dispatch(listAllReadings());
-
-    this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe(readings => {
+    this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe((readings) => {
       if (readings) {
         this.readingsList = readings;
-        this.readingsData = readings.map(reading => ({
+        this.readingsData = readings.map((reading) => ({
           ...reading,
           createdAt: this.formatDate(reading.createdAt),
           updatedAt: this.formatDate(reading.updatedAt),
-          state: this.translateState(reading.state)
+          state: this.translateState(reading.state),
         }));
-
-        this.filteredReadings = [...this.readingsData]
+        this.updatePagination(); // Update pagination when readingsData changes
       }
     });
-
   }
 
   translateState(state: string): string {
     switch (state) {
-      case 'PENDING':
-        return 'PENDENTE';
-      case 'APPROVED':
-        return 'APROVADO';
-      case 'CANCELED':
-        return 'CANCELADO';
+      case "PENDING":
+        return "PENDENTE";
+      case "APPROVED":
+        return "APROVADO";
+      case "CANCELED":
+        return "CANCELADO";
       default:
         return state;
     }
   }
 
+  getStatusColor(status: string): string {
+    switch (status.toLowerCase()) {
+      case "aprovado":
+      case "completed":
+        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
+      case "pendente":
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
+      case "cancelado":
+      case "cancelled":
+        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    return this.translateState(status);
+  }
+
   exportExcel() {
-    this.store.dispatch(exportReadingsByZone({ zoneId: this.selectedZoneId }))
-
-    this.store.pipe(select(selectExportedReadingFile), filter((file) => !!file), first()).subscribe((fileContent) => {
-      if (fileContent) {
-        const date = new Date()
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-
-        const blob = new Blob([fileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${this.selectedZoneDesc}_${day}-${month}-${year} ${hours}:${minutes}:${seconds}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        window.URL.revokeObjectURL(url);
-      }
-    });
+    this.store.dispatch(exportReadingsByZone({ zoneId: this.selectedZoneId }));
+    this.store
+      .pipe(
+        select(selectExportedReadingFile),
+        filter((file) => !!file),
+        first(),
+      )
+      .subscribe((fileContent) => {
+        if (fileContent) {
+          const date = new Date();
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = date.getFullYear();
+          const hours = String(date.getHours()).padStart(2, "0");
+          const minutes = String(date.getMinutes()).padStart(2, "0");
+          const seconds = String(date.getSeconds()).padStart(2, "0");
+          const blob = new Blob([fileContent], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${this.selectedZoneDesc}_${day}-${month}-${year} ${hours}:${minutes}:${seconds}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }
+      });
   }
 
   private setFormControlState(isEnabled: boolean): void {
-    const method = isEnabled ? 'enable' : 'disable';
-    this.readingForm.controls['readingYear'][method]();
-    this.readingForm.controls['counter'][method]();
-    this.readingForm.controls['lastReading'][method]();
+    const method = isEnabled ? "enable" : "disable";
+    // Only enable/disable the editable fields, not the readonly ones
+    this.readingForm.controls["readingMonth"][method]();
+    this.readingForm.controls["currentReading"][method]();
+    this.readingForm.controls["state"][method]();
+
+    // Ensure readonly fields remain disabled
+    this.readingForm.controls["readingYear"].disable();
+    this.readingForm.controls["counter"].disable();
+    this.readingForm.controls["lastReading"].disable();
   }
 
   editReading(reading: IReading): void {
     this.isEditing = true;
     this.selectedReading = reading;
-
     this.readingForm.patchValue({
       readingMonth: reading.readingMonth,
       currentReading: reading.currentReading,
-      counter: reading.meterId,
+      counter: reading.meterId, // Make sure 'counter' matches 'meterId'
       lastReading: reading.previousReading,
       readingYear: reading.readingYear,
-      state: reading.state
+      state: this.getStatusLabel(reading.state), // Use translated state
     });
-
     this.setFormControlState(true);
   }
 
   submitForm(): void {
-    this.readingForm.controls['readingYear'].enable();
-
     if (this.readingForm.valid && this.isEditing) {
+      // Re-enable for submission if needed by API, then disable again
+      this.readingForm.controls["readingYear"].enable();
+      this.readingForm.controls["counter"].enable();
+      this.readingForm.controls["lastReading"].enable();
+
       const payload = {
-        readingMonth: this.selectedReading.readingMonth,
-        currentReading: this.selectedReading.currentReading,
-        readingYear: this.selectedReading.readingYear,
-        state: this.readingForm.get('state')?.value
-      }
+        readingMonth: this.readingForm.get("readingMonth")?.value, // Use form value
+        currentReading: this.readingForm.get("currentReading")?.value, // Use form value
+        readingYear: this.readingForm.get("readingYear")?.value, // Use form value
+        state: this.readingForm.get("state")?.value, // Use form value
+      };
 
       this.store.dispatch(updateReading({ readingId: this.selectedReading.readingId, reading: payload }));
-      this.isEditing = false;
-      this.readingForm.reset();
-      this.setFormControlState(false);
-
-      delay(5000)
-
-      this.loadData()
+      this.store.select(selectReadingIsSaving).pipe(
+        filter(saving => !saving), // Wait for saving to complete
+        first(),
+        delay(500) // Small delay to ensure state update propagates
+      ).subscribe(() => {
+        this.isEditing = false;
+        this.readingForm.reset();
+        this.setFormControlState(false);
+        this.loadData(); // Reload data to reflect changes
+      });
     }
   }
 
-  filterByZone(event: { value: string, label: string }) {
+  filterByZone(event: { value: string; label: string }) {
     this.selectedZoneId = event.value;
     this.selectedZoneDesc = event.label;
-
-
-    this.store.dispatch(resetReadingActions())
-
-    if (event.value === 'AZN') {
-      this.enableExport = false
-      this.getAllReadings()
+    this.store.dispatch(resetReadingActions());
+    if (event.value === "AZN") {
+      this.enableExport = false;
+      this.getAllReadings(); // Reload all readings
     } else {
-
-      this.applyFilters();
+      this.applyFilters(); // Apply zone filter
     }
-  }
-
-  filterByState(event: { value: string, label: string }) {
-    this.selectedState = event.value;
-
-    this.applyFilters();
+    this.currentPage = 1; // Reset to first page on filter change
+    this.updatePagination();
   }
 
   applyFilters() {
-
-    this.cancel()
+    this.cancel(); // Close edit form on filter change
     const payload = {
-      zoneId: this.selectedZoneId
-    }
-
-
+      zoneId: this.selectedZoneId,
+    };
     if (this.selectedZoneId) {
-      this.store.dispatch(getReadingByZone({ payload }))
-
-      this.store.pipe(select(selectSelectedReadings), filter((readings) => !!readings), first()).subscribe((readings) => {
-        if (readings) {
-
-          this.filteredReadings = readings
-          this.readingsList = readings
-          this.enableExport = true
-
-        }
-      })
+      this.store.dispatch(getReadingByZone({ payload }));
+      this.store
+        .pipe(
+          select(selectSelectedReadings),
+          filter((readings) => !!readings),
+          first(),
+        )
+        .subscribe((readings) => {
+          if (readings) {
+            this.readingsList = readings; // Update readingsList
+            this.readingsData = readings.map((reading) => ({
+              ...reading,
+              createdAt: this.formatDate(reading.createdAt),
+              updatedAt: this.formatDate(reading.updatedAt),
+              state: this.translateState(reading.state),
+            }));
+            this.enableExport = true;
+            this.updatePagination(); // Update pagination after applying zone filter
+          }
+        });
     }
-
   }
 
   cancel() {
-    this.isEditing = false
+    this.isEditing = false;
+    this.readingForm.reset();
+    this.setFormControlState(false);
   }
 
-  toggleSelection(reading: any) {
-    const index = this.selectedReadings.findIndex(item => item.id === reading.id);
+  toggleSelection(reading: IReading) {
+    const index = this.selectedReadings.findIndex((item) => item.readingId === reading.readingId);
     if (index > -1) {
       this.selectedReadings.splice(index, 1);
     } else {
@@ -292,114 +338,69 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  resetFilters() {
-    this.selectedZone = '';
-    this.selectedState = '';
-    this.filteredReadings = [...this.readingsList];
-  }
-  applyBulkStatusChange(): void {
-    if (this.selectedBulkStatus) {
-      this.readingsList = this.readingsList.map((reading) => {
-        return {
-          ...reading,
-          state: this.selectedBulkStatus
-        };
-      });
-      this.saveUpdatedReadings();
+  toggleSelectAll() {
+    if (this.isAllSelected()) {
+      this.selectedReadings = [];
+    } else {
+      this.selectedReadings = [...this.paginatedReadings]; // Select all on current page
     }
   }
 
-
-  onBulkStatusChange(event: { value: string }): void {
-    const selectedStatus = event.value;
-    if (selectedStatus) {
-      this.selectedBulkStatus = selectedStatus;
-    }
+  isAllSelected(): boolean {
+    return this.paginatedReadings.length > 0 && this.selectedReadings.length === this.paginatedReadings.length &&
+           this.paginatedReadings.every(reading => this.selectedReadings.includes(reading));
   }
 
-  private saveUpdatedReadings(): void {
-    if (this.selectedBulkStatus) {
-      this.readingsList.forEach((reading) => {
-        const updatedReading = { ...reading, state: this.selectedBulkStatus };
-        this.store.dispatch(updateReading({
-          readingId: updatedReading.readingId,
-          reading: updatedReading
-        }));
-      });
-    }
+  isIndeterminate(): boolean {
+    return this.selectedReadings.length > 0 && !this.isAllSelected();
   }
 
+  deleteSelected(): void {
+    if (this.selectedReadings.length === 0) return;
+    // Dispatch an action to delete readings by their IDs
+    console.log("Deleting selected readings:", this.selectedReadings.map(r => r.readingId));
+    // Example: this.store.dispatch(deleteReadings({ ids: this.selectedReadings.map(r => r.readingId) }));
 
-  loadEnterpriseData(): void {
-    this.store.pipe(select(selectSelectedEnterprises), takeUntil(this.destroy$)).subscribe((enterprises) => {
-      if (enterprises) {
-        this.enterpriseData = enterprises.map(enterprise => ({
-          label: enterprise.name,
-          value: enterprise.enterpriseId
-        }));
-      }
-    });
+    // For now, simulate deletion and update local data
+    this.readingsData = this.readingsData.filter(r => !this.selectedReadings.includes(r));
+    this.selectedReadings = [];
+    this.updatePagination();
   }
 
-  onValueSelected(option: IOption): void {
-    if (option?.value) {
-      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: option.value }));
-      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
-        if (zones) {
-          this.zoneData = [
-            { label: 'Seleccione...', value: '' },
-            ...zones.map(zone => ({
-              label: zone.designation,
-              value: zone.zoneId
-            }))
-          ];
-        }
-      });
-    }
+  onNumberInputChange(inputElement: HTMLInputElement): void {
+    inputElement.value = inputElement.value.replace(/[^0-9]/g, "");
   }
 
-  onStatusSelect(event: { value: string }): void {
-    if (event?.value) {
-      this.readingForm.get('state')?.setValue(event.value);
-
-      this.setState = event.value;
-    }
+  onMonthSelect(selectedOption: { value: string }): void {
+    this.readingForm.get("readingMonth")?.setValue(selectedOption.value);
   }
 
-  onEnterpriseSelect(event: { value: string }): void {
-    if (event?.value) {
-      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId: event.value }));
-      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe((zones) => {
-        if (zones) {
-          this.zoneData = [
-            { label: 'Seleccione...', value: '' },
-            ...zones.map(zone => ({
-              label: zone.designation,
-              value: zone.zoneId
-            }))
-          ];
-        }
-      });
-    }
+  filterReadings(searchTerm: string): void {
+    this.searchTerm = searchTerm;
+    this.currentPage = 1; // Reset to first page on search change
+    this.updatePagination(); // Re-calculate pagination based on new filters
   }
 
-  onZoneSelect(event: { value: string }): void {
-    if (event?.value) {
-      this.selectedZoneId = event.value
-      this.store.dispatch(getClientByZoneId({ zoneId: event.value }));
-      this.filterPendingReadingsByZone(event.value);
-    }
+  generateMonths(): void {
+    this.monthsData = [
+      { value: "1", label: "Janeiro" },
+      { value: "2", label: "Fevereiro" },
+      { value: "3", label: "Março" },
+      { value: "4", label: "Abril" },
+      { value: "5", label: "Maio" },
+      { value: "6", label: "Junho" },
+      { value: "7", label: "Julho" },
+      { value: "8", label: "Agosto" },
+      { value: "9", label: "Setembro" },
+      { value: "10", label: "Outubro" },
+      { value: "11", label: "Novembro" },
+      { value: "12", label: "Dezembro" },
+    ];
   }
 
-  filterPendingReadingsByZone(zoneId: string): void {
-    this.filteredReadings = this.readingsData.filter(
-      reading => reading.state === 'PENDENTE'
-    );
-  }
-
-
-  getCurrentYear(): number {
-    return new Date().getFullYear();
+  private formatDate(date: string): string {
+    const d = new Date(date);
+    return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
   }
 
   ngOnDestroy(): void {
@@ -407,42 +408,72 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onNumberInputChange(inputElement: HTMLInputElement): void {
-    inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
+  // --- Pagination Logic ---
+
+  get filteredReadings(): IReading[] {
+    let readings = this.readingsData;
+
+    // Apply zone filter
+    // if (this.selectedZoneId && this.selectedZoneId !== "AZN") {
+    //   readings = readings.filter(reading => {
+    //     const zone = this.zones.find(z => z.zoneId === this.selectedZoneId);
+    //     return zone && reading === zone.designation.toUpperCase();
+    //   });
+    // }
+
+    // Apply search term filter
+    if (this.searchTerm) {
+      const searchTermLower = this.searchTerm.toLowerCase();
+      readings = readings.filter(reading =>
+        Object.values(reading).some(value =>
+          String(value).toLowerCase().includes(searchTermLower)
+        )
+      );
+    }
+    return readings;
   }
 
-  onMonthSelect(selectedOption: { value: string }): void {
-    this.readingForm.get('readingMonth')?.setValue(selectedOption.value);
+  get paginatedReadings(): IReading[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredReadings.slice(startIndex, endIndex);
   }
 
-  filterReadings(searchTerm: string): void {
-    const searchTermLower = searchTerm.toLowerCase();
-    this.filteredReadings = this.readingsData.filter(reading =>
-      Object.values(reading).some(value =>
-        String(value).toLowerCase().includes(searchTermLower)
-      )
-    );
-  }
- 
-  generateMonths(): void {
-    this.monthsData = [
-      { value: '1', label: 'Janeiro' },
-      { value: '2', label: 'Fevereiro' },
-      { value: '3', label: 'Março' },
-      { value: '4', label: 'Abril' },
-      { value: '5', label: 'Maio' },
-      { value: '6', label: 'Junho' },
-      { value: '7', label: 'Julho' },
-      { value: '8', label: 'Agosto' },
-      { value: '9', label: 'Setembro' },
-      { value: '10', label: 'Outubro' },
-      { value: '11', label: 'Novembro' },
-      { value: '12', label: 'Dezembro' }
-    ];
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredReadings.length / this.itemsPerPage);
+    // Adjust current page if it's out of bounds after filtering/data changes
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = this.totalPages;
+    } else if (this.totalPages === 0) {
+      this.currentPage = 1; // Or 0, depending on desired empty state
+    }
+    // Clear selections if the current page data changes
+    this.selectedReadings = [];
   }
 
-  private formatDate(date: string): string {
-    const d = new Date(date);
-    return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.selectedReadings = []; // Clear selections on page change
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.selectedReadings = []; // Clear selections on page change
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.selectedReadings = []; // Clear selections on page change
+    }
+  }
+
+  get enableExportButton(): boolean {
+    // Enable export if there are any filtered readings, regardless of current page
+    return this.filteredReadings.length > 0;
   }
 }

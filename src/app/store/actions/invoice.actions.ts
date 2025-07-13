@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
-import { IInvoice } from 'src/app/models/invoice';
+import { IInvoice, InvoicePayment } from 'src/app/models/invoice';
 import { IFile } from 'src/app/models/file';
 import { Error } from 'src/app/models/error';
 
@@ -31,6 +31,23 @@ export const loadInvoicesByZoneSuccess = createAction(
 
 export const loadInvoicesByZoneFailure = createAction(
   '[Invoice] Load Invoices By Zone Failure',
+  props<{ error: Error }>()
+);
+
+export const loadRecentInvoices = createAction(
+  '[Dashboard] Load Recent Invoices',
+  props<{ period: string | null, region: string | null }>()
+);
+
+// Action for successful loading of recent invoices
+export const loadRecentInvoicesSuccess = createAction(
+  '[Dashboard] Load Recent Invoices Success',
+  props<{ invoices: InvoicePayment[] }>()
+);
+
+// Action for failed loading of recent invoices
+export const loadRecentInvoicesFailure = createAction(
+  '[Dashboard] Load Recent Invoices Failure',
   props<{ error: Error }>()
 );
 

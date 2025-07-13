@@ -1,120 +1,309 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
-    <app-breadcrumb title="Lista de Leituras" [breadcrumbItems]="['Dashboard', 'Listar Leituras']"></app-breadcrumb>
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+  <div class="mx-auto px-4 py-8 space-y-6">
 
-    <ng-container *ngIf="(isReadingsLoading$ | async) || (isReadingSaving$ | async)">
-        <div class="flex flex-col justify-center my-4 gap-1">
-            <app-loading-spinner></app-loading-spinner>
-            <span class="flex justify-center text-sm">
-                <ng-container *ngIf="(isReadingSaving$ | async); else loadingData">
-                    Atualizando a leitura
-                </ng-container>
-                <ng-template #loadingData>
-                    Carregando dados
-                </ng-template>
-            </span>
+    <div class="space-y-4">
+      <nav class="flex items-center space-x-2 text-sm">
+        <a href="/dashboard"
+          class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Dashboard
+        </a>
+        <span class="text-slate-400 dark:text-slate-500">/</span>
+        <span class="font-medium text-slate-900 dark:text-slate-100">Lista de Leituras</span>
+      </nav>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Lista de Leituras</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              Gerir e visualizar todas as leituras registadas
+            </p>
+          </div>
         </div>
-    </ng-container>
 
-    <div *ngIf="isEditing" class="py-4 dark:bg-deep-dark w-full mt-4">
-        <form [formGroup]="readingForm" class="p-4">
-            <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano
-                        Económico</label>
-                    <input formControlName="readingYear"
-                        class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
+        <div class="flex items-center gap-3">
+          <button *ngIf="selectedReadings.length > 0" (click)="deleteSelected()"
+            class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Eliminar ({{ selectedReadings.length }})
+          </button>
 
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-                    <input formControlName="counter"
-                        class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura
-                        Anterior</label>
-                    <input formControlName="lastReading"
-                        class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-                </div>
-            </div>
-
-            <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
-                <div class="w-full">
-                    <app-custom-drop-down formControlName="readingMonth" label="Mês" [options]="monthsData"
-                        (selectionChange)="onMonthSelect($event)">
-                    </app-custom-drop-down>
-                </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Leitura
-                        Actual</label>
-                    <input type="text" formControlName="currentReading" #currentReading
-                        (input)="onNumberInputChange(currentReading)"
-                        class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                </div>
-
-                <div class="w-full">
-                    <app-custom-drop-down formControlName="state" label="Estado" [options]="statusData"
-                        (selectionChange)=" onStatusSelect($event)">
-                    </app-custom-drop-down>
-                </div>
-            </div>
-        </form>
-
-        <div class="flex mt-4 p-6 gap-6 justify-end">
-            <button type="button" (click)="cancel()"
-                class="px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-700 hover:text-white disabled:opacity-50 cursor-pointer">
-                Cancelar
-            </button>
-            <button type="button" (click)="submitForm()"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer">
-                Atualizar Leitura
-            </button>
+          <button *ngIf="enableExportButton" (click)="exportExcel()"
+            class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Exportar Excel
+          </button>
         </div>
+      </div>
+    </div>
+ 
+    <div *ngIf="isEditing" class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Editar Leitura
+        </h2>
+        <button (click)="cancel()"
+          class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="readingForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Ano Económico</label>
+            <input formControlName="readingYear"
+              class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              readonly>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Contador</label>
+            <input formControlName="counter"
+              class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              readonly>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Leitura Anterior</label>
+            <input formControlName="lastReading"
+              class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              readonly>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Mês</label>
+            <select formControlName="readingMonth"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <option value="">Seleccione o mês</option>
+              <option *ngFor="let month of monthsData" [value]="month.label">
+                {{ month.label }}
+              </option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Leitura Actual</label>
+            <input type="text" formControlName="currentReading" #currentReading (input)="onNumberInputChange(currentReading)"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Estado</label>
+            <select formControlName="state"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <option value="">Seleccione o estado</option>
+              <option *ngFor="let status of statusData" [value]="status.label">
+                {{ status.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" (click)="cancel()"
+            class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" (click)="submitForm()" [disabled]="!readingForm.valid || (isReadingSaving$ | async)"
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+            <div *ngIf="isReadingSaving$ | async"
+              class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            {{ (isReadingSaving$ | async) ? 'Atualizando...' : 'Atualizar Leitura' }}
+          </button>
+        </div>
+      </form>
     </div>
 
-    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
+    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0">
+      <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Bairro</label>
+            <select (change)="filterByZone({value: $any($event.target).value, label: $any($event.target).options[$any($event.target).selectedIndex].text})"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <option *ngFor="let zone of zoneData" [value]="zone.value" [selected]="zone.value === selectedZoneId">
+                {{ zone.label }}
+              </option>
+            </select>
+          </div>
 
-        <div class="grid grid-cols-4 px-6 w-full gap-4">
-            <app-custom-drop-down label="Bairro" [options]="zoneData" (selectionChange)="filterByZone($event)">
-            </app-custom-drop-down>
-
-
-            <div class="w-full ">
-                <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">
-                    Pesquisar Leitura
-                </label>
-                <app-search-input (searchChange)="filterReadings($event)"></app-search-input>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Pesquisar Leitura</label>
+            <div class="relative">
+              <input type="text" [value]="searchTerm" (input)="filterReadings($any($event.target).value)"
+                placeholder="Pesquisar por cliente ou contador..."
+                class="h-11 w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
             </div>
-            <div *ngIf="filteredReadings.length > 0 && enableExport" class="flex items-end justify-end py-4 w-full ">
-                <button (click)="exportExcel()" class="bg-green-500 text-white py-2 px-6 rounded ml-2">Exportar
-                    Excel</button>
-            </div>
+          </div>
 
+          <div class="flex items-end">
+            <div class="text-sm text-slate-500 dark:text-slate-400">
+              {{ filteredReadings.length }} de {{ readingsData.length }} leituras
+            </div>
+          </div>
+
+          <div class="flex items-end justify-end">
+            </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div *ngIf="isReadingsLoading$ | async" class="space-y-4">
+          <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-1/3"></div>
+          <div *ngFor="let i of [1,2,3,4,5]" class="h-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
         </div>
 
-        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md my-6 p-4">
+        <div *ngIf="!(isReadingsLoading$ | async)">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Lista de Leituras</h2>
 
-            <div *ngIf="isReadingsLoading$ | async" class="space-y-4">
-                <app-skeleton lineHeight="24px" lineWidth="30%"></app-skeleton>
-                <app-skeleton *ngFor="let i of [1,2,3,4,5]" lineHeight="20px" lineWidth="100%"></app-skeleton>
-            </div>
+            <label *ngIf="paginatedReadings.length > 0"
+              class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+              <input type="checkbox" [checked]="isAllSelected()" [indeterminate]="isIndeterminate()"
+                (change)="toggleSelectAll()"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+              Seleccionar Todos (página atual)
+            </label>
+          </div>
 
-            <h2 *ngIf="!(isReadingsLoading$ | async)" class="text-lg font-semibold mb-4">Lista de Leituras</h2>
+          <div *ngIf="paginatedReadings && paginatedReadings.length > 0" class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-700">
+                  <th class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm">
+                    <input type="checkbox" [checked]="isAllSelected()" [indeterminate]="isIndeterminate()"
+                      (change)="toggleSelectAll()"
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                  </th>
+                  <th *ngFor="let column of readingColumns"
+                    class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm cursor-pointer hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+                    {{ column.label }}
+                  </th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let reading of paginatedReadings"
+                  class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                  (click)="editReading(reading)">
+                  <td class="py-3 px-4" (click)="$event.stopPropagation()">
+                    <input type="checkbox" [checked]="selectedReadings.includes(reading)"
+                      (change)="toggleSelection(reading)"
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                  </td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.readingYear }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ reading.readingMonth }}</td> 
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono">{{ reading.meterId }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono">{{ reading.previousReading | number }}
+                  </td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono font-semibold">
+                    {{ reading.currentReading | number }}</td> 
+                  <td class="py-3 px-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [class]="getStatusColor(reading.state)">
+                      {{ getStatusLabel(reading.state) }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-sm text-slate-500 dark:text-slate-400">{{ reading.createdAt }}</td>
+                  <td class="py-3 px-4" (click)="$event.stopPropagation()">
+                    <button (click)="editReading(reading)"
+                      class="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            <ng-container *ngIf="filteredReadings && filteredReadings.length > 0">
+          <div *ngIf="paginatedReadings.length === 0 && !(isReadingsLoading$ | async)" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">Nenhuma leitura encontrada</h3>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Tente ajustar os filtros de pesquisa.</p>
+          </div>
 
-                <app-table [data]="filteredReadings" [columns]="readingColumnsWithCheckbox"
-                    [totalCount]="filteredReadings.length" (rowClick)="editReading($event)">
-                    <ng-template #customColumn let-row>
-                        <input type="checkbox" [checked]="selectedReadings.includes(row)"
-                            (change)="toggleSelection(row)" class="form-checkbox h-5 w-5 text-blue-600" />
-                    </ng-template>
-                </app-table>
+          <div *ngIf="filteredReadings.length > itemsPerPage"
+            class="flex justify-center items-center mt-6 p-4 border-t border-slate-200 dark:border-slate-700 space-x-2">
 
+            <button (click)="goToPage(1)" [disabled]="currentPage === 1"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Primeira Página</span>
+              &lt;&lt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Primeira</span>
+            </button>
+
+            <button (click)="previousPage()" [disabled]="currentPage === 1"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Página Anterior</span>
+              &lt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Anterior</span>
+            </button>
+
+            <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+              <button *ngIf="i + 1 === 1 || i + 1 === totalPages || (i + 1 >= currentPage - 2 && i + 1 <= currentPage + 2)"
+                (click)="goToPage(i + 1)"
+                [ngClass]="{
+                  'bg-blue-600 text-white': currentPage === i + 1,
+                  'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600': currentPage !== i + 1
+                }"
+                class="px-3 py-1 text-sm font-medium rounded-lg transition-colors">
+                {{ i + 1 }}
+              </button>
+              <span *ngIf="(i + 1 === currentPage - 3 || i + 1 === currentPage + 3) && totalPages > 5"
+                    class="text-sm text-slate-700 dark:text-slate-300">...</span>
             </ng-container>
-            
+
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Próxima Página</span>
+              &gt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Seguinte</span>
+            </button>
+
+            <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Última Página</span>
+              &gt;&gt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Última</span>
+            </button>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
