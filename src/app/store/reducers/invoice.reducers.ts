@@ -42,7 +42,10 @@ import {
   getWaterBillsByZoneIdFailure,
   getInvoiceByZoneId,
   getInvoiceByZoneIdFailure,
-  getInvoiceByZoneIdSuccess
+  getInvoiceByZoneIdSuccess, 
+  loadInvoicesByZone,
+  loadInvoicesByZoneFailure,
+  loadInvoicesByZoneSuccess
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
 import { IFile } from 'src/app/models/file';
@@ -53,6 +56,7 @@ export interface IInvoiceState extends EntityState<IInvoice> {
   isSaving: boolean;
   errorMessage: string;
   successMessage: string;
+  invoicesByZone: { zone: string; total: number }[] | null;
   invoiceError: Error | null;
   invoice: IInvoice | null;
   invoices: IInvoice[] | null;
@@ -67,6 +71,7 @@ export const initialState: IInvoiceState = adapter.getInitialState({
   isLoading: false,
   isSaving: false,
   errorMessage: '',
+  invoicesByZone: null,
   successMessage: '',
   invoiceError: null,
   invoice: null,
@@ -116,6 +121,18 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
     invoiceError: error
+  })),
+
+ on(loadInvoicesByZone, (state) => ({ ...state, isLoading: true })),
+
+  on(loadInvoicesByZoneSuccess, (state, { data }) => ({
+    ...state,
+    invoicesByZone: data,
+    error: null
+  })),
+  on(loadInvoicesByZoneFailure, (state, { error }) => ({
+    ...state,
+    error
   })),
 
   on(getInvoiceByStatus, (state) => ({ ...state, isLoading: true })),

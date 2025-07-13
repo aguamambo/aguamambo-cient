@@ -27,6 +27,7 @@ import { UploadFileComponent } from './upload-file/upload-file.component';
 import { CardUiComponent } from './card-ui/card-ui.component'; 
 import { AlertComponent } from './alert/alert.component';
 import { AlertDescriptionComponent } from './alert-description/alert-description.component';
+import { SkeletonComponent } from './components/skeleton/skeleton.component';
 
 @NgModule({
   declarations: [ 
@@ -53,7 +54,9 @@ import { AlertDescriptionComponent } from './alert-description/alert-description
     LineChartComponent, 
     UploadFileComponent,
     CardUiComponent, 
-    AlertComponent, AlertDescriptionComponent
+    AlertComponent,
+     AlertDescriptionComponent, 
+     SkeletonComponent
   ],
   imports: [
     CommonModule,
@@ -86,7 +89,8 @@ import { AlertDescriptionComponent } from './alert-description/alert-description
     UploadFileComponent,
     CardUiComponent, 
     AlertComponent, 
-    AlertDescriptionComponent
+    AlertDescriptionComponent,
+    SkeletonComponent
   ]
 })
 export class SharedModule { }

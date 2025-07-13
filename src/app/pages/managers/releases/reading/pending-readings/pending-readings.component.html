@@ -102,8 +102,15 @@
             <app-search-input  (searchChange)="filterReadings($event)"></app-search-input>
         </div>
 
-        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-            <ng-container *ngIf="readingsList.length > 0; else noData">
+        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md my-6 p-4">
+              <div *ngIf="isReadingsLoading$ | async" class="space-y-4">
+                <app-skeleton lineHeight="24px" lineWidth="30%"></app-skeleton>
+                <app-skeleton *ngFor="let i of [1,2,3,4,5]" lineHeight="20px" lineWidth="100%"></app-skeleton>
+            </div>
+
+            <h2 *ngIf="!(isReadingsLoading$ | async)" class="text-lg font-semibold mb-4">Lista de Leituras</h2>
+
+            <ng-container *ngIf="readingsList.length > 0">
                 <app-table
                     [data]="filteredReadings"
                     [columns]="readingColumns"
@@ -111,9 +118,7 @@
                     (rowClick)="editReading($event)">
                 </app-table>
             </ng-container>
-            <ng-template #noData>
-                <div class="text-center p-4">Nenhuma leitura disponível</div>
-            </ng-template>
+             
         </div>
     </div>
 </div>

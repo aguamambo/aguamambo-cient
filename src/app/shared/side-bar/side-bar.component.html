@@ -1,72 +1,71 @@
-<div class="md:block w-64 h-screen bg-light-mode dark:bg-deep-dark text-gray-600 transition duration-300 dark:text-light-mode overflow-hidden"
-     [class]="{'fixed inset-0 z-50': isSidebarOpen, 'hidden': !isSidebarOpen}">
+<div class="relative flex flex-col w-64  h-[98%] bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 shadow-lg rounded-r-2xl my-4 p-4 transition-all duration-300 ease-in-out z-30 hidden md:flex flex-shrink-0"
+ [class]="{'fixed inset-0 z-50': isSidebarOpen, 'hidden': !isSidebarOpen}">
 
-    <div class="sm:hidden flex justify-between p-4">
-        <button (click)="toggleTheme()" class="p-2">
-            <div *ngIf="!isDarkMode" class="flex justify-between px-1 w-16 rounded-2xl border border-white bg-gray-300 transition duration-300">
-                <div class="bg-white rounded-full p-0.5 shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                        <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 40q-66.85 0-113.42-46.58Q320-413.15 320-480t46.58-113.42Q413.15-640 480-640t113.42 46.58Q640-546.85 640-480t-46.58 113.42Q546.85-320 480-320ZM200-460H60v-40h140v40Zm700 0H760v-40h140v40ZM460-760v-140h40v140h-40Zm0 700v-140h40v140h-40ZM269.85-663.85l-86.39-83.92 27.77-29.77 84.46 85.39-25.84 28.3Zm478.92 481.39-84.69-85.62 26.07-28.07 86.39 83.92-27.77 29.77Zm-84.92-507.69 83.92-86.39 29.77 27.77-85.39 84.46-28.3-25.84ZM182.46-211.23l85.62-84.69 26.54 26.07-83.16 87.16-29-28.54ZM480-480Z" />
-                    </svg>
-                </div>
-                <span></span>
-            </div>
-            <div *ngIf="isDarkMode" class="flex justify-between px-1 w-16 rounded-2xl  border border-blue-800 bg-blue-800 transition duration-300">
-                <span></span>
-                <div class="bg-white rounded-full p-0.5 shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#4e4e4e">
-                        <path d="M482.31-160q-133.34 0-226.67-93.33-93.33-93.34-93.33-226.67 0-121.54 79.23-210.77t196.15-105.38q3.23 0 6.35.23 3.11.23 6.11.69-20.23 28.23-32.03 62.81-11.81 34.57-11.81 72.42 0 106.67 74.66 181.33Q555.64-404 662.31-404q38.07 0 72.54-11.81 34.46-11.81 61.92-32.04.46 3 .69 6.12.23 3.11.23 6.35-15.38 116.92-104.61 196.15T482.31-160Zm0-40q88 0 158-48.5t102-126.5q-20 5-40 8t-40 3q-123 0-209.5-86.5T366.31-660q0-20 3-40t8-40q-78 32-126.5 102t-48.5 158q0 116 82 198t198 82Zm-10-270Z" />
-                    </svg>
-                </div>
+    <div class="sm:hidden flex justify-end p-4">
+        <!-- Theme Toggle Button -->
+        <button (click)="toggleTheme()" class="relative w-14 h-8 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-300"
+                [ngClass]="{'bg-gray-300': !isDarkMode, 'bg-blue-600': isDarkMode}">
+            <div class="absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300"
+                 [ngClass]="{'translate-x-0': !isDarkMode, 'translate-x-6': isDarkMode}">
+                <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-gray-700">
+                    <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 40q-66.85 0-113.42-46.58Q320-413.15 320-480t46.58-113.42Q413.15-640 480-640t113.42 46.58Q640-546.85 640-480t-46.58 113.42Q546.85-320 480-320ZM200-460H60v-40h140v40Zm700 0H760v-40h140v40ZM460-760v-140h40v140h-40Zm0 700v-140h40v140h-40ZM269.85-663.85l-86.39-83.92 27.77-29.77 84.46 85.39-25.84 28.3Zm478.92 481.39-84.69-85.62 26.07-28.07 86.39 83.92-27.77 29.77Zm-84.92-507.69 83.92-86.39 29.77 27.77-85.39 84.46-28.3-25.84ZM182.46-211.23l85.62-84.69 26.54 26.07-83.16 87.16-29-28.54ZM480-480Z" />
+                </svg>
+                <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-gray-700">
+                    <path d="M482.31-160q-133.34 0-226.67-93.33-93.33-93.34-93.33-226.67 0-121.54 79.23-210.77t196.15-105.38q3.23 0 6.35.23 3.11.23 6.11.69-20.23 28.23-32.03 62.81-11.81 34.57-11.81 72.42 0 106.67 74.66 181.33Q555.64-404 662.31-404q38.07 0 72.54-11.81 34.46-11.81 61.92-32.04.46 3 .69 6.12.23 3.11.23 6.35-15.38 116.92-104.61 196.15T482.31-160Zm0-40q88 0 158-48.5t102-126.5q-20 5-40 8t-40 3q-123 0-209.5-86.5T366.31-660q0-20 3-40t8-40q-78 32-126.5 102t-48.5 158q0 116 82 198t198 82Zm-10-270Z" />
+                </svg>
             </div>
         </button>
     </div>
 
-    <div class="w-full flex justify-center items-center py-3 border-b">
+    <div class="w-full flex justify-center items-center py-4 px-4 border-b border-gray-200 dark:border-gray-700">
         <a class="flex justify-center items-center gap-4">
-            <img [src]="logo" class="w-full" alt="Sidebar Logo" />
+            <img [src]="logo" class="w-full max-h-12 object-contain" alt="Sidebar Logo" />
         </a>
     </div>
-    <div class="py-4 space-y-2 overflow-y-auto overflow-auto scrollbar-custom max-h-[calc(100vh-96px)]">
+    <div class="py-4 space-y-2 overflow-y-auto scrollbar-custom max-h-[calc(100vh-96px)]">
 
-    <ul>
+    <ul class="pl-2">
         <li *ngFor="let menu of menuItems; let i = index;">
-            <div class="flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 hover:border-r hover:border-blue-800"
+            <div class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 ease-in-out group relative rounded-md"
                  (click)="toggleSubMenu(menu)">
-                <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="currentColor">
+                <!-- Half-height, centered left border on hover for main menu items -->
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-indigo-600 dark:bg-indigo-400 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-150 ease-in-out rounded-r-sm"></div>
+                <div class="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
                         <path [attr.d]="menu.icon"/>
                     </svg>
-                    <span class="font-medium">{{ menu.label }}</span>
+                    <span class="font-semibold">{{ menu.label }}</span>
                 </div>
                 <ng-container *ngIf="menu.subMenu">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                         class="w-5 h-5 transition-transform duration-300" [ngClass]="{'rotate-180': menu.isOpen}">
-                        <path d="M19 9l-7 7-7-7" />
+                          class="w-5 h-5 transition-transform duration-300" [ngClass]="{'rotate-180': menu.isOpen}">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </ng-container>
             </div>
 
-            <ul *ngIf="menu.isOpen && menu.subMenu" class="transition duration-300">
-                <li *ngFor="let subMenu of menu.subMenu" 
-                    >
-                    <div class="flex items-center justify-between hover:cursor-pointer py-2 hover:bg-gray-300 dark:hover:bg-gray-500 hover:border-r hover:border-blue-800 px-8 transition duration-100" (click)="toggleSecondLevelSubMenu(subMenu)">
-                        <a [routerLink]="subMenu.url" class="block pl-8">{{ subMenu.label }}</a>
+            <ul *ngIf="menu.isOpen && menu.subMenu" class="transition-all duration-300 ease-in-out">
+                <li *ngFor="let subMenu of menu.subMenu">
+                    <div class="flex items-center justify-between hover:cursor-pointer py-2 px-8 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 ease-in-out group relative rounded-md" (click)="toggleSecondLevelSubMenu(subMenu)">
+                        <!-- Half-height, centered left border on hover for second-level sub-menu items -->
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-indigo-600 dark:bg-indigo-400 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-150 ease-in-out rounded-r-sm"></div>
+                        <a [routerLink]="subMenu.url" class="block flex-1">{{ subMenu.label }}</a>
                         <ng-container *ngIf="subMenu.subMenuOptions">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                 class="w-5 h-5 transition-transform duration-300 pl-2" [ngClass]="{'rotate-180': subMenu.isOpen}">
-                                <path d="M19 9l-7 7-7-7" />
+                                  class="w-5 h-5 transition-transform duration-300 ml-2" [ngClass]="{'rotate-180': subMenu.isOpen}">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </ng-container>
                     </div>
  
-                    <ul *ngIf="subMenu.isOpen && subMenu.subMenuOptions" class="flex flex-col gap-2 pl-20 dark:border-gray-700 border-gray-400">
+                    <ul *ngIf="subMenu.isOpen && subMenu.subMenuOptions" class="flex flex-col gap-1 pl-12 border-l border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out">
                         <li *ngFor="let option of subMenu.subMenuOptions"
-                            class=" w-full hover:bg-blue-200 dark:hover:bg-gray-600 transition duration-300 hover:cursor-pointer"
-                            routerLinkActive="dark:bg-slate-400 font-semibold text-white bg-blue-500">
+                            class="w-full hover:bg-indigo-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out rounded-md group relative"
+                            routerLinkActive="bg-indigo-100 dark:bg-indigo-700 text-indigo-800 dark:text-white font-semibold">
                             
-                             
-                            <a *ngIf="!option.restrict" [routerLink]="option.url" class="block w-full h-full py-1 px-1">
+                            <a *ngIf="!option.restrict" [routerLink]="option.url" class="block w-full h-full py-2 px-4 relative">
+                                <!-- Half-height, centered left border on hover -->
+                                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-indigo-600 dark:bg-indigo-400 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-150 ease-in-out rounded-r-sm"></div>
                                 {{ option.label }}
                             </a>
                         </li>

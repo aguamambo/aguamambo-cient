@@ -20,6 +20,7 @@ import { UserComponent } from './components/user/user.component';
 import { ZoneComponent } from './components/zone/zone.component';
 import { ReactiveFormsModule } from '@angular/forms'; 
 import { ContractsModule } from './contracts/contracts.module';
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 
 
@@ -44,6 +45,7 @@ import { ContractsModule } from './contracts/contracts.module';
     ManagersRoutingModule,
     SharedModule,
     ReactiveFormsModule,
+    NgApexchartsModule,
     ParameterisationModule,
     TreasuryModule,
     ReleasesModule,

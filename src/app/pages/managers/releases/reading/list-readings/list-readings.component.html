@@ -75,15 +75,11 @@
     </div>
 
     <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
-        <h2 class="text-lg font-semibold mb-4">Lista de Leituras</h2>
 
         <div class="grid grid-cols-4 px-6 w-full gap-4">
             <app-custom-drop-down label="Bairro" [options]="zoneData" (selectionChange)="filterByZone($event)">
             </app-custom-drop-down>
 
-            <!-- <app-custom-drop-down label="Estado da Leitura" [options]="statusData"
-                (selectionChange)="filterByState($event)">
-            </app-custom-drop-down> -->
 
             <div class="w-full ">
                 <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">
@@ -92,13 +88,22 @@
                 <app-search-input (searchChange)="filterReadings($event)"></app-search-input>
             </div>
             <div *ngIf="filteredReadings.length > 0 && enableExport" class="flex items-end justify-end py-4 w-full ">
-                <button (click)="exportExcel()" class="bg-green-500 text-white py-2 px-6 rounded ml-2">Exportar Excel</button>
+                <button (click)="exportExcel()" class="bg-green-500 text-white py-2 px-6 rounded ml-2">Exportar
+                    Excel</button>
             </div>
 
         </div>
 
-        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-            <ng-container *ngIf="filteredReadings.length > 0; else noData">
+        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md my-6 p-4">
+
+            <div *ngIf="isReadingsLoading$ | async" class="space-y-4">
+                <app-skeleton lineHeight="24px" lineWidth="30%"></app-skeleton>
+                <app-skeleton *ngFor="let i of [1,2,3,4,5]" lineHeight="20px" lineWidth="100%"></app-skeleton>
+            </div>
+
+            <h2 *ngIf="!(isReadingsLoading$ | async)" class="text-lg font-semibold mb-4">Lista de Leituras</h2>
+
+            <ng-container *ngIf="filteredReadings && filteredReadings.length > 0">
 
                 <app-table [data]="filteredReadings" [columns]="readingColumnsWithCheckbox"
                     [totalCount]="filteredReadings.length" (rowClick)="editReading($event)">
@@ -109,9 +114,7 @@
                 </app-table>
 
             </ng-container>
-            <ng-template #noData>
-                <div class="text-center p-4">Nenhuma leitura disponível</div>
-            </ng-template>
+            
         </div>
     </div>
 </div>

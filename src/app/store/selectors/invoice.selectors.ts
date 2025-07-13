@@ -43,6 +43,10 @@ export const selectInvoiceSuccessMessage = createSelector(
   (state) => state.successMessage
 );
 
+export const selectInvoicesByZone  = createSelector(
+ selectInvoiceState,
+  (invoiceState) => invoiceState.invoicesByZone
+);
 
 export const selectInvoiceCount = createSelector(
   selectInvoiceState,

@@ -1,30 +1,40 @@
-<div class="p-6 border-2 border-dashed rounded-md border-gray-400 w-full">
+<div class="p-6 border-2 border-dashed rounded-xl border-gray-300 w-full max-w-lg bg-white shadow-lg">
   <div (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
-    [ngClass]="{'bg-gray-100': isDragging}"
-    class="flex flex-col items-center gap-4 justify-center p-8 border-2 border-dashed rounded-md border-gray-400 transition duration-200 ease-in-out text-gray-400">
-    <svg xmlns="http://www.w3.org/2000/svg" height="50px" viewBox="0 -960 960 960" width="50px" fill="currentColor">
+    [ngClass]="{'drag-area-active': isDragging}"
+    class="flex flex-col items-center gap-4 justify-center p-8 border-2 border-dashed rounded-xl border-gray-300 transition duration-200 ease-in-out text-gray-400 hover:border-blue-400 hover:text-blue-600 cursor-pointer">
+    <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" height="50px" viewBox="0 -960 960 960" width="50px" fill="currentColor">
       <path
         d="M460-249.23h40V-437l84 84 28.31-28.54L480-513.85 347.69-381.54l28.54 28.31L460-437v187.77ZM264.62-120q-27.62 0-46.12-18.5Q200-157 200-184.62v-590.76q0-27.62 18.5-46.12Q237-840 264.62-840H580l180 180v475.38q0 27.62-18.5 46.12Q723-120 695.38-120H264.62ZM560-640v-160H264.62q-9.24 0-16.93 7.69-7.69 7.69-7.69 16.93v590.76q0 9.24 7.69 16.93 7.69 7.69 16.93 7.69h430.76q9.24 0 16.93-7.69 7.69-7.69 7.69-16.93V-640H560ZM240-800v160-160 640-640Z" />
     </svg>
-    <p class="text-gray-400">Arraste e solte o ficheiro aqui</p>
-    <p class="text-gray-400">ou</p>
-    <label for="fileInput" class="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded cursor-pointer">
+    <p class="text-lg font-medium">Arraste e solte o ficheiro aqui</p>
+    <p class="text-sm">ou</p>
+    <label for="fileInput"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full cursor-pointer shadow-md transition duration-200 ease-in-out transform hover:scale-105">
       Selecionar ficheiro
     </label>
     <input id="fileInput" type="file" (change)="onFileSelected($event)" class="hidden" />
-    <p *ngIf="selectedFile" class="mt-4 text-sm text-gray-500">
-      Ficheiro selecionado: {{ selectedFile.name }}
+    <p *ngIf="selectedFile" class="mt-4 text-sm text-gray-600 flex items-center gap-2">
+      Ficheiro selecionado: <span class="font-semibold text-primary">{{ selectedFile.name }}</span>
+      <button (click)="removeFile()" class="text-red-500 hover:text-red-700 focus:outline-none">
+        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
+          <path d="m251.33-204.67-46.66-46.66L433.33-480 204.67-708.67l46.66-46.66L480-526.67l228.67-228.66 46.66 46.66L526.67-480l228.66 228.67-46.66 46.66L480-433.33-251.33Z"/>
+        </svg>
+      </button>
     </p>
   </div>
-  <div class="mt-4 flex justify-center">
+
+  <div class="mt-6 flex justify-center">
     <button (click)="onUpload()" [disabled]="!selectedFile"
-      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">
+      class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full shadow-md transition duration-200 ease-in-out transform hover:scale-105"
+      [ngClass]="{'cursor-not-allowed opacity-50': !selectedFile, 'cursor-pointer': selectedFile}">
       Submeter
     </button>
   </div>
-  <div *ngIf="uploadProgress > 0" class="mt-4">
-    <div class="bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-      <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="uploadProgress"></div>
+
+  <div *ngIf="selectedFile && uploadProgress > 0 && uploadProgress < 100" class="mt-6">
+    <div class="text-sm font-medium text-gray-700 mb-1">Progresso do upload: <span>{{ uploadProgress }}%</span></div>
+    <div class="w-full bg-gray-200 rounded-full h-3 dark:bg-gray-700 overflow-hidden">
+      <div class="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out" [style.width.%]="uploadProgress"></div>
     </div>
   </div>
 </div>

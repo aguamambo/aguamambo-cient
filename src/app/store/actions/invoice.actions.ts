@@ -20,6 +20,20 @@ export const getInvoiceFailure = createAction(
   props<{ error: Error }>()
 );
 
+export const loadInvoicesByZone = createAction(
+  '[Invoice] Load Invoices By Zone' 
+);
+
+export const loadInvoicesByZoneSuccess = createAction(
+  '[Invoice] Load Invoices By Zone Success',
+ props<{ data: { zone: string, total: number }[] }>()
+);
+
+export const loadInvoicesByZoneFailure = createAction(
+  '[Invoice] Load Invoices By Zone Failure',
+  props<{ error: Error }>()
+);
+
 // GET invoices/{readingId}
 export const getInvoiceByReadingId = createAction(
   '[Invoice] Get Invoice By Reading',

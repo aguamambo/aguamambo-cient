@@ -1,0 +1,11 @@
+<div *ngIf="circle; else linesTemplate"
+     class="animate-pulse rounded-full bg-gray-300 dark:bg-gray-700"
+     [ngStyle]="{ width: circleSize, height: circleSize }">
+</div>
+
+<ng-template #linesTemplate>
+  <div *ngFor="let _ of [].constructor(lines)"
+       class="animate-pulse rounded bg-gray-300 dark:bg-gray-700 mb-2"
+       [ngStyle]="{ height: lineHeight, width: lineWidth }">
+  </div>
+</ng-template>
