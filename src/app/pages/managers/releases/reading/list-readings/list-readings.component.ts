@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, filter, first, takeUntil, delay } from "rxjs";
 import { IOption } from "src/app/models/option";
@@ -26,17 +26,18 @@ import {
   selectExportedReadingFile,
 } from "src/app/store/selectors/reading.selectors";
 import { selectSelectedZones } from "src/app/store/selectors/zone.selectors";
+import { GenericConfig } from "src/app/core/config/generic.config"; // Import GenericConfig
 
 @Component({
   selector: "app-list-readings",
   templateUrl: "./list-readings.component.html",
+  styleUrls: ["./list-readings.component.css"],
 })
 export class ListReadingsComponent implements OnInit, OnDestroy {
   readingForm: FormGroup;
   readingsList: IReading[] = [];
   readingsData: IReading[] = []; // All raw readings from the store
   selectedReadings: IReading[] = [];
-  // filteredReadings will now be a getter that applies all filters
   selectedZone = "";
   selectedState = "";
   monthsData: IOption[] = [];
@@ -77,6 +78,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     private _fb: FormBuilder,
     private store: Store<IAppState>,
     private fileService: FileHandlerService,
+    private genericConfig: GenericConfig, // Inject GenericConfig
   ) {
     this.readingForm = this._fb.group({
       readingMonth: ["", Validators.required],
@@ -109,7 +111,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   }
 
   private loadData(): void {
-    this.generateMonths();
+    this.monthsData = this.genericConfig.generateMonths(); // Use GenericConfig to get months
     this.statusData = [
       { label: "Seleccione...", value: "" },
       { label: "PENDENTE", value: "PENDING" },
@@ -149,12 +151,8 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.store.pipe(select(selectSelectedReadings), takeUntil(this.destroy$)).subscribe((readings) => {
       if (readings) {
         this.readingsList = readings;
-        this.readingsData = readings.map((reading) => ({
-          ...reading,
-          createdAt: this.formatDate(reading.createdAt),
-          updatedAt: this.formatDate(reading.updatedAt),
-          state: this.translateState(reading.state),
-        }));
+        // Store raw readings in readingsData to use original values for patching
+        this.readingsData = readings;
         this.updatePagination(); // Update pagination when readingsData changes
       }
     });
@@ -176,13 +174,13 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
   getStatusColor(status: string): string {
     switch (status.toLowerCase()) {
       case "aprovado":
-      case "completed":
+      case "approved": // Use original value for consistency
         return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
       case "pendente":
-      case "pending":
+      case "pending": // Use original value for consistency
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
       case "cancelado":
-      case "cancelled":
+      case "canceled": // Use original value for consistency
         return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
@@ -242,12 +240,12 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.isEditing = true;
     this.selectedReading = reading;
     this.readingForm.patchValue({
-      readingMonth: reading.readingMonth,
+      readingMonth:  this.monthsData.find(month => month.value === reading.readingMonth.toString())?.label, 
       currentReading: reading.currentReading,
-      counter: reading.meterId, // Make sure 'counter' matches 'meterId'
+      counter: reading.meterId,
       lastReading: reading.previousReading,
       readingYear: reading.readingYear,
-      state: this.getStatusLabel(reading.state), // Use translated state
+      state: reading.state, // Patch with the original state value (e.g., "PENDING"), not the translated label
     });
     this.setFormControlState(true);
   }
@@ -260,10 +258,10 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
       this.readingForm.controls["lastReading"].enable();
 
       const payload = {
-        readingMonth: this.readingForm.get("readingMonth")?.value, // Use form value
-        currentReading: this.readingForm.get("currentReading")?.value, // Use form value
-        readingYear: this.readingForm.get("readingYear")?.value, // Use form value
-        state: this.readingForm.get("state")?.value, // Use form value
+        readingMonth: this.readingForm.get("readingMonth")?.value,
+        currentReading: this.readingForm.get("currentReading")?.value,
+        readingYear: this.readingForm.get("readingYear")?.value,
+        state: this.readingForm.get("state")?.value,
       };
 
       this.store.dispatch(updateReading({ readingId: this.selectedReading.readingId, reading: payload }));
@@ -275,7 +273,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
         this.isEditing = false;
         this.readingForm.reset();
         this.setFormControlState(false);
-        this.loadData(); // Reload data to reflect changes
+        this.getAllReadings(); // Reload data to reflect changes
       });
     }
   }
@@ -310,12 +308,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
         .subscribe((readings) => {
           if (readings) {
             this.readingsList = readings; // Update readingsList
-            this.readingsData = readings.map((reading) => ({
-              ...reading,
-              createdAt: this.formatDate(reading.createdAt),
-              updatedAt: this.formatDate(reading.updatedAt),
-              state: this.translateState(reading.state),
-            }));
+            this.readingsData = readings; // Store raw readings
             this.enableExport = true;
             this.updatePagination(); // Update pagination after applying zone filter
           }
@@ -355,18 +348,6 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     return this.selectedReadings.length > 0 && !this.isAllSelected();
   }
 
-  deleteSelected(): void {
-    if (this.selectedReadings.length === 0) return;
-    // Dispatch an action to delete readings by their IDs
-    console.log("Deleting selected readings:", this.selectedReadings.map(r => r.readingId));
-    // Example: this.store.dispatch(deleteReadings({ ids: this.selectedReadings.map(r => r.readingId) }));
-
-    // For now, simulate deletion and update local data
-    this.readingsData = this.readingsData.filter(r => !this.selectedReadings.includes(r));
-    this.selectedReadings = [];
-    this.updatePagination();
-  }
-
   onNumberInputChange(inputElement: HTMLInputElement): void {
     inputElement.value = inputElement.value.replace(/[^0-9]/g, "");
   }
@@ -380,23 +361,7 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
     this.currentPage = 1; // Reset to first page on search change
     this.updatePagination(); // Re-calculate pagination based on new filters
   }
-
-  generateMonths(): void {
-    this.monthsData = [
-      { value: "1", label: "Janeiro" },
-      { value: "2", label: "Fevereiro" },
-      { value: "3", label: "Março" },
-      { value: "4", label: "Abril" },
-      { value: "5", label: "Maio" },
-      { value: "6", label: "Junho" },
-      { value: "7", label: "Julho" },
-      { value: "8", label: "Agosto" },
-      { value: "9", label: "Setembro" },
-      { value: "10", label: "Outubro" },
-      { value: "11", label: "Novembro" },
-      { value: "12", label: "Dezembro" },
-    ];
-  }
+ 
 
   private formatDate(date: string): string {
     const d = new Date(date);
@@ -412,14 +377,6 @@ export class ListReadingsComponent implements OnInit, OnDestroy {
 
   get filteredReadings(): IReading[] {
     let readings = this.readingsData;
-
-    // Apply zone filter
-    // if (this.selectedZoneId && this.selectedZoneId !== "AZN") {
-    //   readings = readings.filter(reading => {
-    //     const zone = this.zones.find(z => z.zoneId === this.selectedZoneId);
-    //     return zone && reading === zone.designation.toUpperCase();
-    //   });
-    // }
 
     // Apply search term filter
     if (this.searchTerm) {

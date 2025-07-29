@@ -163,7 +163,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private loadCounts(): void {
-    this.store.dispatch(loadInvoicesByZone());
+    // this.store.dispatch(loadInvoicesByZone());
     this.store.dispatch(loadCutsCount());
     this.store.dispatch(loadClientsCount());
     this.store.dispatch(loadReadingsCount());

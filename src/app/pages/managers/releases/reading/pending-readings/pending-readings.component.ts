@@ -104,6 +104,7 @@ export class PendingReadingsComponent implements OnInit, OnDestroy {
         this.readingsList = readings;
         this.readingsData = readings.map(reading => ({
           ...reading,
+          active: true,
           createdAt: this.formatDate(reading.createdAt),
           updatedAt: this.formatDate(reading.updatedAt),
           state: this.translateState(reading.state) // Ensure state is translated for display

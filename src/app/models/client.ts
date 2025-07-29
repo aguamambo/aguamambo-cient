@@ -6,7 +6,9 @@ export interface IClient {
     nuit: string;
     balance: number;
     contractStatus: number;
-    exemptFromFines: true;
+    exemptFromFines: boolean;
+     wantsReceiptSMS: boolean;
+    wantsInvoiceSMS: boolean;
     contractTypeId: string;
     contractId: string;
     contractType: string;

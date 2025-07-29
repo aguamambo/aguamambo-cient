@@ -1,70 +1,239 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
-    <app-breadcrumb title="Registar Nova Suspensão"
-        [breadcrumbItems]="['Dashboard', 'Registar Suspensão']"></app-breadcrumb>
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-screen">
+  <div class="mx-auto px-4 py-8 space-y-6">
 
-    <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[40vh] h-full rounded-lg shadow-md p-4">
-        <ng-container *ngIf="(isZonesLoading$ | async) || (isEnterprisesLoading$ | async) || (isClientLoading$ | async) || (isSuspensionSaving$ | async)">
-            <div class="flex flex-col justify-center my-4 gap-1">
-              <app-loading-spinner></app-loading-spinner>
-              <span class="flex justify-center text-sm">
-                <ng-container *ngIf="(isSuspensionSaving$ | async); else loadingData">
-                  Salvando a suspensão
-                </ng-container>
-                <ng-template #loadingData>
-                  Carregando dados
-                </ng-template>
-              </span>
-            </div>
-          </ng-container>
-      
-
-        <form [formGroup]="registSuspensionForm" class=" py-4 dark:bg-deep-dark ">
-
-            <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
-                <div class="w-full">
-                    <app-autocomplete-input label="Empresa" [dataSource]="enterpriseData"
-                        (valueSelected)="onValueSelected($event)">
-                    </app-autocomplete-input>
-                </div>
-
-                <div class="w-full">
-                    <app-autocomplete-input label="Zona" [dataSource]="ZoneData"
-                        (valueSelected)="onEnterpriseSelect($event)">
-                    </app-autocomplete-input>
-                </div>
-                <div class="w-full">
-                    <app-autocomplete-input label="Cliente" [dataSource]="clientsData" (valueSelected)="onClientSelect($event)">
-                    </app-autocomplete-input>
-                </div>
-            </div>
-            <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contador</label>
-                    <app-custom-drop-down
-                        [options]="clientMetersData"
-                    (selectionChange)="onMeterSeclected($event)"> 
-                    </app-custom-drop-down>
-                </div>
-
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Data
-                        Início</label>
-                    <app-date-picker formControlName="startDate"></app-date-picker>
-                </div> 
-                <div class="w-full">
-                    <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Ano
-                        Económico</label>
-                    <span
-                        class=" text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10">{{year}}
-                    </span>
-                </div>
-            </div>
-
-        </form>
-
-        <div class="w-full flex items-center justify-end p-4">
-            <button (click)="saveSuspension()"
-                class="w-full md:w-1/4 bg-blue-600 py-2 text-light-mode rounded-full sm:rounded-lg">Submeter</button>
-        </div>
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div class="w-8 h-8 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        <ng-container *ngIf="isSubmitting; else loadingData">
+          Salvando a suspensão
+        </ng-container>
+        <ng-template #loadingData>
+          Carregando dados
+        </ng-template>
+      </p>
     </div>
+
+    <!-- Main Content -->
+    <div *ngIf="!isLoading" class="space-y-6">
+
+      <!-- Header Section -->
+      <div class="space-y-4">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm">
+          <a href="/dashboard"
+            class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Dashboard
+          </a>
+          <span class="text-slate-400 dark:text-slate-500">/</span>
+          <span class="font-medium text-slate-900 dark:text-slate-100">Registar Nova Suspensão</span>
+        </nav>
+
+        <!-- Page Title -->
+        <div class="flex items-center space-x-3 p-4">
+          <div class="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M18.364 18.364A9 9 0 0012 3V1m-6.062 4.938A9 9 0 0012 21v-1m-4.938-6.062H3m18 0h-1M6 12H4m16 0h-2m-8-8V4m0 16v-2m4-4h2m-2-4h-2m-4 4v2m0-2v-2"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Registar Nova Suspensão</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              Adicione um novo registo de suspensão
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Card -->
+      <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0 p-4">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Dados da Suspensão</h2>
+            <div
+              class="flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-xs text-slate-600 dark:text-slate-300">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ currentDate | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <form [formGroup]="registSuspensionForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+
+            <!-- Enterprise, Zone, Client Selection -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  Empresa
+                </label>
+                <select formControlName="enterprise" (change)="onEnterpriseChange($event)"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <option value="">Seleccione a empresa</option>
+                  <option *ngFor="let enterprise of enterpriseData" [value]="enterprise.value">
+                    {{ enterprise.label }}
+                  </option>
+                </select>
+                <div *ngIf="registSuspensionForm.get('enterprise')?.invalid && registSuspensionForm.get('enterprise')?.touched"
+                  class="text-red-500 text-xs mt-1">
+                  Empresa é obrigatória.
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  Zona
+                </label>
+                <select formControlName="zone" (change)="onZoneChange($event)"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <option value="">Seleccione a zona</option>
+                  <option *ngFor="let zone of ZoneData" [value]="zone.value">
+                    {{ zone.label }}
+                  </option>
+                </select>
+                <div *ngIf="registSuspensionForm.get('zone')?.invalid && registSuspensionForm.get('zone')?.touched"
+                  class="text-red-500 text-xs mt-1">
+                  Zona é obrigatória.
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Cliente
+                </label>
+                <select formControlName="client" (change)="onClientChange($event)"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <option value="">Seleccione o cliente</option>
+                  <option *ngFor="let client of clientsData" [value]="client.value">
+                    {{ client.label }}
+                  </option>
+                </select>
+                <div *ngIf="registSuspensionForm.get('client')?.invalid && registSuspensionForm.get('client')?.touched"
+                  class="text-red-500 text-xs mt-1">
+                  Cliente é obrigatório.
+                </div>
+              </div>
+            </div>
+
+            <!-- Meter, Start Date, Reason, Year -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  Contador
+                </label>
+                <select formControlName="meterId" (change)="onMeterSelected($event)"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <option value="">Seleccione o contador</option>
+                  <option *ngFor="let meterOption of clientMetersData" [value]="meterOption.value">
+                    {{ meterOption.label }}
+                  </option>
+                </select>
+                <div *ngIf="registSuspensionForm.get('meterId')?.invalid && registSuspensionForm.get('meterId')?.touched"
+                  class="text-red-500 text-xs mt-1">
+                  Contador é obrigatório.
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  Data Início
+                </label>
+                <input type="date" formControlName="startDate"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <div *ngIf="registSuspensionForm.get('startDate')?.invalid && registSuspensionForm.get('startDate')?.touched"
+                  class="text-red-500 text-xs mt-1">
+                  Data de Início é obrigatória.
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                  </svg>
+                  Motivo da Suspensão
+                </label>
+                <input type="text" formControlName="suspensionReason" placeholder="Digite o motivo da suspensão"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <div *ngIf="registSuspensionForm.get('suspensionReason')?.invalid && registSuspensionForm.get('suspensionReason')?.touched"
+                  class="text-red-500 text-xs mt-1">
+                  Motivo da Suspensão é obrigatório.
+                </div>
+              </div>
+            </div>
+
+            <!-- Year and Month Selection -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  Ano Económico
+                </label>
+                <select formControlName="readingYear" [(ngModel)]="selectedYear"
+                  class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <option *ngFor="let yearOption of yearsData" [value]="yearOption.value">
+                    {{ yearOption.label }}
+                  </option>
+                </select>
+                <div *ngIf="registSuspensionForm.get('readingYear')?.invalid && registSuspensionForm.get('readingYear')?.touched"
+                  class="text-red-500 text-xs mt-1">
+                  Ano Económico é obrigatório.
+                </div>
+              </div>
+ 
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end pt-6">
+              <button type="submit" [disabled]="!isFormValid() || isSubmitting"
+                class="min-w-[200px] h-11 px-6 font-medium rounded-md transition-all duration-200 flex items-center justify-center gap-2"
+                [class]="isFormValid() && !isSubmitting
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
+                  : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'">
+
+                <span *ngIf="!isSubmitting">Submeter Suspensão</span>
+                <span *ngIf="isSubmitting" class="flex items-center gap-2">
+                  <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Processando...
+                </span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,127 +1,415 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300 h-full">
-  <app-breadcrumb 
-      title="Lista de Clientes" 
-      [breadcrumbItems]="['Dashboard', 'Listar Clientes']">
-  </app-breadcrumb>
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-screen">
+    <div class=" px-4 py-8 space-y-6">
 
-  <ng-container *ngIf="(isClientLoading$ | async) || (isClientSaving$ | async)">
-      <div class="flex flex-col justify-center my-4 gap-1">
-          <app-loading-spinner></app-loading-spinner>
-          <span class="flex justify-center text-sm">
-              <ng-container *ngIf="(isClientSaving$ | async); else loadingData">
-                  Salvando a leitura
-              </ng-container>
-              <ng-template #loadingData>
-                  Carregando dados
-              </ng-template>
-          </span>
-      </div>
-  </ng-container>
- 
-  <div class="w-full bg-light-mode dark:bg-deep-dark p-6 mt-6 rounded-md shadow-md">
-      <h3 class="text-lg font-semibold mb-4">Editar Cliente</h3>
-      <form [formGroup]="generalForm">
-          <div class="flex flex-col sm:grid sm:grid-cols-3 w-full gap-4 items-center">
-              
-              <div class="w-full">
-                  <label for="clientId" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Código</label>
-                  <input formControlName="clientId" id="clientId" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-              </div>
+        <!-- Breadcrumb and Page Header -->
+        <div class="space-y-4">
+            <nav class="flex items-center space-x-2 text-sm">
+                <a href="/dashboard"
+                    class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Dashboard
+                </a>
+                <span class="text-slate-400 dark:text-slate-500">/</span>
+                <span class="font-medium text-slate-900 dark:text-slate-100">Lista de Clientes</span>
+            </nav>
 
-              <div class="w-full">
-                  <label for="name" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Nome</label>
-                  <input formControlName="name" id="name" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-              </div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Lista de Clientes</h1>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">
+                            Gerir e visualizar todos os clientes registados
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-              <div class="w-full">
-                  <label for="phoneNumber" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contacto</label>
-                  <input formControlName="phoneNumber" id="phoneNumber" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-              </div>
+        <!-- Loading Spinner -->
+        <ng-container *ngIf="(isClientLoading$ | async) || (isClientSaving$ | async)">
+            <div class="flex flex-col justify-center my-4 gap-1">
+                <div class="flex justify-center">
+                    <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                </div>
+                <span class="flex justify-center text-sm text-slate-600 dark:text-slate-400">
+                    <ng-container *ngIf="(isClientSaving$ | async); else loadingData">
+                        Salvando dados do cliente...
+                    </ng-container>
+                    <ng-template #loadingData>
+                        Carregando dados dos clientes...
+                    </ng-template>
+                </span>
+            </div>
+        </ng-container>
 
-              <div class="w-full">
-                  <label for="address" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Endereço</label>
-                  <input formControlName="address" id="address" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-              </div>
+        <!-- Edit Client Form -->
+        <div *ngIf="isEditing"
+            class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                        </path>
+                    </svg>
+                    Editar Cliente
+                </h2>
+                <button (click)="cancelEdit()"
+                    class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
 
-              <div class="w-full">
-                  <label for="nuit" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">NUIT</label>
-                  <input formControlName="nuit" id="nuit" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-              </div>
+            <form [formGroup]="generalForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label for="clientId"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Código</label>
+                        <input formControlName="clientId" id="clientId" readonly
+                            class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-not-allowed">
+                    </div>
 
-              <div class="w-full">
-                  <label for="balance" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Saldo</label>
-                  <input formControlName="balance" id="balance" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-              </div>
+                    <div class="space-y-2">
+                        <label for="name"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nome</label>
+                        <input formControlName="name" id="name"
+                            class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <div *ngIf="generalForm.get('name')?.invalid && generalForm.get('name')?.touched"
+                            class="text-red-500 text-xs mt-1">
+                            Nome é obrigatório.
+                        </div>
+                    </div>
 
-              <div class="w-full">
-                  <label for="contractStatus" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Estado do Contracto</label>
-                  <input formControlName="contractStatus" id="contractStatus" class="text-gray-900 bg-gray-300 dark:bg-gray-400 text-sm rounded-lg block w-full p-2.5 pr-10" />
-              </div>
- 
+                    <div class="space-y-2">
+                        <label for="phoneNumber"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Contacto</label>
+                        <input formControlName="phoneNumber" id="phoneNumber" #phoneNumberInput
+                            (input)="onNumberInputChange(phoneNumberInput)"
+                            class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <div *ngIf="generalForm.get('phoneNumber')?.invalid && generalForm.get('phoneNumber')?.touched"
+                            class="text-red-500 text-xs mt-1">
+                            Contacto é obrigatório e deve conter apenas números.
+                        </div>
+                    </div>
+                </div>
 
-              <div class="w-full">
-                <label for="contractType" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Tipo de Contrato</label>
-                <app-custom-select formControlName="contractTypeId" id="contractType" [options]="contractTypeData" 
-                    (selectedValueChange)="onContractTypeSelect($event)">
-                </app-custom-select>
-              </div>
-              
-              <div class="w-full">
-                <label for="zone" class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Zona</label>
-                <app-custom-select formControlName="zoneId" id="zone" [options]="zoneData" 
-                    (selectedValueChange)="onZoneSelect($event)">
-                </app-custom-select>
-              </div>
-              
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label for="address"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Endereço</label>
+                        <input formControlName="address" id="address"
+                            class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <div *ngIf="generalForm.get('address')?.invalid && generalForm.get('address')?.touched"
+                            class="text-red-500 text-xs mt-1">
+                            Endereço é obrigatório.
+                        </div>
+                    </div>
 
-               <!-- Client Filters and Settings -->
-  <div class="w-full mt-6">
-    <app-checkbox formControlName="exemptFromFines" label="Isento de Multas"
-        (checkedChange)="onCheckboxValueChange('isentoDeMultas', $event)"></app-checkbox>
-</div>
+                    <div class="space-y-2">
+                        <label for="nuit"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">NUIT</label>
+                        <input formControlName="nuit" id="nuit" #nuitInput (input)="onNumberInputChange(nuitInput)"
+                            class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <div *ngIf="generalForm.get('nuit')?.invalid && generalForm.get('nuit')?.touched"
+                            class="text-red-500 text-xs mt-1">
+                            NUIT deve conter 9 números.
+                        </div>
+                    </div>
 
-<div class="w-full mt-4">
-    <app-checkbox formControlName="wantsReceiptSMS" label="Receber Recibo"
-        (checkedChange)="onCheckboxValueChange('receberRecibo', $event)"></app-checkbox>
-</div>
+                    <div class="space-y-2">
+                        <label for="balance"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Saldo</label>
+                        <input formControlName="balance" id="balance" readonly
+                            class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-not-allowed">
+                    </div>
+                </div>
 
-<div class="w-full mt-4">
-    <app-checkbox formControlName="wantsInvoiceSMS" label="Receber Factura"
-        (checkedChange)="onCheckboxValueChange('receberFactura', $event)"></app-checkbox>
-</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label for="contractStatus"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Estado do
+                            Contrato</label>
+                        <input formControlName="contractStatus" id="contractStatus" readonly
+                            class="h-11 w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-not-allowed">
+                    </div>
 
+                    <div class="space-y-2">
+                        <label for="contractTypeId"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Tipo de
+                            Contrato</label>
+                        <select formControlName="contractTypeId" id="contractTypeId"
+                            class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <option *ngFor="let type of contractTypeData" [value]="type.value">
+                                {{ type.label }}
+                            </option>
+                        </select>
+                        <div *ngIf="generalForm.get('contractTypeId')?.invalid && generalForm.get('contractTypeId')?.touched"
+                            class="text-red-500 text-xs mt-1">
+                            Tipo de Contrato é obrigatório.
+                        </div>
+                    </div>
 
-          </div>
+                    <div class="space-y-2">
+                        <label for="zoneId"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300">Zona</label>
+                        <select formControlName="zoneId" id="zoneId"
+                            class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <option value="">Seleccione...</option>
+                            <option *ngFor="let zone of zoneData" [value]="zone.value">
+                                {{ zone.label }}
+                            </option>
+                        </select>
+                        <div *ngIf="generalForm.get('zoneId')?.invalid && generalForm.get('zoneId')?.touched"
+                            class="text-red-500 text-xs mt-1">
+                            Zona é obrigatória.
+                        </div>
+                    </div>
+                </div>
 
-          <div class="flex justify-end mt-6">
-              <button (click)="saveClient()" [disabled]="generalForm.invalid" class="bg-blue-500 text-white p-2 rounded-lg">
-                  Salvar
-              </button>
-          </div>
-      </form>
-  </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" formControlName="exemptFromFines" id="exemptFromFines"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="exemptFromFines"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Isento de Multas</label>
+                    </div>
 
- 
-  <!-- Client Table -->
-  <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6 mt-6">
-      <h2 class="text-lg font-semibold mb-4">Lista de Clientes</h2>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" formControlName="wantsReceiptSMS" id="wantsReceiptSMS"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="wantsReceiptSMS"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Receber Recibo SMS</label>
+                    </div>
 
-      <div *ngIf="clientsList.length > 0" class="grid grid-cols-2 px-6  w-full">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" formControlName="wantsInvoiceSMS" id="wantsInvoiceSMS"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="wantsInvoiceSMS"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Receber Factura SMS</label>
+                    </div>
+                </div>
 
-        <app-search-input  (searchChange)="filterClients($event)"></app-search-input>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" (click)="cancelEdit()"
+                        class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                        Cancelar
+                    </button>
+                    <button type="submit" (click)="saveClient()"
+                        [disabled]="!generalForm.valid || (isClientSaving$ | async)"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shadow-md">
+                        <div *ngIf="isClientSaving$ | async"
+                            class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        {{ (isClientSaving$ | async) ? 'Atualizando...' : 'Atualizar Cliente' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Client List Section -->
+        <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="space-y-2">
+                        <label for="zoneFilter"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Bairro</label>
+                        <select id="zoneFilter" (change)="filterClients(searchTerm, $any($event.target).value)"
+                            class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <option *ngFor="let zone of zoneData" [value]="zone.value"
+                                [selected]="zone.value === selectedZoneId">
+                                {{ zone.label }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        <label for="clientSearch"
+                            class="text-sm font-medium text-slate-700 dark:text-slate-300">Pesquisar Cliente</label>
+                        <div class="relative">
+                            <input type="text" id="clientSearch" [value]="searchTerm"
+                                (input)="filterClients($any($event.target).value, selectedZoneId)"
+                                placeholder="Pesquisar por nome, contacto, NUIT..."
+                                class="h-11 w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="flex items-end justify-end">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">
+                            {{ filteredClients.length }} de {{ clientsList.length }} clientes
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div *ngIf="isClientLoading$ | async" class="space-y-4">
+                    <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-1/3"></div>
+                    <div *ngFor="let i of [1,2,3,4,5]"
+                        class="h-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                </div>
+
+                <div *ngIf="!(isClientLoading$ | async)">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Lista de Clientes</h2>
+
+                        <label *ngIf="paginatedClients.length > 0"
+                            class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                            <input type="checkbox" [checked]="isAllSelected()" [indeterminate]="isIndeterminate()"
+                                (change)="toggleSelectAll()"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            Seleccionar Todos (página atual)
+                        </label>
+                    </div>
+
+                    <div *ngIf="paginatedClients && paginatedClients.length > 0" class="overflow-x-auto">
+                        <table class="w-full min-w-[800px] border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 dark:border-slate-700">
+                                    <th
+                                        class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm">
+                                        <input type="checkbox" [checked]="isAllSelected()"
+                                            [indeterminate]="isIndeterminate()" (change)="toggleSelectAll()"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    </th>
+                                    <th *ngFor="let column of clientColumns"
+                                        class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm cursor-pointer hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+                                        {{ column.label }}
+                                    </th>
+                                    <th
+                                        class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm">
+                                        Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let client of paginatedClients"
+                                    class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                                    (click)="editClient(client)">
+                                    <td class="py-3 px-4" (click)="$event.stopPropagation()">
+                                        <input type="checkbox" [checked]="selectedClients.includes(client)"
+                                            (change)="toggleSelection(client)"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ client.clientId
+                                        }}</td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ client.name }}
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{
+                                        client.phoneNumber }}</td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ client.address
+                                        }}</td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ client.nuit }}
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                            [class]="getContractStatusColor(client.contractStatus)">
+                                            {{ getContractStatusLabel(client.contractStatus) }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{
+                                        client.exemptFromFines ? 'Sim' : 'Não' }}</td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{
+                                        client.contractType }}</td>
+                                    <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ client.zone }}
+                                    </td>
+                                        <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100 font-mono">{{
+                                            client.balance | number:'1.2-2' }}</td>
+                                    <td class="py-3 px-4" (click)="$event.stopPropagation()">
+                                        <button (click)="editClient(client)"
+                                            class="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div *ngIf="paginatedClients.length === 0 && !(isClientLoading$ | async)" class="text-center py-12">
+                         <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+                        <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">Nenhum cliente
+                            encontrado</h3>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Tente ajustar os filtros de pesquisa.
+                        </p>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <div *ngIf="filteredClients.length > itemsPerPage"
+                        class="flex justify-center items-center mt-6 p-4 border-t border-slate-200 dark:border-slate-700 space-x-2">
+
+                        <button (click)="goToPage(1)" [disabled]="currentPage === 1"
+                            class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+                            <span class="sr-only">Primeira Página</span>
+                            &lt;&lt;
+                            <span
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Primeira</span>
+                        </button>
+
+                        <button (click)="previousPage()" [disabled]="currentPage === 1"
+                            class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+                            <span class="sr-only">Página Anterior</span>
+                            &lt;
+                            <span
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Anterior</span>
+                        </button>
+
+                        <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+                            <button
+                                *ngIf="i + 1 === 1 || i + 1 === totalPages || (i + 1 >= currentPage - 2 && i + 1 <= currentPage + 2)"
+                                (click)="goToPage(i + 1)" [ngClass]="{
+                  'bg-blue-600 text-white': currentPage === i + 1,
+                  'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600': currentPage !== i + 1
+                }" class="px-3 py-1 text-sm font-medium rounded-lg transition-colors">
+                                {{ i + 1 }}
+                            </button>
+                            <span *ngIf="(i + 1 === currentPage - 3 || i + 1 === currentPage + 3) && totalPages > 5"
+                                class="text-sm text-slate-700 dark:text-slate-300">...</span>
+                        </ng-container>
+
+                        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+                            class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+                            <span class="sr-only">Próxima Página</span>
+                            &gt;
+                            <span
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Seguinte</span>
+                        </button>
+
+                        <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages"
+                            class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+                            <span class="sr-only">Última Página</span>
+                            &gt;&gt;
+                            <span
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Última</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-      <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-          <ng-container *ngIf="clientsList.length > 0; else noData">
-              <app-table
-                  [data]="filteredClients"
-                  [columns]="clientColumns"
-                  [totalCount]="filteredClients.length"
-                  (rowClick)="editClient($event)">
-              </app-table>
-          </ng-container>
-          <ng-template #noData>
-              <div class="text-center p-4">Nenhum cliente disponível</div>
-          </ng-template>
-      </div>
-  </div>
 </div>

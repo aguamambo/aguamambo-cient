@@ -52,7 +52,7 @@ export const listAllCutsFailure = createAction(
 // POST cuts
 export const createCut = createAction(
   '[Cut] Create Cut',
-  props<{ cut: ICut }>()
+  props<{ cut: any }>()
 );
 
 export const createCutSuccess = createAction(

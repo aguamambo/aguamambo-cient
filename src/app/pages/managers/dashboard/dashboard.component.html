@@ -10,7 +10,7 @@
       <app-stats label="Total Clientes" [value]="totalCustomers" subtext="Atualizado" [icon]="customerIcon"></app-stats>
     </div>
 
-    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <!-- <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div class="bg-white border-l border-blue-600 dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-xl">
         <h4 class="text-md font-semibold mb-2 text-blue-600">Comparação com o Mês Anterior</h4>
         <p class="text-sm">Facturas: <span class="font-bold text-blue-600">{{ totalInvoices }}</span></p>
@@ -19,9 +19,9 @@
         <h4 class="text-md font-semibold mb-2 text-yellow-600 ">Comparação com o Mês Anterior</h4>
         <p class="text-sm">Cortes: <span class="font-bold">{{ previousCuts }}</span> → <span class="font-bold text-yellow-600">{{ totalCuts }}</span> (<span [ngClass]="{'text-yellow-600': cutChange > 0, 'text-red-600': cutChange < 0}">{{ cutChange }}%</span>)</p>
       </div>
-    </div>
+    </div> -->
 
-    <div [formGroup]="form" class="mt-6 ml-auto flex w-1/2  justify-end m:flex-row gap-4  sm:items-center">
+    <!-- <div [formGroup]="form" class="mt-6 ml-auto flex w-1/2  justify-end m:flex-row gap-4  sm:items-center">
       <app-custom-select
         formControlName="period"
         class="w-1/5"
@@ -45,16 +45,16 @@
         <app-skeleton lineHeight="24px" lineWidth="30%"></app-skeleton>
         <app-skeleton lineHeight="12rem" lineWidth="100%"></app-skeleton>
       </ng-template>
-    </div>
+    </div> -->
 
-    <div class="mt-8 p-4 bg-blue-100 dark:bg-blue-900 rounded-md text-sm text-blue-900 dark:text-blue-100">
+    <!-- <div class="mt-8 p-4 bg-blue-100 dark:bg-blue-900 rounded-md text-sm text-blue-900 dark:text-blue-100">
       <p><strong>Análise:</strong> O número de cortes subiu <span class="font-bold text-red-600">{{ cutChange }}%</span> em relação ao período anterior.</p>
-    </div>
+    </div> -->
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 mt-8 shadow-md hover:shadow-xl">
+    <!-- <div class="bg-white dark:bg-gray-800 rounded-xl p-4 mt-8 shadow-md hover:shadow-xl">
       <h3 class="text-lg font-semibold mb-4">Últimas Facturas Emitidas</h3>
       <app-table [data]="recentInvoices" [columns]="invoiceColumns" [totalCount]="recentInvoices.length"></app-table>
-    </div>
+    </div> -->
 
     
   </div>
