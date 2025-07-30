@@ -1,18 +1,12 @@
 import { filter } from 'rxjs';
 import { IOption } from './../../../../../models/option';
-import * as pdfjsLib from 'pdfjs-dist';
-import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser'; 
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { select, Store } from '@ngrx/store';
 import { first, Observable, Subject, takeUntil } from 'rxjs';
 import { IReceipt } from 'src/app/models/receipt';
-import { IAppState, getZoneByEnterpriseId, getClientByZoneId, getWaterBillByReadingId, listAllReceipts, getReceiptFile } from 'src/app/store';
-import { selectSelectedClients } from 'src/app/store/selectors/client.selectors';
-import { selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
-import { selectSelectedEnterprises } from 'src/app/store/selectors/enterprise.selectors';
-import { selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
-import { selectReceiptIsLoading, selectSelectedReceipt, selectSelectedReceiptFile, selectSelectedReceipts } from 'src/app/store/selectors/receipt.selectors';
-import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
+import { IAppState, listAllReceipts, getReceiptFile, clearReceiptFile } from 'src/app/store';
+import { selectReceiptIsLoading, selectSelectedReceiptFile, selectSelectedReceipts } from 'src/app/store/selectors/receipt.selectors';
 
 @Component({
   selector: 'app-list-receipt',
@@ -20,145 +14,150 @@ import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
   styleUrl: './list-receipt.component.css'
 })
 export class ListReceiptComponent implements OnInit, OnDestroy {
-  receiptsList: IReceipt[] = [];
-  receiptsData: IReceipt[] = [];
-  filteredReceipts: IReceipt[] = [];
-  monthsData: IOption[] = [];
-  counter: string = '';
-  clientData: IOption[] = [];
-  clientMetersData: IOption[] = [];
-  fileUrl: SafeUrl | null = null;
-  zoneData: IOption[] = []; 
-  lastreceipt: number = 0;
-  enterpriseData: IOption[] = [];
-  receiptColumns: { key: keyof IReceipt; label: string }[] = [];
-  isEditing: boolean = false;
-  selectedreceipt!: IReceipt;
-  isDialogOpen: boolean = false;
-  dialogType: 'success' | 'error' = 'success'; 
-  dialogMessage = ''; 
-  pdfUrl: SafeResourceUrl | null = null;
-  
-  isReceiptsLoading$: Observable<boolean>; 
+  receiptsList: IReceipt[] = []; // Original list of receipts from the store
+  receiptsData: IReceipt[] = []; // Formatted receipts list for display
+  filteredReceipts: IReceipt[] = []; // Receipts filtered by search term
+
+  receiptColumns: { key: keyof IReceipt; label: string }[] = []; // Configuration for table columns
+
+  isDialogOpen: boolean = false; // Controls visibility of the PDF dialog
+  dialogMessage = ''; // Message displayed in the PDF loading dialog
+  title = '';
+  pdfUrl: SafeResourceUrl | null = null; // URL for the PDF to be displayed in the iframe
+  isReceiptsLoading$: Observable<boolean>;
+
+  private receiptCancel$ = new Subject<void>();
   private destroy$ = new Subject<void>();
-  getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
-  getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
-  getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
-  getreceipts$ = this.store.pipe(select(selectSelectedReceipt));
-  getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
 
-  constructor( private store: Store<IAppState>, private sanitizer: DomSanitizer) {
+  // Pagination properties
+  currentPage: number = 1;
+  itemsPerPage: number = 10; // Number of items to display per page
+  totalPages: number = 0;
+  paginatedReceipts: IReceipt[] = []; // Receipts for the current page
 
-    this.isReceiptsLoading$ = this.store.select(selectReceiptIsLoading); 
+  // NGRX Selectors
+  getReceiptsFromStore$ = this.store.pipe(select(selectSelectedReceipts));
+  getSelectedReceiptFile$ = this.store.pipe(select(selectSelectedReceiptFile));
+
+  constructor(private store: Store<IAppState>, private sanitizer: DomSanitizer) {
+    this.isReceiptsLoading$ = this.store.select(selectReceiptIsLoading);
 
     this.receiptColumns = [
-      { key: 'receiptID', label: 'Código' }, 
-      { key: 'paymentMethod', label: 'Metodo de Pagamento' }, 
+      { key: 'receiptID', label: 'Código' },
+      { key: 'paymentMethod', label: 'Metodo de Pagamento' },
       { key: 'paymentDate', label: 'Data do Pagamento' },
       { key: 'amount', label: 'Valor Pago' },
       { key: 'purpose', label: 'Finalidade' },
-      { key: 'clientId', label: 'Id Cliente' } 
+      { key: 'clientId', label: 'Id Cliente' }
     ];
- 
   }
 
   ngOnInit(): void {
-    this.loadData(); 
+    this.loadData();
   }
 
+  /**
+   * Dispatches action to load all receipts and subscribes to updates from the store.
+   * Formats date fields for display and initializes pagination.
+   */
   private loadData(): void {
-    this.generateMonths()
     this.store.dispatch(listAllReceipts());
-    this.store.pipe(select(selectSelectedReceipts), takeUntil(this.destroy$)).subscribe(receipts => {
+    this.getReceiptsFromStore$.pipe(takeUntil(this.destroy$)).subscribe(receipts => {
       if (receipts) {
-        this.receiptsList = receipts;
+        this.receiptsList = receipts; // Keep original data for filtering
         this.receiptsData = receipts.map(receipt => ({
-          ...receipt, 
+          ...receipt,
           paymentDate: this.formatDate(receipt.paymentDate)
         }));
-
-        this.filteredReceipts = [...this.receiptsData]
+        this.filteredReceipts = [...this.receiptsData]; // Initialize filtered list
+        this.calculatePagination(); // Calculate pagination for the initial load
       }
     });
   }
-  
+
+  /**
+   * Filters the receipts list based on a search term across all receipt properties.
+   * @param searchTerm The text to search for.
+   */
   filterReceipts(searchTerm: string): void {
     const searchTermLower = searchTerm.toLowerCase();
-    this.filteredReceipts = this.receiptsData.filter(receipt =>
+    this.filteredReceipts = this.receiptsList.filter(receipt =>
       Object.values(receipt).some(value =>
         String(value).toLowerCase().includes(searchTermLower)
       )
     );
-  }
-   
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-   
-  generateMonths(): void {
-    this.monthsData = [
-      { value: '1', label: 'Janeiro' },
-      { value: '2', label: 'Fevereiro' },
-      { value: '3', label: 'Março' },
-      { value: '4', label: 'Abril' },
-      { value: '5', label: 'Maio' },
-      { value: '6', label: 'Junho' },
-      { value: '7', label: 'Julho' },
-      { value: '8', label: 'Agosto' },
-      { value: '9', label: 'Setembro' },
-      { value: '10', label: 'Outubro' },
-      { value: '11', label: 'Novembro' },
-      { value: '12', label: 'Dezembro' }
-    ];
+    this.currentPage = 1; // Reset to first page on filter change
+    this.calculatePagination(); // Recalculate pagination after filtering
   }
 
+  /**
+   * Handles the click event on a receipt row to display its associated PDF.
+   * @param receipt The selected receipt object.
+   */
   getReceipt(receipt: IReceipt): void {
-    if (receipt) {
-      this.isDialogOpen = true;
+    if (receipt && receipt.receiptID) {
+
+      this.receiptCancel$.next();
+      this.title = 'Recibo'
+      this.isDialogOpen = true; // Open the dialog
+      this.dialogMessage = 'Carregando PDF...'; // Set loading message
+      this.pdfUrl = null; // Clear previous PDF URL
+
+      this.store.dispatch(clearReceiptFile());
+
       this.store.dispatch(getReceiptFile({ receiptId: receipt.receiptID }));
-  
-      this.store
-        .pipe(
-          select(selectSelectedReceiptFile),
-          filter((file) => !!file), 
-          first()
-        )
-        .subscribe(file => {
-           if(file){ 
-            this.handleBase64File(file.base64)
-           }
-        });}
-    }
- 
-  
-  handleBase64File(base64String: string): void {
-      const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, '');
-      this.openPdfFromBase64(cleanBase64);
-     
-  }
 
-  openPdfFromBase64(base64: string, mimeType: string = 'application/pdf'): void {
-    const blob = this.base64ToBlob(base64, mimeType);
-    const url = URL.createObjectURL(blob);
-    this.pdfUrl = url;
-    const pdfWindow = window.open('');
-    if (pdfWindow) {
-      this.isDialogOpen = false;
-      pdfWindow.document.write(`
-        <iframe 
-          width="100%" 
-          height="100%" 
-          src="${url}" 
-          frameborder="0" 
-          allowfullscreen>
-        </iframe>
-      `);
+      this.getSelectedReceiptFile$.pipe(
+        filter((file) => !!file),
+        first(),
+        takeUntil(this.destroy$)
+      ).subscribe(file => {
+        if (file && file.base64) {
+          this.handleBase64File(file.base64);
+        } else {
+          this.dialogMessage = 'Não foi possível carregar o PDF.';
+        }
+      });
     } else {
-      console.error('Unable to open a new window for the PDF.');
+      console.warn('Receipt ID is missing for PDF retrieval.');
     }
   }
 
+  /**
+   * Converts a base64 string to a Blob and creates a URL for PDF display.
+   * @param base64String The base64 encoded PDF string.
+   */
+  handleBase64File(base64String: string): void {
+    // Remove potential data URI prefix if present
+    const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, '');
+    this.openPdfFromBase64(cleanBase64);
+  }
+
+  /**
+   * Creates an object URL from a base64 string and sets it as the iframe source.
+   * @param base64 The base64 string of the PDF.
+   * @param mimeType The MIME type of the file (defaults to 'application/pdf').
+   */
+  openPdfFromBase64(base64: string, mimeType: string = 'application/pdf'): void {
+    try {
+      const blob = this.base64ToBlob(base64, mimeType);
+      const url = URL.createObjectURL(blob);
+      // Use DomSanitizer to mark the URL as safe for resource URLs
+      this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      this.dialogMessage = ''; // Clear loading message on success
+    } catch (error) {
+      console.error('Error opening PDF from Base64:', error);
+      this.dialogMessage = 'Erro ao exibir PDF.';
+      this.pdfUrl = null;
+    }
+  }
+
+  /**
+   * Converts a base64 string to a Blob object.
+   * @param base64 The base64 string.
+   * @param mimeType The MIME type of the data.
+   * @returns A Blob object.
+   */
   private base64ToBlob(base64: string, mimeType: string = 'application/octet-stream'): Blob {
     const binaryString = atob(base64);
     const length = binaryString.length;
@@ -167,8 +166,13 @@ export class ListReceiptComponent implements OnInit, OnDestroy {
       byteArray[i] = binaryString.charCodeAt(i);
     }
     return new Blob([byteArray], { type: mimeType });
-  } 
-  
+  }
+
+  /**
+   * Formats a date string into 'dd-MM-yyyy' format.
+   * @param dateString The date string to format.
+   * @returns The formatted date string.
+   */
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -177,8 +181,53 @@ export class ListReceiptComponent implements OnInit, OnDestroy {
     return `${day}-${month}-${year}`;
   }
 
+  /**
+   * Closes the PDF viewing dialog and resets the PDF URL.
+   */
   closeDialog(): void {
-    this.isDialogOpen = false; 
-    this.pdfUrl = null
+    this.isDialogOpen = false;
+    this.pdfUrl = null; // Clear the PDF URL when closing the dialog
+  }
+
+  // --- Pagination Logic ---
+
+  /**
+   * Calculates total pages and updates the paginatedReceipts array based on current page and items per page.
+   */
+  calculatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredReceipts.length / this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedReceipts = this.filteredReceipts.slice(startIndex, endIndex);
+  }
+
+  /**
+   * Navigates to a specific page.
+   * @param page The page number to navigate to.
+   */
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.calculatePagination();
+    }
+  }
+
+  /**
+   * Navigates to the previous page.
+   */
+  previousPage(): void {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  /**
+   * Navigates to the next page.
+   */
+  nextPage(): void {
+    this.goToPage(this.currentPage + 1);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

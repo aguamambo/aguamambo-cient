@@ -1,71 +1,172 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text  transition duration-300 h-full">
-    <app-breadcrumb title="Lista de Recibos" [breadcrumbItems]="['Dashboard', 'Listar Recibos']">
-    </app-breadcrumb>
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-screen">
+  <div class="mx-auto px-4 py-8 space-y-6 ">
 
-    <ng-container *ngIf="(isReceiptsLoading$ | async)">
-        <div class="flex flex-col justify-center my-4 gap-1">
-            <app-loading-spinner></app-loading-spinner>
-            <span class="flex justify-center text-sm">
-                Carregando dados...
-            </span>
-        </div>
-    </ng-container>
-
-    <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md p-6">
-            <h2 class="text-lg font-semibold mb-4">Lista de Recibos</h2>
-            <div *ngIf="receiptsList.length > 0" class="grid grid-cols-2 px-6  w-full">
-
-                <app-search-input  (searchChange)="filterReceipts($event)"></app-search-input>
-            </div>
-
-            <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md shadow-md">
-                <ng-container *ngIf="receiptsList.length > 0; else noData">
-                    <app-table [data]="filteredReceipts" [columns]="receiptColumns" [totalCount]="filteredReceipts.length"
-                        (rowClick)="getReceipt($event)">
-                    </app-table>
-                </ng-container>
-                <ng-template #noData>
-                    <div class="text-center p-4">Nenhum recibo disponível</div>
-                </ng-template>
-            </div>
-        </div>
+    <!-- Loading State -->
+    <div *ngIf="isReceiptsLoading$ | async" class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div class="w-8 h-8 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Carregando dados...</p>
     </div>
 
+    <!-- Main Content -->
+    <div *ngIf="!(isReceiptsLoading$ | async)" class="space-y-6">
 
-    <div *ngIf="isDialogOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full">
-            <!-- Header -->
-            <div class="flex justify-between items-center">
-                <h2 class="text-lg font-semibold">Visualizar PDF</h2>
-                <button class="text-gray-400 hover:text-gray-600" (click)="closeDialog()">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                        fill="currentColor">
-                        <path
-                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                    </svg>
-                </button>
-            </div>
+      <!-- Header Section -->
+      <div class="space-y-4">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm">
+          <a href="/dashboard"
+            class="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Dashboard
+          </a>
+          <span class="text-slate-400 dark:text-slate-500">/</span>
+          <span class="font-medium text-slate-900 dark:text-slate-100">Lista de Recibos</span>
+        </nav>
 
-            <!-- Content -->
-            <div class="mt-4">
-                <ng-container *ngIf="pdfUrl; else loading">
-                    <iframe width="100%" height="100%" [src]="pdfUrl" frameborder="0" allowfullscreen>
-                    </iframe>
-                </ng-container>
-                <ng-template #loading>
-                    <div class="flex flex-col gap-4 items-center">
-                        <app-loading-spinner></app-loading-spinner>
-                        <p class="text-gray-700">{{ dialogMessage || 'Carregando PDF...' }}</p>
-                    </div>
-                </ng-template>
-            </div>
-
-            <!-- Footer -->
-            <div class="flex justify-end mt-6">
-                <button class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-                    (click)="closeDialog()">Fechar</button>
-            </div>
+        <!-- Page Title -->
+        <div class="flex items-center space-x-3 p-4">
+          <div class="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Lista de Recibos</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              Visualize e gerencie todos os registros de recibos
+            </p>
+          </div>
         </div>
+      </div>
+
+      <!-- Main Card for Filters and Table -->
+      <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <!-- Search Input -->
+            <div class="space-y-2 md:col-span-2">
+              <label for="receiptSearch" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Pesquisar Recibo</label>
+              <div class="relative">
+                <input type="text" id="receiptSearch" (input)="filterReceipts($any($event.target).value)"
+                  placeholder="Pesquisar por código, cliente, método de pagamento..."
+                  class="h-11 w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" fill="none"
+                  stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="paginatedReceipts && paginatedReceipts.length > 0; else noData" class="overflow-x-auto">
+            <table class="w-full min-w-[1000px] border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-700">
+                  <th *ngFor="let column of receiptColumns"
+                    class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm">
+                    {{ column.label }}
+                  </th>
+                  <th class="text-left py-3 px-4 font-medium text-slate-700 dark:text-slate-300 text-sm">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let receipt of paginatedReceipts"
+                  class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                  (click)="getReceipt(receipt)">
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ receipt.receiptID }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ receipt.paymentMethod }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ receipt.paymentDate }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ receipt.amount | number }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ receipt.purpose }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ receipt.clientId }}</td>
+                  <td class="py-3 px-4">
+                    <button (click)="getReceipt(receipt)"
+                      class="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noData>
+            <div class="text-center py-12">
+              <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+              </svg>
+              <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">Nenhum recibo encontrado</h3>
+              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Tente ajustar os filtros de pesquisa.</p>
+            </div>
+          </ng-template>
+
+          <!-- Pagination Controls -->
+          <div *ngIf="filteredReceipts.length > itemsPerPage"
+            class="flex justify-center items-center mt-6 p-4 border-t border-slate-200 dark:border-slate-700 space-x-2">
+
+            <button (click)="goToPage(1)" [disabled]="currentPage === 1"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Primeira Página</span>
+              &lt;&lt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Primeira</span>
+            </button>
+
+            <button (click)="previousPage()" [disabled]="currentPage === 1"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Página Anterior</span>
+              &lt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Anterior</span>
+            </button>
+
+            <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+              <button *ngIf="i + 1 === 1 || i + 1 === totalPages || (i + 1 >= currentPage - 2 && i + 1 <= currentPage + 2)"
+                (click)="goToPage(i + 1)"
+                [ngClass]="{
+                  'bg-blue-600 text-white': currentPage === i + 1,
+                  'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600': currentPage !== i + 1
+                }"
+                class="px-3 py-1 text-sm font-medium rounded-lg transition-colors">
+                {{ i + 1 }}
+              </button>
+              <span *ngIf="(i + 1 === currentPage - 3 || i + 1 === currentPage + 3) && totalPages > 5"
+                class="text-sm text-slate-700 dark:text-slate-300">...</span>
+            </ng-container>
+
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Próxima Página</span>
+              &gt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Seguinte</span>
+            </button>
+
+            <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages"
+              class="relative px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors group">
+              <span class="sr-only">Última Página</span>
+              &gt;&gt;
+              <span
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden w-max px-2 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300">Última</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<app-pdf-viewer [isOpen]="isDialogOpen"  [pdfUrl]="pdfUrl"  [dialogMessage]="'Carregando o documento...'"
+  (closed)="isDialogOpen = false" [title]="title">
+</app-pdf-viewer>

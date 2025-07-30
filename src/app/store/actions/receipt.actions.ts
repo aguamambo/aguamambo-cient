@@ -144,6 +144,7 @@ export const loadReceiptsCountFailure = createAction(
   props<{ error: any }>()
 );
 
+export const clearReceiptFile = createAction('[Receipt] Clear Receipt File');
 
 export const resetReceiptActions = createAction(
   '[Receipt] Reset all actions'
