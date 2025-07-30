@@ -45,7 +45,8 @@ import {
   getInvoiceByZoneIdSuccess, 
   loadInvoicesByZone,
   loadInvoicesByZoneFailure,
-  loadInvoicesByZoneSuccess
+  loadInvoicesByZoneSuccess,
+  clearInvoiceFile
 } from '../actions/invoice.actions';
 import { Update } from '@ngrx/entity';
 import { IFile } from 'src/app/models/file';
@@ -83,6 +84,12 @@ export const initialState: IInvoiceState = adapter.getInitialState({
 
 const reducer = createReducer(
   initialState,
+
+  on(clearInvoiceFile, (state) => ({
+  ...state,
+  selectedWaterBillFile: null,
+  selectedWaterBillsFile: null
+})),
 
   // Get invoice by ID
   on(getInvoice, (state) => ({ ...state, isLoading: true })),

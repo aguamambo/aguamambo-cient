@@ -238,6 +238,7 @@ export const loadInvoicesCountFailure = createAction(
   props<{ error: Error }>()
 );
 
+export const clearInvoiceFile = createAction('[Invoice] Clear Invoice File');
 
 export const resetInvoiceActions = createAction(
   '[Invoice] Reset all actions'

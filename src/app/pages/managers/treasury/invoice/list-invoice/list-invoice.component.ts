@@ -5,7 +5,7 @@ import { filter, first, Observable, Subject, takeUntil } from 'rxjs';
 import { IInvoice } from 'src/app/models/invoice';
 import { IOption } from 'src/app/models/option';
 import { IZone } from 'src/app/models/zone';
-import { IAppState, listAllInvoices, getWaterBillByReadingId, resetInvoiceActions, getInvoiceByZoneId, getWaterBillsByZoneId, listAllZones } from 'src/app/store';
+import { IAppState, listAllInvoices, getWaterBillByReadingId, resetInvoiceActions, getInvoiceByZoneId, getWaterBillsByZoneId, listAllZones, clearInvoiceFile } from 'src/app/store';
 import { selectInvoiceIsLoading, selectInvoices, selectSelectedWaterBill, selectSelectedWaterBills } from 'src/app/store/selectors/invoice.selectors';
 import { selectSelectedZones } from 'src/app/store/selectors/zone.selectors';
 
@@ -30,12 +30,13 @@ export class ListInvoiceComponent implements OnInit, OnDestroy {
 
   isDialogOpen: boolean = false; // Controls visibility of the PDF dialog
   dialogMessage = ''; // Message displayed in the PDF loading dialog
+  title: string = ''; 
   pdfUrl: SafeResourceUrl | null = null; // URL for the PDF to be displayed in the iframe
 
   isInvoicesLoading$: Observable<boolean>; // Observable for invoice loading state
 
   private destroy$ = new Subject<void>(); // Subject to manage component unsubscription
-
+  private invoiceCancel$ = new Subject<void>();
   // Pagination properties
   currentPage: number = 1;
   itemsPerPage: number = 10; // Number of items to display per page
@@ -47,6 +48,7 @@ export class ListInvoiceComponent implements OnInit, OnDestroy {
   getInvoicesFromStore$ = this.store.pipe(select(selectInvoices));
   getSelectedWaterBill$ = this.store.pipe(select(selectSelectedWaterBill));
   getSelectedWaterBills$ = this.store.pipe(select(selectSelectedWaterBills));
+
 
   constructor(private store: Store<IAppState>, private sanitizer: DomSanitizer) {
     this.isInvoicesLoading$ = this.store.select(selectInvoiceIsLoading);
@@ -201,10 +203,14 @@ export class ListInvoiceComponent implements OnInit, OnDestroy {
    */
   getInvoice(invoice: IInvoice): void {
     if (invoice && invoice.readingId) {
+
+      this.invoiceCancel$.next();
+
       this.isDialogOpen = true; // Open the dialog
       this.dialogMessage = 'Carregando PDF...'; // Set loading message
+      this.title = 'Factura'
       this.pdfUrl = null; // Clear previous PDF URL
-
+      this.store.dispatch(clearInvoiceFile());
       this.store.dispatch(getWaterBillByReadingId({ readingId: invoice.readingId }));
 
       this.getSelectedWaterBill$.pipe(

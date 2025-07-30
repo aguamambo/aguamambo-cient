@@ -1,38 +1,21 @@
-// pdf-viewer.component.ts
-import { Component, Input, OnInit, OnDestroy } from '@angular/core'; 
-import { PdfService } from 'src/app/services/pdf.service';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
   styleUrls: ['./pdf-viewer.component.css']
 })
-export class PdfViewerComponent implements OnInit, OnDestroy {
-  @Input() readingId: string = '';  
-  pdfUrl: string | null = null;  
+export class PdfViewerComponent {
+  @Input() isOpen = false;
+  @Input() pdfUrl: SafeResourceUrl | null = null
+  @Input() dialogMessage: string = 'Carregando PDF...';
+  @Input() title: string = 'Docuemnto';
 
-  constructor(private pdfService: PdfService) {}
+  @Output() closed = new EventEmitter<void>();
 
-  ngOnInit(): void {
-    if (this.readingId) {
-      this.loadPdf();
-    }
+  closeDialog() {
+    this.closed.emit();
   }
 
-  loadPdf(): void { 
-    this.pdfService.getPdfFile(`/invoice/waterBill/${this.readingId}`).subscribe({
-      next: (pdfBlob) => {
-        this.pdfUrl = URL.createObjectURL(pdfBlob);  
-      },
-      error: (err) => {
-        console.error('Erro ao carregar PDF:', err);
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.pdfUrl) {
-      URL.revokeObjectURL(this.pdfUrl); 
-    }
-  }
 }
