@@ -45,7 +45,7 @@ export class AuthEffects {
                     map(authResponse => loginSuccess({ authResponse: authResponse })),
                     catchError(error => {
                         this.errorMessage.getErrorMessage(error.status, error.error);
-                        return of(loginFailure({ error }));
+                        return of(loginFailure({ error: error.error }));
                     })
                 )
             )

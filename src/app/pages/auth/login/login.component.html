@@ -1,5 +1,5 @@
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-zinc-500 to-gray-400 p-4 select-none">
-    <app-card-ui class="w-1/5 h-full space-y-2">
+    <app-card-ui class="w-1/5 lg:w-1/4 h-full space-y-2">
         <div class="flex justify-center ">
             <img src="../../../assets/img/EAgua_1.png" alt="Sistema de Gestão de Água" class="h-16">
         </div>
@@ -16,7 +16,7 @@
                         <line x1="12" x2="12" y1="8" y2="12"/>
                         <line x1="12" x2="12.01" y1="16" y2="16"/>
                     </svg>
-                    <app-alert-description class="text-red-700">{{ loginError }}</app-alert-description>
+                    <app-alert-description class="text-red-700">{{ errorMessage }}</app-alert-description>
                 </app-alert>
             </ng-container>
 

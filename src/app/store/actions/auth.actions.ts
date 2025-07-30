@@ -1,5 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { IAuthResponse } from 'src/app/models/authResponse';
+import { Error } from 'src/app/models/error';
 
 // POST auth/register
 export const register = createAction(
@@ -30,7 +31,7 @@ export const loginSuccess = createAction(
 
 export const loginFailure = createAction(
   '[Auth] Login Failure',
-  props<{ error: any }>()
+  props<{ error: Error }>()
 );
 
 // POST auth/refresh-token

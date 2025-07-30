@@ -2,6 +2,7 @@ import { createReducer, on, Action } from "@ngrx/store";
 import { register, registerSuccess, registerFailure, login, loginSuccess, loginFailure, refreshToken, refreshTokenSuccess, refreshTokenFailure, logout, resetAuthActions } from "../actions";
 import { IAuthResponse } from "src/app/models/authResponse";
 import { IUser } from "src/app/models/user";
+import { Error } from "src/app/models/error";
 
 export interface AuthState {
   currentUser: string;
@@ -9,7 +10,7 @@ export interface AuthState {
   isLoading: boolean;
   loggingIn: boolean;
   loginFailed: boolean;
-  loginError: any;
+  loginError: Error | null;
   errorMessage: string | null;
   successMessage: string | null;
   role: string;
