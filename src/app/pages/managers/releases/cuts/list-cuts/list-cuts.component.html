@@ -1,5 +1,5 @@
 <div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-screen">
-  <div class="mx-auto px-4 py-8 space-y-6">
+  <div class="mx-auto px-4 py-8 space-y-6 max-w-7xl">
 
     <!-- Loading State -->
     <div *ngIf="isLoading" class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -40,7 +40,25 @@
             </div>
           </div>
 
-           
+          <div class="flex items-center gap-3">
+            <button *ngIf="selectedCuts.length > 0" (click)="deleteSelected()"
+              class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Eliminar ({{ selectedCuts.length }})
+            </button>
+
+            <button (click)="exportExcel()" [disabled]="!enableExportButton"
+              class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Exportar Excel
+            </button>
+          </div>
         </div>
       </div>
 
@@ -79,6 +97,18 @@
               </div>
             </div>
 
+            <div class="space-y-2">
+              <label for="endDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Data de Fim</label>
+              <input type="date" formControlName="endDate" id="endDate"
+                class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <div *ngIf="cutForm.get('endDate')?.invalid && cutForm.get('endDate')?.touched" class="text-red-500 text-xs mt-1">
+                Data de Fim é obrigatória.
+              </div>
+            </div>
+
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="space-y-2">
               <label for="meterId" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Contador Afectado</label>
               <input formControlName="meterId" id="meterId"
@@ -168,7 +198,8 @@
                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                   </td>
                   <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ cut.cutId }}</td>
-                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ cut.startDate }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ cut.startDate | date:'dd-MM-yyyy' }}</td>
+                  <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ cut.endDate | date:'dd-MM-yyyy' }}</td>
                   <td class="py-3 px-4 text-sm text-slate-900 dark:text-slate-100">{{ cut.meterId }}</td>
                   <td class="py-3 px-4" (click)="$event.stopPropagation()">
                     <button (click)="editCut(cut)"
@@ -185,7 +216,7 @@
           </div>
 
           <div *ngIf="paginatedCuts.length === 0 && !isLoading" class="text-center py-12">
-             <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>

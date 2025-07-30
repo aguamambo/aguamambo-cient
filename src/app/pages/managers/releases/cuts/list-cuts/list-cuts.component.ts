@@ -41,10 +41,11 @@ export class ListCutsComponent implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder, private store: Store<IAppState>) {
     // Initialize the form with controls and validators
-    this.cutForm = this.fb.group({
+   this.cutForm = this.fb.group({
       // cutId is typically read-only, so disable it in the form
       cutId: new FormControl({ value: '', disabled: true }, Validators.required),
       startDate: ['', Validators.required],
+      endDate: ['', Validators.required], // Added endDate form control
       meterId: ['', Validators.required]
     });
 
@@ -56,6 +57,7 @@ export class ListCutsComponent implements OnInit, OnDestroy {
     this.cutColumns = [
       { key: 'cutId', label: 'Código de Corte' },
       { key: 'startDate', label: 'Data de Início' },
+      { key: 'endDate', label: 'Data de Fim' }, // Added endDate column
       { key: 'meterId', label: 'Contador afectado' }
     ];
   }
@@ -119,19 +121,31 @@ export class ListCutsComponent implements OnInit, OnDestroy {
     this.isEditing = true;
     this.selectedCut = cut;
 
+    
     // Convert the startDate to 'YYYY-MM-DD' format required by input type="date"
-    let formattedDateForInput = '';
+    let formattedStartDateForInput = '';
     if (cut.startDate) {
       const date = new Date(cut.startDate);
       // Ensure the date is valid before formatting
       if (!isNaN(date.getTime())) {
-        formattedDateForInput = date.toISOString().split('T')[0];
+        formattedStartDateForInput = date.toISOString().split('T')[0];
       }
     }
 
+    // Convert the endDate to 'YYYY-MM-DD' format required by input type="date"
+    let formattedEndDateForInput = '';
+    if (cut.endDate) { // Assuming ICut now has an endDate property
+      const date = new Date(cut.endDate);
+      if (!isNaN(date.getTime())) {
+        formattedEndDateForInput = date.toISOString().split('T')[0];
+      }
+    }
+
+
     this.cutForm.patchValue({
       cutId: cut.cutId,
-      startDate: formattedDateForInput, // Patch with YYYY-MM-DD format
+      startDate: formattedStartDateForInput, // Patch with YYYY-MM-DD format
+      endDate: formattedEndDateForInput, // Patch with YYYY-MM-DD format
       meterId: cut.meterId
     });
   }
@@ -150,8 +164,18 @@ export class ListCutsComponent implements OnInit, OnDestroy {
    */
   submitForm(): void {
     if (this.cutForm.valid && this.isEditing) {
-      // Use getRawValue() to include values from disabled form controls (like cutId)
-      const payload = this.cutForm.getRawValue();
+       const formValues = this.cutForm.getRawValue();
+
+      // Format startDate and endDate to YYYY-MM-DDTHH:mm:ss
+      const formattedStartDate = formValues.startDate ? `${formValues.startDate}T00:00:00` : null;
+      const formattedEndDate = formValues.endDate ? `${formValues.endDate}T00:00:00` : null;
+
+      const payload = {
+        ...formValues,
+        startDate: formattedStartDate,
+        endDate: formattedEndDate
+      };
+
       this.store.dispatch(updateCut({ cutId: this.selectedCut.cutId, cut: payload }));
 
       // Optionally, listen for success actions to reset form/hide edit section

@@ -555,13 +555,7 @@ export class RegisterReceiptComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this._dialogService.open({
-      title: 'Processando',
-      message: 'Aguarde um instante enquanto guarda as informações do pagamento.',
-      type: 'loading',
-      isProcessing: true,
-    });
-
+    
     // Manually construct the receipt payload
     const receiptPayload = {
       paymentDate: this.fullDate,

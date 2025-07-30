@@ -102,6 +102,7 @@ export class RegisterSuspensionComponent implements OnInit, OnDestroy {
       client: new FormControl('', Validators.required),
       meterId: new FormControl(null, Validators.required),
       startDate: new FormControl(formattedDate, Validators.required), // Initialize with current date
+      endDate: new FormControl('1900-01-01T00:00:00'), // Initialize with current date
       suspensionReason: new FormControl('', Validators.required),
       readingYear: new FormControl(String(this.year), Validators.required), // Initialize with current year
       readingMonth: new FormControl('', Validators.required), // Keep as is, or set a default month
@@ -220,6 +221,7 @@ export class RegisterSuspensionComponent implements OnInit, OnDestroy {
         meterId: formData.meterId,
         reason: formData.suspensionReason,
         startDate: formData.startDate,
+        endDate: formData.endDate,
         updatedAt: new Date().toISOString(),
       };
 
