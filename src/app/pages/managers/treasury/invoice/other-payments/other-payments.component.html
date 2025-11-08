@@ -2,7 +2,7 @@
     <app-breadcrumb title="Outros Pagamentos" [breadcrumbItems]="['Dashboard', 'Outros Pagamentos']"></app-breadcrumb>
 
     <div class="flex flex-col w-full p-4 gap-4 items-center justify-center h-full">
-        <div class="p-8 bg-white dark:bg-slate-700 shadow-md rounded-3xl grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-8 w-full max-w-7xl bg-white dark:bg-slate-700 shadow-md rounded-3xl grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <app-autocomplete-input label="Cliente" [dataSource]="clientData"
                     (valueSelected)="onClientSelected($event)">

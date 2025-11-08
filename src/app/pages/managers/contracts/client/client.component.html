@@ -1,136 +1,151 @@
-<div class="flex flex-col gap-4 p-4 dark:bg-medium-dark dark:text-primary-dark-text transition duration-300">
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div class=" px-4 py-8 space-y-6">
 
-    <div class="bg-light-mode dark:bg-deep-dark w-full min-h-[60vh] h-full rounded-lg p-4">
-        <ng-container *ngIf="(isClientSaving$ | async) || (isZonesLoading$ | async)">
-            <div class="flex flex-col justify-center my-4 gap-1">
-                <app-loading-spinner></app-loading-spinner>
-                <span class="flex justify-center text-sm">
-                    <ng-container *ngIf="(isClientSaving$ | async); else loadingData">
-                        Salvando dados do cliente
-                    </ng-container>
-                    <ng-template #loadingData>
-                        Carregando dados
-                    </ng-template>
-                </span>
-            </div>
-        </ng-container>
-
-       
-        <div class="bg-light-mode dark:bg-deep-dark w-full h-full rounded-md ">
-            <form [formGroup]="clientForm" class=" py-4 dark:bg-deep-dark ">
-                <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center ">
-                    <div class="w-full">
-                        <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Nome</label>
-                        <input type="text" formControlName="name"
-                            class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                    </div>
-                    <div class="w-full">
-                        <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Nuit</label>
-                        <input type="text" formControlName="nuit" #nuit (input)="onNumberInputChange(nuit)"
-                            class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                    </div>
-                    <div class="w-full">
-                        <label
-                            class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contacto</label>
-                        <div class="w-full flex">
-                            <span
-                                class="p-2.5 border border-gray-300 text-deep-dark dark:text-light-mode font-medium bg-light-mode dark:bg-slate-500 text-sm rounded-l-lg ">+258</span>
-                            <input type="text" formControlName="phoneNumber" #telefone
-                                (input)="onNumberInputChange(telefone)"
-                                class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                        </div>
-                    </div>
-                    <div class="w-full">
-                        <label class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Contacto
-                            Alternativo</label>
-                        <div class="w-full flex">
-                            <span
-                                class="p-2.5 border border-gray-300 text-deep-dark dark:text-light-mode font-medium bg-light-mode dark:bg-slate-500 text-sm rounded-l-lg ">+258</span>
-                            <input type="text" formControlName="alternativeNumber" #alternative
-                                (input)="onNumberInputChange(alternative)"
-                                class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                        </div>
-                    </div>
-
-
-                </div>
-                <div class="flex flex-col lg:flex-row w-full p-4 gap-4 items-center ">
-                    <div class="w-full">
-                        <app-custom-select formControlName="zoneId" label="Zona" [options]="zoneData"
-                            (selectedValueChange)="onEnterpriseSelect($event)">
-                        </app-custom-select>
-                    </div>
-
-
-                    <div class="w-full">
-                        <label
-                            class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Endereço</label>
-                        <input type="text" formControlName="address"
-                            class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                    </div>
-                    <div class="w-full">
-                        <label
-                            class="block text-sm font-medium text-deep-dark dark:text-light-mode mb-2">Observação</label>
-                        <input type="text" formControlName="observation"
-                            class="border border-gray-300 text-gray-900 bg-light-mode dark:bg-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 cursor-text" />
-                    </div>
-
-
-
-                </div>
-                <div class="p-4">
-                    <button (click)="toggleAccordion()"
-                        class="w-full flex justify-between items-center border text-deep-dark dark:text-light-mode p-3 rounded-lg focus:outline-none">
-                        <span class="font-semibold">Ver Informações Sobre as Opções</span>
-                        <svg *ngIf="!isAccordionOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                        <svg *ngIf="isAccordionOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 15l-7-7-7 7" />
-                        </svg>
-                    </button>
-
-                    <div *ngIf="isAccordionOpen" class="p-4">
-                        <p class="mb-4 text-blue-700">
-                            Leia atentamente cada uma das opções abaixo para entender como elas podem impactar a
-                            experiência do
-                            cliente com o
-                            serviço.
-                        </p>
-
-                        <ul class="list-disc p-4 text-gray-700">
-                            <li class="mb-3">
-                                <strong>Isento de Multas:</strong> O cliente é isento de penalidades por atrasos no
-                                pagamento.
-                            </li>
-                            <li class="mb-3">
-                                <strong>Receber Recibo:</strong> O cliente passará a receber recibos após cada
-                                transação.
-                            </li>
-                            <li class="mb-3">
-                                <strong>Receber Factura:</strong> O cliente passará a receber faturas detalhadas
-                                mensalmente.
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="flex flex-col md:flex-row w-full p-4 gap-4 items-center ">
-                    <div class="w-full">
-                        <app-checkbox formControlName="exemptFromFines" label="Isento de Multas"
-                            (checkedChange)="onCheckboxValueChange('exemptFromFines', $event)"></app-checkbox>
-                    </div>
-                    <div class="w-full">
-                        <app-checkbox formControlName="wantsReceiptSMS" label="Receber Recibo"
-                            (checkedChange)="onCheckboxValueChange('wantsReceiptSMS', $event)"></app-checkbox>
-                    </div>
-                    <div class="w-full">
-                        <app-checkbox formControlName="wantsInvoiceSMS" label="Receber Factura"
-                            (checkedChange)="onCheckboxValueChange('wantsInvoiceSMS', $event)"></app-checkbox>
-                    </div>
-                </div>
-            </form> 
-            
+    <!-- Cabeçalho da Página -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 112-2h2a2 2 0 112 2">
+            </path>
+          </svg>
         </div>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Criação de Cliente</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            Preencha os campos abaixo para criar um novo cliente.
+          </p>
+        </div>
+      </div>
     </div>
+
+    <!-- Indicador de Carregamento/Salvando -->
+    <ng-container *ngIf="(isClientSaving$ | async) || (isZonesLoading$ | async)">
+      <div class="flex flex-col justify-center my-4 gap-1">
+        <div class="flex justify-center">
+          <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+        <span class="flex justify-center text-sm text-slate-600 dark:text-slate-400">
+          <ng-container *ngIf="(isClientSaving$ | async); else loadingData">
+            Salvando dados do cliente...
+          </ng-container>
+          <ng-template #loadingData>
+            Carregando dados...
+          </ng-template>
+        </span>
+      </div>
+    </ng-container>
+
+    <!-- Formulário do Cliente -->
+    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border-0 p-6">
+      <form [formGroup]="clientForm" class="space-y-6">
+
+        <!-- Linha 1: Nome, Nuit e Contactos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nome</label>
+            <input type="text" formControlName="name"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nuit</label>
+            <input type="text" formControlName="nuit" #nuit (input)="onNumberInputChange(nuit)"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Contacto</label>
+            <div class="flex rounded-md shadow-sm">
+              <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-sm">
+                +258
+              </span>
+              <input type="text" formControlName="phoneNumber" #telefone (input)="onNumberInputChange(telefone)"
+                class="flex-1 min-w-0 h-11 block w-full rounded-none rounded-r-md px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Contacto Alternativo</label>
+            <div class="flex rounded-md shadow-sm">
+              <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-sm">
+                +258
+              </span>
+              <input type="text" formControlName="alternativeNumber" #alternative (input)="onNumberInputChange(alternative)"
+                class="flex-1 min-w-0 h-11 block w-full rounded-none rounded-r-md px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha 2: Zona, Endereço e Observação -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Zona</label>
+            <app-custom-select formControlName="zoneId" [options]="zoneData" (selectedValueChange)="onEnterpriseSelect($event)">
+            </app-custom-select>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Endereço</label>
+            <input type="text" formControlName="address"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Observação</label>
+            <input type="text" formControlName="observation"
+              class="h-11 w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          </div>
+        </div>
+
+        <!-- Acordeão com informações das opções -->
+        <div class="space-y-4">
+          <button (click)="toggleAccordion()" type="button"
+            class="w-full flex justify-between items-center bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors shadow-sm">
+            <span class="font-semibold">Ver Informações Sobre as Opções</span>
+            <svg *ngIf="!isAccordionOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 transition-transform duration-300">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+            <svg *ngIf="isAccordionOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 transition-transform duration-300 rotate-180">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 15l-7-7-7 7"></path>
+            </svg>
+          </button>
+          
+          <div *ngIf="isAccordionOpen" class="p-4 bg-slate-50 dark:bg-slate-700 rounded-md transition-all duration-300">
+            <p class="mb-4 text-blue-700 dark:text-blue-400">
+              Leia atentamente cada uma das opções abaixo para entender como elas podem impactar a experiência do cliente com o serviço.
+            </p>
+            <ul class="list-disc pl-5 text-slate-700 dark:text-slate-300 space-y-2">
+              <li>
+                <strong>Isento de Multas:</strong> O cliente é isento de penalidades por atrasos no pagamento.
+              </li>
+              <li>
+                <strong>Receber Recibo:</strong> O cliente passará a receber recibos após cada transação.
+              </li>
+              <li>
+                <strong>Receber Factura:</strong> O cliente passará a receber faturas detalhadas mensalmente.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Checkbox Options -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <app-checkbox formControlName="exemptFromFines" label="Isento de Multas"
+            (checkedChange)="onCheckboxValueChange('exemptFromFines', $event)"></app-checkbox>
+          <app-checkbox formControlName="wantsReceiptSMS" label="Receber Recibo"
+            (checkedChange)="onCheckboxValueChange('wantsReceiptSMS', $event)"></app-checkbox>
+          <app-checkbox formControlName="wantsInvoiceSMS" label="Receber Factura"
+            (checkedChange)="onCheckboxValueChange('wantsInvoiceSMS', $event)"></app-checkbox>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex justify-end pt-4">
+          <button type="submit" (click)="saveClient()"
+            [disabled]="clientForm.invalid || (isClientSaving$ | async)"
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shadow-md">
+            <div *ngIf="isClientSaving$ | async"
+              class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            {{ (isClientSaving$ | async) ? 'Salvando...' : 'Salvar Cliente' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

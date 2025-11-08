@@ -27,7 +27,7 @@
   <!-- Lista de opções -->
   <ul
     *ngIf="filteredData.length > 0"
-    class="absolute z-10 w-full mt-1 bg-light-mode dark:bg-slate-500 border border-gray-300 rounded-lg shadow-lg"
+    class="absolute z-10 w-full mt-1 bg-light-mode dark:bg-slate-500 border border-gray-300 rounded-lg shadow-lg  h-52 overflow-y-auto"
   >
     <li
       *ngFor="let option of filteredData; let i = index"

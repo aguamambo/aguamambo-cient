@@ -1,5 +1,5 @@
 import { resetReadingActions } from './../../../../../store/actions/reading.actions';
-import { getClientByZoneId, resetClientActions } from './../../../../../store/actions/client.actions';
+import { getClientByZoneId, listAllClients, resetClientActions } from './../../../../../store/actions/client.actions';
 import { getZoneByEnterpriseId, resetZonesActions } from './../../../../../store/actions/zone.actions';
 import { selectReadingErrorMessage, selectReadingIsSaving, selectReadingStatusCode, selectReadingSuccessMessage, selectSelectedMeterReading, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
 import { Component, OnInit, OnDestroy } from "@angular/core";
@@ -154,6 +154,7 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
 
   // New method for initial data loading
   loadInitialData(): void {
+    this.getAllClients()
     this._dialogService.reset();
     this.store.dispatch(listAllEnterprises());
     this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
@@ -167,6 +168,23 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
         ];
       }
     });
+  }
+
+  getAllClients(): void {
+    this.store.dispatch(listAllClients());
+      this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
+        (clients) => {
+          if (clients) {
+            this.clientsList = clients;
+            this.clientData = [ 
+              ...clients.map(client => ({ label: client.name, value: client.clientId }))
+            ];
+          }
+        },
+        () => {
+          console.log('error', 'Erro ao carregar clientes.');
+        }
+      );
   }
 
   generateYearsList(): void {
@@ -312,25 +330,12 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
     this.selectedClientId = null;
 
     if (zoneId) {
-      this.store.dispatch(getClientByZoneId({ zoneId }));
-      this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
-        (clients) => {
-          if (clients) {
-            this.clientsList = clients;
-            this.clientData = [ 
-              ...clients.map(client => ({ label: client.name, value: client.clientId }))
-            ];
-          }
-        },
-        () => {
-          console.log('error', 'Erro ao carregar clientes.');
-        }
-      );
+      
     }
   }
 
-  onClientChange(event: Event): void {
-    let clientId = (event.target as HTMLSelectElement).value
+  onClientChange(event: IOption): void {
+    let clientId = event.value
     this.selectedClientId = clientId;
     this.registReadingForm.get('client')?.setValue(clientId);
 
