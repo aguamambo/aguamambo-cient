@@ -131,7 +131,7 @@ export class RegisterReceiptComponent implements OnInit, OnDestroy {
     ];
   }
 
-ngOnInit() {
+  ngOnInit() {
     this.getData();
     this.updateDetailItems();
   }
@@ -205,9 +205,9 @@ ngOnInit() {
     this.getPaymentMethods$.pipe(filter((paymentMethods) => !!paymentMethods), first()).subscribe(paymentMethods => {
       if (paymentMethods) {
         this.paymentMethods = [...paymentMethods.map(paymentMethod => ({
-            label: paymentMethod,
-            value: paymentMethod,
-          })),
+          label: paymentMethod,
+          value: paymentMethod,
+        })),
         ];
         const mpesaOption = this.paymentMethods.find(method => method.value === 'MPESA');
         if (mpesaOption) {
@@ -282,10 +282,14 @@ ngOnInit() {
           this.selectedContractId = this.firstContract.value;
           this.selectedMeterId = this.firstContract.label;
           this.counter = this.firstContract.label;
-          this.contractsData = contracts.map(contract => ({
-            label: contract.meterId,
-            value: contract.contractId,
-          }));
+          this.contractsData = contracts
+            .filter((contract, index, self) =>
+              index === self.findIndex(c => c.meterId === contract.meterId)
+            )
+            .map(contract => ({
+              label: contract.meterId,
+              value: contract.contractId,
+            }));
           this.onContractSelected(this.firstContract);
         } else {
           this.selectedContractId = '';
@@ -301,8 +305,8 @@ ngOnInit() {
       console.log(this.detailItems);
       this.showDetailsCard = true;
     }
-  } 
-  
+  }
+
   onContractSelected(event: { value: string; label: string }): void {
     if (event && event.value) {
       this.selectedContractId = event.value;
@@ -574,9 +578,7 @@ ngOnInit() {
     this.selectedClientName = '';
     this.selectedContractId = '';
     this.selectedMeterId = '';
-    this.counter = 'Selecione...';
-    this.zoneData = [{ label: 'Seleccione a zona', value: '' }];
-    this.clientData = [{ label: 'Seleccione o cliente', value: '' }];
+    this.counter = '';
     this.contractsData = [{ label: 'Selecione o contador', value: '' }];
     this.showDetailsCard = false;
     this.updateDetailItems();

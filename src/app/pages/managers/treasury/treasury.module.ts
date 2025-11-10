@@ -6,6 +6,7 @@ import { ListReceiptComponent } from "./receipt/list-receipt/list-receipt.compon
 import { RegisterReceiptComponent } from "./receipt/register-receipt/register-receipt.component";
 import { TreasuryRoutingModule } from "./treasury-routing.module";
 import { OtherPaymentsComponent } from './invoice/other-payments/other-payments.component';
+import { FormsModule } from "@angular/forms";
 
  
 @NgModule({
@@ -18,7 +19,8 @@ import { OtherPaymentsComponent } from './invoice/other-payments/other-payments.
   imports: [
     CommonModule,
     TreasuryRoutingModule,
-    SharedModule
+    SharedModule,
+    FormsModule
 ],
   exports: [
     
