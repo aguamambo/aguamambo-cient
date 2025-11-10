@@ -301,85 +301,8 @@ ngOnInit() {
       console.log(this.detailItems);
       this.showDetailsCard = true;
     }
-  }
-
-
-  onClientSelect(event: { value: string; label: string }): void {
-    if (event && event.value) {
-      this.selectedClientId = event.value;
-      this.selectedClientName = event.label;
-      this.selectedZoneId = '';
-      this.selectedZoneName = '';
-      this.selectedEnterpriseId = '';
-      this.selectedEnterpriseName = '';
-      this.selectedContractId = '';
-      this.selectedMeterId = '';
-      this.counter = 'Selecione...';
-      this.contractsData = [{ label: 'Selecione o contador', value: '' }];
-      this.resetPaymentCalculations();
-      this.updateDetailItems();
-
-      this.store.dispatch(getZoneByClientId({ clientId: event.value }));
-
-      this.store.pipe(select(selectSelectedZone), filter((zone) => !!zone), first()).subscribe((zone) => {
-        if (zone) {
-          this.selectedZone = zone;
-          this.selectedZoneId = zone.zoneId;
-          this.selectedZoneName = zone.description;
-          this.updateDetailItems();
-
-          this.store.dispatch(getEnterpriseByZoneId({ zoneId: this.selectedZoneId }));
-
-          this.store.pipe(select(selectSelectedEnterprise), filter((enterprise) => !!enterprise), first()).subscribe((enterprise) => {
-            if (enterprise) {
-              this.selectedEnterprise = enterprise;
-              this.selectedEnterpriseId = enterprise.enterpriseId;
-              this.selectedEnterpriseName = enterprise.name;
-              this.updateDetailItems();
-            }
-          });
-        }
-      });
-
-      this.store.dispatch(getContractByClientId({ clientId: event.value }));
-
-      this.store.pipe(
-        select(selectSelectedContracts),
-        filter(contracts => !!contracts),
-        first()
-      ).subscribe(contracts => {
-        if (contracts && contracts.length > 0) {
-          this.contractList = contracts;
-          this.firstContract = { value: this.contractList[0].contractId, label: this.contractList[0].meterId };
-          this.selectedContractId = this.firstContract.value;
-          this.selectedMeterId = this.firstContract.label;
-          this.counter = this.firstContract.label;
-          this.contractsData = contracts.map(contract => ({
-            label: contract.meterId,
-            value: contract.contractId,
-          }));
-          this.onContractSelected(this.firstContract);
-        } else {
-          this.selectedContractId = '';
-          this.selectedMeterId = '';
-          this.counter = 'Nenhum contador encontrado';
-          this.contractsData = [];
-          this.resetPaymentCalculations();
-        }
-        this.updateDetailItems();
-      });
-
-      this.showDetailsCard = true;
-
-      if (this.customerBalance < 0) {
-        this.showAmountInput = true;
-      }
-    } else {
-      this.resetField();
-    }
-  }
-
-
+  } 
+  
   onContractSelected(event: { value: string; label: string }): void {
     if (event && event.value) {
       this.selectedContractId = event.value;

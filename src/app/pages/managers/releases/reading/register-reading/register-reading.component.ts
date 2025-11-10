@@ -1,12 +1,12 @@
 import { resetReadingActions } from './../../../../../store/actions/reading.actions';
-import { getClientByZoneId, listAllClients, resetClientActions } from './../../../../../store/actions/client.actions';
-import { getZoneByEnterpriseId, resetZonesActions } from './../../../../../store/actions/zone.actions';
+import {  listAllClients, resetClientActions } from './../../../../../store/actions/client.actions';
+import { getZoneByClientId } from './../../../../../store/actions/zone.actions';
 import { selectReadingErrorMessage, selectReadingIsSaving, selectReadingStatusCode, selectReadingSuccessMessage, selectSelectedMeterReading, selectSelectedReading } from './../../../../../store/selectors/reading.selectors';
 import { Component, OnInit, OnDestroy } from "@angular/core";
-import { FormControl, FormGroup, ValidatorFn, AbstractControl, ValidationErrors, Validators } from "@angular/forms"; // Added Validators
+import { FormControl, FormGroup, ValidatorFn, AbstractControl, ValidationErrors, Validators } from "@angular/forms";
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { select, Store } from "@ngrx/store";
-import { filter, first, Observable, skipWhile, Subject, takeUntil, combineLatest, map } from "rxjs"; // Added combineLatest, map
+import { filter, first, Observable, skipWhile, Subject, takeUntil, combineLatest, map } from "rxjs";
 import { IClient } from "src/app/models/client";
 import { IEnterprise } from "src/app/models/enterprise";
 import { IOption } from "src/app/models/option";
@@ -14,12 +14,12 @@ import { IReading } from "src/app/models/reading";
 import { IZone } from "src/app/models/zone";
 import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
-import { IAppState, createInvoice, createReading, getClientMeterByClient, getLastReadingByMeter, getWaterBillByReadingId, listAllEnterprises, resetClientMetersActions, resetEnterpriseActions, resetInvoiceActions } from 'src/app/store';
+import { IAppState, createInvoice, createReading, getClientMeterByClient, getEnterpriseByZoneId, getLastReadingByMeter, getWaterBillByReadingId, resetClientMetersActions, resetInvoiceActions } from 'src/app/store';
 import { selectClientIsLoading, selectSelectedClients } from 'src/app/store/selectors/client.selectors';
 import { selectClientMeterIsLoading, selectSelectedClientMeters } from 'src/app/store/selectors/clientMeter.selectors';
-import { selectEnterpriseIsLoading, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
+import { selectEnterpriseIsLoading, selectSelectedEnterprise, selectSelectedEnterprises } from "src/app/store/selectors/enterprise.selectors";
 import { selectInvoiceError, selectInvoice, selectSelectedWaterBill } from 'src/app/store/selectors/invoice.selectors';
-import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
+import { selectSelectedZone, selectSelectedZones, selectZoneIsLoading } from "src/app/store/selectors/zone.selectors";
 
 @Component({
   selector: 'app-register-reading',
@@ -29,61 +29,63 @@ import { selectSelectedZones, selectZoneIsLoading } from "src/app/store/selector
 export class RegisterReadingComponent implements OnInit, OnDestroy {
   registReadingForm: FormGroup;
   lastReading: number = 0;
-  counter: string = ''; // This will now represent the selected meterId label
-  selectedEnterpriseId: string = ''; // Store the ID for dispatching actions
-  selectedZoneId: string = ''; // Store the ID for dispatching actions
-  selectedClientId: string | null = null; // Store the ID for dispatching actions
-  readingId: string | null = null; // Not used in new HTML, but kept for logic
-  fileUrl: SafeUrl | null = null; // Not used in new HTML, but kept for logic
-  
+  counter: string = '';
+  selectedEnterpriseId: string = '';
+  selectedZoneId: string = '';
+  selectedClientId: string | null = null;
+  readingId: string | null = null;
+  fileUrl: SafeUrl | null = null;
+  selectedEnterpriseName: string = '';
+  selectedZoneName: string = '';
+  selectedClientName: string = '';
+  selectedMeterId: string = '';
+
   zoneData: IOption[] = [];
   clientData: IOption[] = [];
   enterpriseData: IOption[] = [];
-  meterData: IOption[] = []; // Renamed from clientMetersData for consistency with HTML
+  meterData: IOption[] = [];
   monthsData: IOption[] = [];
-  
-  zoneList: IZone[] = []; // Raw data from store
-  enterprisesList: IEnterprise[] = []; // Raw data from store
-  clientsList: IClient[] = []; // Raw data from store
-  readingsList: IReading[] = []; // Raw data from store (though only lastReading is used)
+  clientDetatils: { label: string; value: string; icon: string; color: string }[] = [];
 
-  isDialogOpen: boolean = false; // For custom dialog service
+  selectedZone: IZone | null = null;
+  selectedEnterprise: IEnterprise | null = null;
+  clientsList: IClient[] = [];
+  readingsList: IReading[] = [];
+
+  isDialogOpen: boolean = false;
+  showDetailsCard: boolean = false;
   dialogType: 'success' | 'error' = 'success';
   dialogMessage = '';
-  
-  selectedMonth: string = ''; // Value of the selected month
-  selectedYear: string = this.getCurrentYear().toString(); // Value of the selected year
-  currentDate: Date = new Date(); // For displaying current date in header
 
-  pdfUrl: SafeResourceUrl | null = null; // For PDF viewer
+  selectedMonth: string = '';
+  selectedYear: string = this.getCurrentYear().toString();
+  currentDate: Date = new Date();
 
-  yearsData: { label: string; value: string }[] = []; // For year dropdown
-  isFileUploadSelected: boolean = false; // Toggle for manual vs file upload
+  pdfUrl: SafeResourceUrl | null = null;
 
-  // Loading Observables from NgRx Store
-  isZonesLoading$: Observable<boolean>;
-  isEnterprisesLoading$: Observable<boolean>;
+  yearsData: { label: string; value: string }[] = [];
+  isFileUploadSelected: boolean = false;
+
+
   isClientLoading$: Observable<boolean>;
   isMeterLoading$: Observable<boolean>;
   isReadingSaving$: Observable<boolean>;
   errorMessage$: Observable<string>;
   successMessage$: Observable<string>;
 
-  // Combined loading state for the main template spinner
-  isLoading: boolean = true; 
-  isSubmitting: boolean = false; // For submit button loading state
 
-  // NgRx Selectors
-  getZonesByEnterprise$ = this.store.pipe(select(selectSelectedZones));
-  getEnterprises$ = this.store.pipe(select(selectSelectedEnterprises));
+  isLoading: boolean = true;
+  isSubmitting: boolean = false;
+
+
   getClientsByZone$ = this.store.pipe(select(selectSelectedClients));
   getReadingsByCMeterId$ = this.store.pipe(select(selectSelectedMeterReading));
   getCreatedReading$ = this.store.pipe(select(selectSelectedReading));
   getMeterByClientId$ = this.store.pipe(select(selectSelectedClientMeters));
-  statusCode$ = this.store.select(selectReadingStatusCode); // Not directly used in HTML, but kept for potential debugging/logic
-  
+  statusCode$ = this.store.select(selectReadingStatusCode);
+
   private destroy$ = new Subject<void>();
-  user: string = ''; // User name for display
+  user: string = '';
 
   constructor(
     private store: Store<IAppState>,
@@ -91,20 +93,18 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
     private _dialogService: DialogService,
     private sanitizer: DomSanitizer
   ) {
-    // Initialize registReadingForm directly in the constructor
+
     this.registReadingForm = new FormGroup({
-      currentReading: new FormControl(null, [this.currentReadingValidator()]), // Add custom validator
+      currentReading: new FormControl(null, [this.currentReadingValidator()]),
       readingMonth: new FormControl(null, Validators.required),
       readingYear: new FormControl(this.getCurrentYear().toString(), Validators.required),
-      enterprise: new FormControl(null, Validators.required), // New control name
-      zone: new FormControl(null, Validators.required), // New control name
-      client: new FormControl(null, Validators.required), // New control name
-      meter: new FormControl(null, Validators.required) // New control name
+      enterprise: new FormControl(null, Validators.required),
+      zone: new FormControl(null, Validators.required),
+      client: new FormControl(null, Validators.required),
+      meter: new FormControl(null, Validators.required)
     });
 
-    // Initialize loading observables
-    this.isZonesLoading$ = this.store.select(selectZoneIsLoading);
-    this.isEnterprisesLoading$ = this.store.select(selectEnterpriseIsLoading);
+ 
     this.isClientLoading$ = this.store.select(selectClientIsLoading);
     this.isMeterLoading$ = this.store.select(selectClientMeterIsLoading);
     this.isReadingSaving$ = this.store.select(selectReadingIsSaving);
@@ -113,78 +113,77 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Combine all loading states into a single isLoading observable
-    combineLatest([
-      this.isZonesLoading$,
-      this.isEnterprisesLoading$,
-      this.isClientLoading$,
-      this.isMeterLoading$,
-      this.isReadingSaving$
-    ]).pipe(takeUntil(this.destroy$)).subscribe(([zones, enterprises, client, meter, saving]) => {
-      this.isLoading = zones || enterprises || client || meter || saving;
-    });
 
+    combineLatest([ 
+      this.isClientLoading$,
+      this.isReadingSaving$
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([client, saving]) => {
+      this.isLoading = client  || saving;
+    });
+    this.updateDetailItems()
     this.auth.checkSession().then(userName => {
       this.user = userName;
       this.generateYearsList();
-      this.generateMonths(); // Ensure months are generated early
+      this.generateMonths();
       this.loadInitialData();
     });
 
-    // Subscribe to currentReading changes to re-evaluate form validity
+
     this.registReadingForm.get('currentReading')?.valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe(() => {
-      // Trigger validation check on currentReading when lastReading changes
+
       this.registReadingForm.get('currentReading')?.updateValueAndValidity();
     });
   }
 
-  // Custom validator for currentReading
+  updateDetailItems(): void {
+    this.clientDetatils = [
+      { label: 'Empresa', value: this.selectedEnterpriseName || 'N/A', icon: 'building-2', color: 'text-blue-500' },
+      { label: 'Zona', value: this.selectedZoneName || 'N/A', icon: 'map-pin', color: 'text-green-500' },
+      { label: 'Cliente', value: this.selectedClientName || 'N/A', icon: 'user', color: 'text-purple-500' },
+      { label: 'Contador', value: this.selectedMeterId || 'N/A', icon: 'gauge', color: 'text-yellow-500' }
+    ];
+    this.registReadingForm.get('enterprise')?.setValue(this.selectedEnterpriseId);
+    this.registReadingForm.get('zone')?.setValue(this.selectedZoneId);
+    this.registReadingForm.get('client')?.setValue(this.selectedClientId);
+    this.registReadingForm.get('meter')?.setValue(this.selectedMeterId);
+  }
+
+
   currentReadingValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const currentReading = control.value;
       if (currentReading === null || currentReading === undefined || currentReading === '') {
-        return null; // Let Validators.required handle empty
+        return null; 
       }
       const isValid = +currentReading > this.lastReading;
       return isValid ? null : { invalidReading: { value: currentReading, lastReading: this.lastReading } };
     };
   }
 
-  // New method for initial data loading
+
   loadInitialData(): void {
     this.getAllClients()
     this._dialogService.reset();
-    this.store.dispatch(listAllEnterprises());
-    this.getEnterprises$.pipe(takeUntil(this.destroy$)).subscribe((enterprises) => {
-      if (enterprises) {
-        this.enterprisesList = enterprises;
-        this.enterpriseData = [ // Updated label
-          ...enterprises.map(enterprise => ({
-            label: enterprise.name,
-            value: enterprise.enterpriseId
-          }))
-        ];
-      }
-    });
+     
   }
 
   getAllClients(): void {
     this.store.dispatch(listAllClients());
-      this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
-        (clients) => {
-          if (clients) {
-            this.clientsList = clients;
-            this.clientData = [ 
-              ...clients.map(client => ({ label: client.name, value: client.clientId }))
-            ];
-          }
-        },
-        () => {
-          console.log('error', 'Erro ao carregar clientes.');
+    this.getClientsByZone$.pipe(takeUntil(this.destroy$)).subscribe(
+      (clients) => {
+        if (clients) {
+          this.clientsList = clients;
+          this.clientData = [
+            ...clients.map(client => ({ label: client.name, value: client.clientId }))
+          ];
         }
-      );
+      },
+      () => {
+        console.log('error', 'Erro ao carregar clientes.');
+      }
+    );
   }
 
   generateYearsList(): void {
@@ -195,7 +194,7 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
   }
 
   generateMonths(): void {
-    this.monthsData = [ 
+    this.monthsData = [
       { value: '1', label: 'Janeiro' },
       { value: '2', label: 'Fevereiro' },
       { value: '3', label: 'Março' },
@@ -219,14 +218,14 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
     return new Date().getFullYear();
   }
 
-  // --- New/Refactored Event Handlers for HTML Selects ---
+
 
   onFileUploadToggle(): void {
-    // This method is called when the checkbox is toggled.
-    // The [(ngModel)] handles the `isFileUploadSelected` boolean.
-    // You might want to reset manual input fields if switching to file upload mode, and vice-versa.
+
+
+
     if (this.isFileUploadSelected) {
-      // Reset manual input form controls if switching to file upload
+
       this.registReadingForm.get('enterprise')?.reset();
       this.registReadingForm.get('zone')?.reset();
       this.registReadingForm.get('client')?.reset();
@@ -240,11 +239,11 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
       this.selectedEnterpriseId = '';
       this.selectedZoneId = '';
       this.selectedClientId = null;
-    } else {
-      // Reset file upload related states if switching to manual input
-      // (e.g., clear selected file, upload progress)
-      // For now, no specific file upload state to clear in this component
     }
+
+
+
+
   }
 
   onFileSelect(event: Event): void {
@@ -252,9 +251,9 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       console.log('Selected file:', file.name);
-      // TODO: Implement actual file parsing and processing logic here.
-      // You might use a service to read the file (e.g., using FileReader or a library like 'xlsx').
-      // After parsing, you would dispatch actions to save the readings from the file.
+
+
+
       this._dialogService.open({
         title: 'Ficheiro Seleccionado',
         message: `Ficheiro "${file.name}" pronto para processamento. (Funcionalidade de upload a ser implementada)`,
@@ -277,69 +276,59 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
     this.selectedMonth = value;
   }
 
-  onEnterpriseChange(event: Event): void {
-    let enterpriseId  = (event.target as HTMLSelectElement).value
 
-    this.selectedEnterpriseId = enterpriseId;
-    this.registReadingForm.get('enterprise')?.setValue(enterpriseId);
-    
-    // Reset dependent fields and data
-    this.registReadingForm.get('zone')?.reset();
-    this.registReadingForm.get('client')?.reset();
-    this.registReadingForm.get('meter')?.reset();
-    this.lastReading = 0;
-    this.counter = '';
-    this.zoneData = [];
-    this.clientData = [];
-    this.meterData = [];
-    this.selectedZoneId = '';
-    this.selectedClientId = null;
+  onClientSelected(event: { value: string; label: string }): void {
+    if (event && event.value) {
+      this.selectedZoneId = '';
+      this.selectedZoneName = '';
+      this.selectedEnterpriseId = '';
+      this.selectedEnterpriseName = '';
+      this.selectedMeterId = '';
 
-    if (enterpriseId) {
-      this.store.dispatch(getZoneByEnterpriseId({ enterpriseId }));
-      this.getZonesByEnterprise$.pipe(takeUntil(this.destroy$)).subscribe(
-        (zones) => {
-          if (zones) {
-            this.zoneList = zones;
-            this.zoneData = [ 
-              ...zones.map(zone => ({ label: zone.designation, value: zone.zoneId }))
-            ];
-          }
-        },
-        () => {
-          console.log('error', 'Erro ao carregar zonas.');
+      this.selectedClientId = event.value;
+      this.selectedClientName = event.label;
+
+      this.updateDetailItems();
+
+      this.store.dispatch(getZoneByClientId({ clientId: event.value }));
+
+      this.store.pipe(select(selectSelectedZone), filter((zone) => !!zone), first()).subscribe((zone) => {
+        if (zone) {
+          console.log(zone);
+          this.selectedZone = zone;
+          this.selectedZoneId = zone.zoneId;
+
+          this.selectedZoneName = zone.description;
+          this.updateDetailItems();
+
+
+          this.store.dispatch(getEnterpriseByZoneId({ zoneId: this.selectedZoneId }));
+
+          this.store.pipe(select(selectSelectedEnterprise), filter((enterprise) => !!enterprise), first()).subscribe((enterprise) => {
+            if (enterprise) {
+              console.log(enterprise);
+
+              this.selectedEnterprise = enterprise;
+              this.selectedEnterpriseId = enterprise.enterpriseId;
+              this.selectedEnterpriseName = enterprise.name;
+              this.updateDetailItems();
+            }
+          });
         }
-      );
+      });
+
+      this.onClientChange(this.selectedClientId)
+
+      this.showDetailsCard = true;
     }
   }
 
-  onZoneChange(event: Event): void {
-    let zoneId = (event.target as HTMLSelectElement).value
+  onClientChange(clientId: string): void {
 
-    this.selectedZoneId = zoneId
-      
-    this.registReadingForm.get('zone')?.setValue(zoneId);
-
-    // Reset dependent fields and data
-    this.registReadingForm.get('client')?.reset();
-    this.registReadingForm.get('meter')?.reset();
-    this.lastReading = 0;
-    this.counter = '';
-    this.clientData = [];
-    this.meterData = [];
-    this.selectedClientId = null;
-
-    if (zoneId) {
-      
-    }
-  }
-
-  onClientChange(event: IOption): void {
-    let clientId = event.value
     this.selectedClientId = clientId;
     this.registReadingForm.get('client')?.setValue(clientId);
 
-    // Reset dependent fields and data
+
     this.registReadingForm.get('meter')?.reset();
     this.lastReading = 0;
     this.counter = '';
@@ -353,15 +342,15 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
         this.getMeterByClientId$.pipe(takeUntil(this.destroy$)).subscribe(
           (meters) => {
             if (meters && meters.length > 0) {
-              this.meterData = [ 
+              this.meterData = [
                 ...meters.map(meter => ({ label: meter.meterId || '', value: meter.meterId || '' }))
               ];
-              // Automatically select the first meter if only one, or set placeholder
+
               if (meters.length === 1) {
                 this.registReadingForm.get('meter')?.setValue(meters[0].meterId);
                 this.onMeterChange(meters[0].meterId || '');
               } else {
-                this.counter = 'Seleccione o contador'; // Placeholder for multiple meters
+                this.counter = 'Seleccione o contador';
               }
             } else {
               this.meterData = [{ label: 'Nenhum contador encontrado', value: '' }];
@@ -377,17 +366,18 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
   }
 
   onMeterChange(event: Event | string): void {
-  let meterId: string;
+    let meterId: string;
 
-  if (typeof event === 'string') {
-    meterId = event;
-  } else {
-    meterId = (event.target as HTMLSelectElement).value;
-  }
+    if (typeof event === 'string') {
+      meterId = event;
+    } else {
+      meterId = (event.target as HTMLSelectElement).value;
+    }
     this.registReadingForm.get('meter')?.setValue(meterId);
-    this.lastReading = 0; // Reset before fetching new one
-    this.counter = meterId; // Update counter display
-
+    this.lastReading = 0;
+    this.counter = meterId;
+    this.selectedMeterId = meterId;
+    this.updateDetailItems();
     if (meterId) {
       this.store.dispatch(getLastReadingByMeter({ meterId }));
       this.getReadingsByCMeterId$.pipe(
@@ -397,11 +387,11 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
       ).subscribe((readings) => {
         if (readings) {
           this.lastReading = readings.currentReading;
-          this.readingId = readings.readingId; // Store readingId if needed
+          this.readingId = readings.readingId;
         } else {
-          this.lastReading = 0; // No previous reading found
+          this.lastReading = 0;
         }
-        // Re-validate current reading as lastReading has changed
+
         this.registReadingForm.get('currentReading')?.updateValueAndValidity();
       });
     } else {
@@ -413,19 +403,19 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
   onCurrentReadingInput(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
     const sanitizedValue = inputElement.value.replace(/[^0-9]/g, '');
-    inputElement.value = sanitizedValue; // Update the input field directly
+    inputElement.value = sanitizedValue;
 
     if (sanitizedValue) {
-      this.registReadingForm.get('currentReading')?.setValue(+sanitizedValue); // Convert to number
+      this.registReadingForm.get('currentReading')?.setValue(+sanitizedValue);
     } else {
       this.registReadingForm.get('currentReading')?.setValue(null);
     }
-    // The custom validator handles the comparison with lastReading
+
   }
 
-  // --- Form Submission ---
+
   onSubmit(): void {
-    // Mark all controls as touched to show validation errors
+
     this.registReadingForm.markAllAsTouched();
 
     if (this.registReadingForm.valid) {
@@ -443,7 +433,7 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
 
   saveReading(): void {
     this._dialogService.reset();
-    this.isSubmitting = true; // Start submitting state
+    this.isSubmitting = true;
 
     this._dialogService.open({
       title: 'Processando',
@@ -456,7 +446,7 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
 
     const formData = {
       ...this.registReadingForm.value,
-      meterId: this.registReadingForm.get('meter')?.value // Ensure meterId is passed correctly
+      meterId: this.registReadingForm.get('meter')?.value
     };
 
     this.store.dispatch(createReading({ reading: formData }));
@@ -487,7 +477,7 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
                     cancelText: 'Cancelar',
                     errorDetails: error.error
                   });
-                  this.isSubmitting = false; // End submitting state on error
+                  this.isSubmitting = false;
                 } else {
                   this.store
                     .pipe(
@@ -523,17 +513,17 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
                                 this.onReset();
                                 this._dialogService.close(true);
                               }
-                              this.isSubmitting = false; // End submitting state on success
+                              this.isSubmitting = false;
                             },
                             error: () => {
                               console.log('error', 'Falha ao carregar o ficheiro da factura.');
-                              this.isSubmitting = false; // End submitting state on error
+                              this.isSubmitting = false;
                             },
                           });
                       },
                       error: () => {
                         console.log('error', 'Erro ao buscar a factura.');
-                        this.isSubmitting = false; // End submitting state on error
+                        this.isSubmitting = false;
                       },
                     });
                 }
@@ -549,14 +539,14 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
             showConfirmButton: true,
             cancelText: 'Cancelar',
           });
-          this.isSubmitting = false; // End submitting state on error
+          this.isSubmitting = false;
         },
       });
   }
 
-  // Renamed from isFormValid to reflect its new role as a getter for template
-   isFormValid(): boolean {
-    return this.registReadingForm.valid;
+
+  isFormValid(): boolean {
+    return this.registReadingForm.valid && this.registReadingForm.get('currentReading')?.value !== null;
   }
 
   handleBase64File(base64String: string): void {
@@ -565,47 +555,45 @@ export class RegisterReadingComponent implements OnInit, OnDestroy {
   }
 
   onReset(): void {
-    // Dispatch reset actions for all relevant NgRx states
+
     this.store.dispatch(resetReadingActions());
     this.store.dispatch(resetClientActions());
-    this.store.dispatch(resetZonesActions());
-    this.store.dispatch(resetEnterpriseActions());
     this.store.dispatch(resetInvoiceActions());
     this.store.dispatch(resetClientMetersActions());
 
-    // Reset form controls to their initial state
+
     this.registReadingForm.reset({
       currentReading: null,
-      readingMonth: this.getCurrentMonthString(), // Reset to current month
+      readingMonth: this.getCurrentMonthString(),
       readingYear: this.getCurrentYear().toString(),
       enterprise: null,
       zone: null,
       client: null,
       meter: null
     });
-    
-    // Manually clear validation errors after reset
+
+
     this.registReadingForm.markAsUntouched();
     this.registReadingForm.markAsPristine();
 
-    // Reset component local state variables
+
     this.lastReading = 0;
     this.counter = '';
     this.readingId = null;
     this.selectedClientId = null;
     this.selectedEnterpriseId = '';
     this.selectedZoneId = '';
-    
-    // Clear data for dropdowns to be re-fetched
+
+
     this.zoneData = [];
     this.clientData = [];
     this.meterData = [];
-    this.monthsData = []; // Regenerate months to ensure current month is selected
-    this.yearsData = []; // Regenerate years
+    this.monthsData = [];
+    this.yearsData = [];
 
-    this.generateMonths(); // Re-populate months and set current month
-    this.generateYearsList(); // Re-populate years
-    this.loadInitialData(); // Reload initial enterprise data
+    this.generateMonths();
+    this.generateYearsList();
+    this.loadInitialData();
   }
 
   openPdfFromBase64(base64: string): void {
