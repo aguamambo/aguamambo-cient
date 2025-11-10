@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ManagersRoutingModule } from './managers-routing.module';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { SharedModule } from "../../shared/shared.module";
+import { DashboardComponent } from './dashboard/dashboard.component'; 
 import { ReportsComponent } from './reports/reports.component';
 import { BackupComponent } from './backup/backup.component';
 import { SetupComponent } from './setup/setup.component';
@@ -21,6 +20,7 @@ import { ZoneComponent } from './components/zone/zone.component';
 import { ReactiveFormsModule } from '@angular/forms'; 
 import { ContractsModule } from './contracts/contracts.module';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 
 
@@ -38,7 +38,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
      RubricComponent,
      UserComponent,
      FineComponent,
-     InvoicePaymentComponent 
+     InvoicePaymentComponent
     ],
   imports: [
     CommonModule,
@@ -63,7 +63,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     RubricComponent,
     UserComponent,
     FineComponent,
-    InvoicePaymentComponent 
+    InvoicePaymentComponent
   ]
 })
 export class ManagersModule { }
